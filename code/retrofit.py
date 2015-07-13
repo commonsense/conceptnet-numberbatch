@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn import normalize
 
 def retrofit(word_vecs, sparse_assoc, iterations=8, verbose=True, orig_weight=1):
