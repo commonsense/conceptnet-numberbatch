@@ -1,0 +1,5 @@
+paper/*.aux
+paper/*.log
+paper/*.pdf
+.ninja_deps
+.ninja_log

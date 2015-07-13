@@ -1,0 +1,4 @@
+rule build_latex
+  command = pdflatex $in
+
+build wordsim_paper.pdf: build_latex wordsim_paper.tex
