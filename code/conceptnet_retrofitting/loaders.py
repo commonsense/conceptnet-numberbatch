@@ -1,8 +1,6 @@
 import numpy as np
 from scipy import sparse
 
-import pickle
-
 
 def load_vecs(filename):
     return np.load(filename)

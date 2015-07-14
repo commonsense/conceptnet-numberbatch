@@ -25,10 +25,17 @@ rule filter_vecs
 rule standardize_vecs
   command = python -m conceptnet_retrofitting.builders.standardize_vecs $in $out
 
+rule l1_normalize
+  command = python -m conceptnet_retrofitting.builders.l1norm $in $out
+
+
 rule conceptnet_to_assoc
   command = python -m conceptnet_retrofitting.builders.build_assoc $in $out
 
+rule add_self_loops
+  command = python -m conceptnet_retrofitting.builders.self_loops $in $out
+
 rule retrofit
-  command = python -m conceptnet_retrofitting.retrofit $in $out
+  command = python -m conceptnet_retrofitting.builders.retrofit $in $out
 
 #END OF RULES SECTION

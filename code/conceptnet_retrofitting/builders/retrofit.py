@@ -1,12 +1,12 @@
 import numpy as np
-from sklearn import normalize
+from sklearn.preprocessing import normalize
 
 def retrofit(word_vecs, sparse_assoc, iterations=8, verbose=True, orig_weight=1):
-    orig_vecs = normalize(word_vecs, norm='l2')
-    vecs = orig_vecs
 
-    if verbose:
-        print("Retrofitting")
+    orig_vecs = normalize(word_vecs, norm='l2', copy=False)
+
+    vecs = np.zeros(shape=(sparse_assoc.shape[0], orig_vecs.shape[1]))
+    vecs[:orig_vecs.shape[0]] = orig_vecs
 
     for iteration in range(iterations):
         if verbose:
@@ -24,16 +24,25 @@ def retrofit(word_vecs, sparse_assoc, iterations=8, verbose=True, orig_weight=1)
 
     return vecs
 
-def main(vecs_in, assoc_in, vecs_out):
+def main(vecs_in, assoc_in, vecs_out, verbose=True):
     from conceptnet_retrofitting import loaders
 
-    vecs = loaders.load_word_vecs(vecs_in)
-    assoc = loaders.load_sparse(assoc_in)
+    if verbose:
+        print("Loading vectors")
+    vecs = loaders.load_vecs(vecs_in)
 
+    if verbose:
+        print("Loading associations")
+    assoc = loaders.load_csr(assoc_in)
+
+    if verbose:
+        print("Retrofitting")
     vecs = retrofit(vecs, assoc)
 
+    if verbose:
+        print("Saving")
     loaders.save_vecs(vecs, vecs_out)
 
 if __name__ == '__main__':
     import sys
-    main(*sys[1:])
+    main(*sys.argv[1:])

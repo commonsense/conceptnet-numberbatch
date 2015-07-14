@@ -14,7 +14,7 @@ def test_all(similarity_func):
     print("men-3000")
     print(evaluate(similarity_func, parse_men3000()))
     print("rg65")
-    print(evaluate(similarity_func, parse_rg()))
+    print(evaluate(similarity_func, parse_rg65()))
     print("rw")
     print(evaluate(similarity_func, parse_rw()))
 
@@ -22,9 +22,9 @@ def parse_file(filename, sep=None, preprocess_word=None):
     with open(filename) as file:
         for line in file:
             if sep is None:
-                w1, w2, val = line.strip().split()
+                w1, w2, val, *_ = line.strip().split()
             else:
-                w1, w2, val = line.strip().split(sep)
+                w1, w2, val, *_ = line.strip().split(sep)
 
             if preprocess_word is not None:
                 w1 = preprocess_word(w1)
@@ -44,3 +44,28 @@ def parse_rw(filename='data/rw.csv'):
 
 def parse_rg65(filename='data/rg-65.csv'):
     return parse_file(filename)
+
+
+def main(labels_in, vecs_in, verbose=True):
+    from conceptnet_retrofitting import loaders
+    from conceptnet_retrofitting.assoc import AssocSpace
+
+    if verbose:
+        print("Loading labels")
+
+    labels = loaders.load_labels(labels_in)
+
+    if verbose:
+        print("Loading vectors")
+    vecs = loaders.load_vecs(vecs_in)
+
+
+    if verbose:
+        print("Generating AssocSpace")
+    assoc = AssocSpace(labels, vecs)
+
+    test_all(assoc.similarity)
+
+if __name__ == '__main__':
+    import sys
+    main(sys.argv[1], sys.argv[2])

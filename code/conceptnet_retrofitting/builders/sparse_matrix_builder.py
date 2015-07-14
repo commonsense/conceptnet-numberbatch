@@ -18,5 +18,5 @@ class SparseMatrixBuilder:
         self.values.append(val)
 
     def tocsr(self, shape, dtype=float):
-        return sparse.csr_matrix((self.values, (self.rowIndex, self.colIndex)),
-                                shape=shape, dtype=dtype)
+        return sparse.coo_matrix((self.values, (self.rowIndex, self.colIndex)),
+                                shape=shape, dtype=dtype).tocsr()
