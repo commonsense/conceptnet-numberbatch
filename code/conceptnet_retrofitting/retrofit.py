@@ -23,3 +23,17 @@ def retrofit(word_vecs, sparse_assoc, iterations=8, verbose=True, orig_weight=1)
         vecs = new_vecs
 
     return vecs
+
+def main(vecs_in, assoc_in, vecs_out):
+    from conceptnet_retrofitting import loaders
+
+    vecs = loaders.load_word_vecs(vecs_in)
+    assoc = loaders.load_sparse(assoc_in)
+
+    vecs = retrofit(vecs, assoc)
+
+    loaders.save_vecs(vecs, vecs_out)
+
+if __name__ == '__main__':
+    import sys
+    main(*sys[1:])
