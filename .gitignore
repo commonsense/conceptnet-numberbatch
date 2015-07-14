@@ -64,3 +64,5 @@ docs/_build/
 target/
 
 build.ninja
+
+code/data
