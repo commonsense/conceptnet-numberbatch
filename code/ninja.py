@@ -6,7 +6,7 @@ conceptnet_prefix = CONFIG['datapath']+CONFIG['conceptnet5']
 def build_conceptnet_retrofitting():
     graph = DepGraph()
     build_glove(graph)
-    filter_glove(graph)
+    #filter_glove(graph)
     standardize_glove(graph)
     l1_normalize_glove(graph)
 
@@ -38,7 +38,7 @@ def filter_glove(graph):
 
 def standardize_glove(graph):
     graph['standardize_glove'] = Dep(
-        graph['filter_glove'].outputs,
+        [glove_prefix+suffix for suffix in ['.labels', '.npy']],
         [glove_prefix+'.standardized'+suffix for suffix in ['.labels', '.npy']],
         'standardize_vecs'
     )
