@@ -12,36 +12,38 @@ class Dep(namedtuple('dep', ['inputs', 'outputs', 'rule', 'params'])):
         if params is None:
             params = {}
 
-        return super().__new__(inputs, outputs, rule, args)
+        return super().__new__(cls, inputs, outputs, rule, params)
 
 class DepGraph(defaultdict):
 
     def __init__(self):
-        super().__init__(recursive_dict)
+        super().__init__(DepGraph)
 
 def make_ninja_file(rulesfile, deps):
-    with open('build.ninja') as build_file:
+    with open('build.ninja', mode='w') as build_file:
         build_file.write(open(rulesfile).read())
+        build_file.write('\n')
         build_file.write(to_ninja_deps(deps))
+        build_file.write('\n')
 
 def to_ninja_deps(graph):
-    rules = []
+    commands = []
     for val in graph.values():
         if isinstance(val, DepGraph):
-            commands += build_ninja(val)
+            commands.append(to_ninja_deps(val))
         else:
             commands.append(to_ninja_dep(val))
 
-    return "\n\n".join(rules)
+    return "\n\n".join(commands)
 
 def to_ninja_dep(dep):
     lines = []
 
-    lines.append()'build {outputs}: {rule} {inputs}{extra}'.format(
-        outputs=dep.outputs, rule=dep.rule, inputs=dep.inputs, extra=extrastr
+    lines.append('build {outputs}: {rule} {inputs}'.format(
+        outputs=' '.join(dep.outputs), rule=dep.rule, inputs=' '.join(dep.inputs)
     ))
 
-    for key, val in params.items():
-        lines.append(''  {key} = {val}''.format(key=key, val=val))
+    for key, val in dep.params.items():
+        lines.append('  {key} = {val}'.format(key=key, val=val))
 
     return '\n'.join(lines)

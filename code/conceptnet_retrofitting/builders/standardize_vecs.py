@@ -1,5 +1,9 @@
-from collection import OrderedDict
+from collections import OrderedDict
+
+import numpy as np
+
 from conceptnet5.nodes import standardized_concept_uri
+from ftfy import fix_text
 
 class FastIndexSeq:
 
@@ -15,7 +19,10 @@ class FastIndexSeq:
         return self._seq[item]
 
     def __iter__(self):
-        return self._seq
+        return iter(self._seq)
+
+    def __contains__(self, item):
+        return item in self._seq
 
 def standardize_vecs(labels, vecs):
     standardized_labels = FastIndexSeq()
@@ -29,20 +36,20 @@ def standardize_vecs(labels, vecs):
 
         vec /= (index + 1)
 
-        if concept not in labels_to_index:
+        if label not in standardized_labels:
             standardized_labels.append(label)
             standardized_vecs.append(vec)
         else:
-            index = standardize_labels.index(label)
-            standardize_vecs[index] += vec
+            index = standardized_labels.index(label)
+            standardized_vecs[index] += vec
 
-    return list(standardize_labels), np.array(standardize_vecs)
+    return list(standardized_labels), np.array(standardized_vecs)
 
 def main(labels_in, vecs_in, labels_out, vecs_out):
     from conceptnet_retrofitting import loaders
 
     labels = loaders.load_labels(labels_in)
-    vecs = loaders.load_word_vecs(vecs_in)
+    vecs = loaders.load_vecs(vecs_in)
 
     labels, vecs = standardize_vecs(labels, vecs)
 
@@ -51,4 +58,4 @@ def main(labels_in, vecs_in, labels_out, vecs_out):
 
 if __name__ == '__main__':
     import sys
-    main(*sys[1:])
+    main(*sys.argv[1:])

@@ -22,7 +22,7 @@ def save_sparse(sparse_assoc, filename):
 
 
 def load_labels(filename):
-    return [line.strip() for line in open(filename)]
+    return [line.strip() for line in open(filename, encoding='latin-1')]
 
 
 def save_labels(labels, filename):

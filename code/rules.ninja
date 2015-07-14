@@ -16,8 +16,8 @@
 rule glove_to_labels
   command = cut -d" " -f1 $in >$out
 
-rule glove_to_vectors
-  command = cut -d" " -f2- $in | python -m conceptnet_retrofitting.builders.build_vecs $$(wc -l $in) $out
+rule glove_to_vecs
+  command = cut -d" " -f2- $in | python -m conceptnet_retrofitting.builders.build_vecs $out
 
 rule filter_vecs
   command = python -m conceptnet_retrofitting.builders.filter_vecs $in $out
@@ -25,8 +25,7 @@ rule filter_vecs
 rule standardize_vecs
   command = python -m conceptnet_retrofitting.builders.standardize_vecs $in $out
 
-rule parse_conceptnet
-  command = #TODO
-
 rule retrofit
   command = python -m conceptnet_retrofitting.retrofit $in $out
+
+#END OF RULES SECTION
