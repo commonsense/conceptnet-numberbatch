@@ -13,10 +13,12 @@ def test_all(similarity_func):
     print(evaluate(similarity_func, parse_wordsim()))
     print("men-3000")
     print(evaluate(similarity_func, parse_men3000()))
-    print("rg65")
+    print("rg-65")
     print(evaluate(similarity_func, parse_rg65()))
     print("rw")
     print(evaluate(similarity_func, parse_rw()))
+    print("mc-30")
+    print(evaluate(similarity_func, parse_mc30()))
 
 def parse_file(filename, sep=None, preprocess_word=None):
     with open(filename) as file:
@@ -45,6 +47,8 @@ def parse_rw(filename='data/rw.csv'):
 def parse_rg65(filename='data/rg-65.csv'):
     return parse_file(filename)
 
+def parse_mc30(filename='data/mc30.csv'):
+    return parse_file(filename)
 
 def main(labels_in, vecs_in, verbose=True):
     from conceptnet_retrofitting import loaders
