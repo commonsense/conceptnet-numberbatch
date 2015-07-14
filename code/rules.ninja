@@ -25,6 +25,9 @@ rule filter_vecs
 rule standardize_vecs
   command = python -m conceptnet_retrofitting.builders.standardize_vecs $in $out
 
+rule conceptnet_to_assoc
+  command = python -m conceptnet_retrofitting.builders.build_assoc $in $out
+
 rule retrofit
   command = python -m conceptnet_retrofitting.retrofit $in $out
 

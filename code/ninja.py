@@ -2,12 +2,15 @@ from conceptnet_retrofitting.ninja.ninja_util import Dep, DepGraph, make_ninja_f
 from conceptnet_retrofitting.ninja.config import CONFIG
 
 glove_prefix = CONFIG['datapath']+CONFIG['glove']
-
+conceptnet_prefix = CONFIG['datapath']+CONFIG['conceptnet5']
 def build_conceptnet_retrofitting():
     graph = DepGraph()
     build_glove(graph)
     filter_glove(graph)
     standardize_glove(graph)
+
+    build_assoc(graph)
+
     make_ninja_file('rules.ninja', graph)
 
 def build_glove(graph):
@@ -35,6 +38,13 @@ def standardize_glove(graph):
         graph['filter_glove'].outputs,
         [glove_prefix+'.standardized'+suffix for suffix in ['.labels', '.npy']],
         'standardize_vecs'
+    )
+
+def build_assoc(graph):
+    graph['conceptnet_to_assoc'] = Dep(
+        [graph['standardize_glove'].outputs[0], conceptnet_prefix+'.csv'],
+        [glove_prefix+'.with-assoc.labels', conceptnet_prefix+'.npz'],
+        'conceptnet_to_assoc'
     )
 
 if __name__ == '__main__':

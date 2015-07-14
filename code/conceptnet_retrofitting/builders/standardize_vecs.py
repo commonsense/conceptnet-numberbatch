@@ -1,31 +1,12 @@
-from collections import OrderedDict
-
 import numpy as np
 
 from conceptnet5.nodes import standardized_concept_uri
 from ftfy import fix_text
 
-class FastIndexSeq:
-
-    def __init__(self):
-        self._seq =OrderedDict()
-        self._index = 0
-
-    def append(self, item):
-        self._seq[item] = self._index
-        self._index += 1
-
-    def index(self, item):
-        return self._seq[item]
-
-    def __iter__(self):
-        return iter(self._seq)
-
-    def __contains__(self, item):
-        return item in self._seq
+from conceptnet_retrofitting.builders.label_set import LabelSet
 
 def standardize_vecs(labels, vecs):
-    standardized_labels = FastIndexSeq()
+    standardized_labels = LabelSet()
     standardized_vecs = []
 
     for index, (label, vec) in enumerate(zip(labels, vecs)):

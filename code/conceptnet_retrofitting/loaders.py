@@ -12,13 +12,14 @@ def save_vecs(vecs, filename):
     return np.save(filename, vecs)
 
 
-def load_sparse(filename):
-    return pickle.load(filename)
+def save_csr(matrix, filename):
+    np.savez(filename, data=matrix.data, indices=matrix.indices,
+                indptr=matrix.indptr, shape=matrix.shape)
 
 
-def save_sparse(sparse_assoc, filename):
-    with open(filename, mode='wb') as file:
-         pickle.dump(sparse_assoc, filename)
+def load_csr(filename):
+    matrix = np.load(filename)
+    return sparse.csr_matrix((matrix['data'], matrix['indices'], matrix['indptr']), shape=matrix['shape'])
 
 
 def load_labels(filename):
