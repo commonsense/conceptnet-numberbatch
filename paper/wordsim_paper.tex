@@ -36,10 +36,10 @@ using a Unicode case-conversion algorithm
     \cite{unicode2014}, or the context-sensitive algorithm defined in section
     5.18, but fortunately they give the same results on the vocabulary of
     GloVe.
-} and written to a file in UTF-8. No further standardization was applied, including
-NFC normalization. For example, there are two separate entries for the word ``niño'',
-one where ``ñ'' is spelled as one codepoint and one where it is an ``n'' followed by
-a combining tilde.
+} and written to a file in UTF-8. No further standardization was applied,
+including NFC normalization. For example, there are two separate entries for
+the word ``ni\~{n}o'', one where ``\~{n}'' is spelled as one codepoint and one
+where it is an ``n'' followed by a combining tilde.
 
 In the 840B-token dataset, the words are not normalized in any way, including
 lowercasing. It appears that the words were read as bytes from the Common Crawl
