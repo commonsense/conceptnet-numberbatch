@@ -1,0 +1,41 @@
+# This defines the rules on how to build parts of the wordfreq lists, using the
+# Ninja build system:
+#
+#   http://martine.github.io/ninja/manual.html
+#
+# Ninja is available in the 'ninja-build' Ubuntu package. It's like make with
+# better parallelism and the ability for build steps to produce multiple
+# outputs. The tradeoff is that its rule syntax isn't full of magic for
+# expanding wildcards and finding dependencies, so in general you have to
+# write the dependencies using a script.
+#
+# This file will become the header of the larger build.ninja file, which also
+# contains the programatically-defined dependency graph.
+
+
+rule glove_to_labels
+  command = cut -d" " -f1 $in >$out
+
+rule glove_to_vecs
+  command = cut -d" " -f2- $in | python -m conceptnet_retrofitting.builders.build_vecs $out
+
+rule filter_vecs
+  command = python -m conceptnet_retrofitting.builders.filter_vecs $in $out
+
+rule standardize_vecs
+  command = python -m conceptnet_retrofitting.builders.standardize_vecs $in $out
+
+rule l1_normalize
+  command = python -m conceptnet_retrofitting.builders.l1norm $in $out
+
+
+rule conceptnet_to_assoc
+  command = python -m conceptnet_retrofitting.builders.build_assoc $in $out
+
+rule add_self_loops
+  command = python -m conceptnet_retrofitting.builders.self_loops $in $out
+
+rule retrofit
+  command = python -m conceptnet_retrofitting.builders.retrofit $in $out
+
+#END OF RULES SECTION
