@@ -6,6 +6,10 @@ def load_vecs(filename):
     return np.load(filename)
 
 
+def load_vec_memmap(filename):
+    return np.load(filename, mmap_mode='r')
+
+
 def save_vecs(vecs, filename):
     return np.save(filename, vecs)
 

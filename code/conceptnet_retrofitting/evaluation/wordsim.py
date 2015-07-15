@@ -1,5 +1,9 @@
+import os
+
 from scipy.stats import spearmanr
 import numpy as np
+
+directory = os.path.dirname(os.path.abspath(__file__))
 
 def evaluate(similarity_func, standard):
     actual, ideal = [], []
@@ -21,7 +25,7 @@ def test_all(similarity_func):
     print(evaluate(similarity_func, parse_mc30()))
 
 def parse_file(filename, sep=None, preprocess_word=None):
-    with open(filename) as file:
+    with open(os.path.join(directory, 'data', filename)) as file:
         for line in file:
             if sep is None:
                 w1, w2, val, *_ = line.strip().split()
@@ -35,24 +39,24 @@ def parse_file(filename, sep=None, preprocess_word=None):
             yield w1, w2, float(val)
 
 
-def parse_wordsim(filename='data/ws353.csv'):
+def parse_wordsim(filename='ws353.csv'):
     return parse_file(filename, sep=',')
 
-def parse_men3000(filename='data/men3000.csv'):
+def parse_men3000(filename='men3000.csv'):
     return parse_file(filename, preprocess_word=lambda w: w.split('-')[0])
 
-def parse_rw(filename='data/rw.csv'):
+def parse_rw(filename='rw.csv'):
     return parse_file(filename)
 
-def parse_rg65(filename='data/rg-65.csv'):
+def parse_rg65(filename='rg-65.csv'):
     return parse_file(filename)
 
-def parse_mc30(filename='data/mc30.csv'):
+def parse_mc30(filename='mc30.csv'):
     return parse_file(filename)
 
 def main(labels_in, vecs_in, verbose=True):
     from conceptnet_retrofitting import loaders
-    from conceptnet_retrofitting.assoc import AssocSpace
+    from conceptnet_retrofitting.word_vectors import WordVectors
 
     if verbose:
         print("Loading labels")
@@ -61,14 +65,13 @@ def main(labels_in, vecs_in, verbose=True):
 
     if verbose:
         print("Loading vectors")
-    vecs = loaders.load_vecs(vecs_in)
-
+    vecs = loaders.load_vec_memmap(vecs_in)
 
     if verbose:
-        print("Generating AssocSpace")
-    assoc = AssocSpace(labels, vecs)
+        print("Building LabelSet")
+    wv = WordVectors(labels, vecs)
 
-    test_all(assoc.similarity)
+    test_all(wv.similarity)
 
 if __name__ == '__main__':
     import sys

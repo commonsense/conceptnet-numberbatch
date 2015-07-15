@@ -1,10 +1,10 @@
 from collections import defaultdict
 from functools import namedtuple
+from os.path import exists
 
+class Dep(namedtuple('dep', ['inputs', 'outputs', 'rule', 'params', 'use_existing'])):
 
-class Dep(namedtuple('dep', ['inputs', 'outputs', 'rule', 'params'])):
-
-    def __new__(cls, inputs, outputs, rule, params=None):
+    def __new__(cls, inputs, outputs, rule, params=None, use_existing=False):
         if isinstance(inputs, str):
             inputs = [inputs]
         if isinstance(outputs, str):
@@ -12,7 +12,7 @@ class Dep(namedtuple('dep', ['inputs', 'outputs', 'rule', 'params'])):
         if params is None:
             params = {}
 
-        return super().__new__(cls, inputs, outputs, rule, params)
+        return super().__new__(cls, inputs, outputs, rule, params, use_existing)
 
 class DepGraph(defaultdict):
 
@@ -32,6 +32,10 @@ def to_ninja_deps(graph):
         if isinstance(val, DepGraph):
             commands.append(to_ninja_deps(val))
         else:
+            if val.use_existing and \
+                all(exists(output) for output in val.outputs):
+                continue
+
             commands.append(to_ninja_dep(val))
 
     return "\n\n".join(commands)
