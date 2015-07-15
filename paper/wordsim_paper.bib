@@ -1,0 +1,140 @@
+# Guidelines for putting things in this file:
+#
+# - Google Scholar can usually give you the BibTeX data for any paper.
+# - Add a 'url' entry indicating where you can read the paper online.
+# - Add a 'comment' entry indicating why the paper is important and what key
+#   ideas we should cite it for.
+# - Try to keep the papers organized into sections, so we know where to look
+#   when writing about particular topics.
+# - Try to keep each section in chronological order, at least by year.
+
+# Existing implementations of word similarity
+# -------------------------------------------
+
+@article{mikolov2013efficient,
+  author    = {Tomas Mikolov and
+               Kai Chen and
+               Greg Corrado and
+               Jeffrey Dean},
+  title     = {Efficient Estimation of Word Representations in Vector Space},
+  journal   = {CoRR},
+  volume    = {abs/1301.3781},
+  year      = {2013},
+  url       = {http://arxiv.org/abs/1301.3781},
+  timestamp = {Thu, 07 May 2015 20:02:01 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/journals/corr/abs-1301-3781},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+  comment   = {
+    The first publication of word2vec, with its CBOW and skip-gram models.
+  }
+}
+
+@article{pennington2014glove,
+  title={Glove: Global vectors for word representation},
+  author={Pennington, Jeffrey and Socher, Richard and Manning, Christopher D},
+  journal={Proceedings of the Empiricial Methods in Natural Language Processing (EMNLP 2014)},
+  volume={12},
+  pages={1532--1543},
+  year={2014},
+  url={http://www-nlp.stanford.edu/pubs/glove.pdf},
+  comment={
+    GloVe is the best starting point for word embeddings in a vector space, in our view.
+  }
+}
+
+@article{faruqui2014retrofitting,
+  title={Retrofitting word vectors to semantic lexicons},
+  author={Faruqui, Manaal and Dodge, Jesse and Jauhar, Sujay K and Dyer, Chris and Hovy, Eduard and Smith, Noah A},
+  journal={arXiv preprint arXiv:1411.4166},
+  year={2014},
+  url={http://arxiv.org/abs/1411.4166},
+  comment={
+    We're using this method to combine ConceptNet with GloVe.
+  }
+}
+
+@article{levy2015improving,
+  title={Improving distributional similarity with lessons learned from word embeddings},
+  author={Levy, Omer and Goldberg, Yoav and Dagan, Ido},
+  journal={Transactions of the Association for Computational Linguistics},
+  volume={3},
+  pages={211--225},
+  year={2015},
+  url={https://tacl2013.cs.columbia.edu/ojs/index.php/tacl/article/viewFile/570/124},
+  comment={
+    This is a survey of word similarity methods and how they perform with
+    different parameter settings, aiming to "compare apples to apples" when
+    evaluating the claims of word2vec and GloVe.
+
+    One thing it examines is the effect of L2-normalizing the columns of GloVe.
+
+    It also implements a method based on the SVD of the pointwise mutual
+    information matrix, which achieves the best score I've seen on the
+    rare words dataset, besides ours (rho=.514).
+  }
+}
+
+# Ways to extend word similarity
+# ------------------------------
+
+@inproceedings{mikolov2013distributed,
+  title={Distributed representations of words and phrases and their compositionality},
+  author={Mikolov, Tomas and Sutskever, Ilya and Chen, Kai and Corrado, Greg S and Dean, Jeff},
+  booktitle={Advances in neural information processing systems},
+  pages={3111--3119},
+  year={2013},
+  comment={
+    Extends word2vec's skip-gram model to phrases, so it can learn that
+    "Air Canada" is not just "Air" + "Canada".
+  }
+}
+
+# Evaluation data for word similarity
+# -----------------------------------
+
+@article{luong2013better,
+  title={Better word representations with recursive neural networks for morphology},
+  author={Luong, Minh-Thang and Socher, Richard and Manning, Christopher D},
+  journal={CoNLL-2013},
+  volume={104},
+  year={2013},
+  publisher={Citeseer},
+  url={http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.377.5234\&rep=rep1\&type=pdf#page=116},
+  comment={The publication of the Stanford Rare Words (RW) dataset.}
+}
+
+# still need 4 others
+
+# Background on how we got here
+# -----------------------------
+
+@article{havasi2009digital,
+  title={Digital intuition: Applying common sense using dimensionality reduction},
+  author={Havasi, Catherine and Speer, Robert and Pustejovsky, James and Lieberman, Henry},
+  journal={Intelligent Systems, IEEE},
+  volume={24},
+  number={4},
+  pages={24--35},
+  year={2009},
+  publisher={IEEE},
+  url={http://dspace.mit.edu/openaccess-disseminate/1721.1/51870},
+  comment = {
+    This is the paper underlying what eventually became Luminoso, though our
+    methods have changed significantly.
+
+    Don't go looking in this paper for any kind of evaluation that can be
+    compared to anything else; the only task we evaluated was making inferences
+    over ConceptNet.
+  }
+}
+
+@inproceedings{speer2012representing,
+  title={Representing General Relational Knowledge in ConceptNet 5},
+  author={Speer, Robert and Havasi, Catherine},
+  booktitle={LREC},
+  pages={3679--3686},
+  year={2012},
+  url={http://www.lrec-conf.org/proceedings/lrec2012/pdf/1072_Paper.pdf},
+  comment={The most recent publication of ConceptNet.}
+}
+
