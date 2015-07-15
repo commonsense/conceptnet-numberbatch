@@ -7,6 +7,7 @@ class WordVectors:
 
     def __init__(self, labels, vectors, standardize=True):
         self.labels = LabelSet(labels)
+        normalize(vectors, copy=False)
         self.vectors = vectors
 
         if standardize:
@@ -27,7 +28,7 @@ class WordVectors:
             vec = self.vectors[self.labels.index(word)]
         else:
             vec = self.vectors[self.labels.index(self._standardizer(word))]
-        return vec / np.linalg.norm(vec)
+        return vec
 
     def similar_to(self, word_or_vector, num=20):
         if isinstance(word_or_vector, str):

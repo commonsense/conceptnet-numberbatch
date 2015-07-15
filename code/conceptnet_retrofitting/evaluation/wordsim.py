@@ -65,7 +65,7 @@ def main(labels_in, vecs_in, verbose=True):
 
     if verbose:
         print("Loading vectors")
-    vecs = loaders.load_vec_memmap(vecs_in)
+    vecs = loaders.load_vecs(vecs_in)
 
     if verbose:
         print("Building LabelSet")
