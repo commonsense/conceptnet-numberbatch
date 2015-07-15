@@ -14,4 +14,45 @@ We did stuff to GloVe and ConceptNet and got better stuff.
 \section{Introduction}
 blah blah blah
 
+\section{Methods}
+
+\subsection{Standardizing text}
+
+The way we choose to represent words and compare them for equality may seem
+like a trivial matter, but it can significantly affect evaluation results.
+Additionally, we can only properly combine two resources with a method such
+as retrofitting if their string representations are appropriate to compare
+to each other.
+
+Thus, it's important to be clear about what operations have already been
+applied to the text in our data sources, and what further operations we
+apply to get the text into a standard form.
+
+In the 42B-token dataset provided by the GloVe project, all words are lowercased
+using a Unicode case-conversion algorithm
+\footnote{
+    It's unclear whether the text was lowercased using the simple
+    character-by-character algorithm defined in section 3.13 of
+    \cite{unicode2014}, or the context-sensitive algorithm defined in section
+    5.18, but fortunately they give the same results on the vocabulary of
+    GloVe.
+} and written to a file in UTF-8. No further standardization was applied, including
+NFC normalization. For example, there are two separate entries for the word ``niño'',
+one where ``ñ'' is spelled as one codepoint and one where it is an ``n'' followed by
+a combining tilde.
+
+In the 840B-token dataset, the words are not normalized in any way, including
+lowercasing. It appears that the words were read as bytes from the Common Crawl
+dataset and written to a file as exactly the same bytes. These bytes are in the
+``encoding salad'' that one might expect from scraping arbitrary Web pages:
+most words are in UTF-8, but some are in single-byte encodings such as Latin-1
+or Windows-1252.
+
+The intent of listing these details is not to criticize GloVe, it is simply to
+understand what has happened to the text so far, so that we can standardize the
+text in a way that matches another data source.
+
+ConceptNet is collected from a variety of different sources, and therefore has to
+use a quite aggressive form of normalization\ldots
+
 \end{document}
