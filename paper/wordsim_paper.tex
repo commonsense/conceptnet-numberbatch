@@ -84,7 +84,6 @@ align. Here are the standardizations applied to English terms in ConceptNet
 5.4:
 
 \begin{itemize}
-% TODO: find a reference for Treebank tokenization
 \item The words and phrases that the data sources provide are first run
     through the {\tt ftfy.fix\_text} function, in version 4.0 of the Python
     module {\tt ftfy}.\footnote{
@@ -92,7 +91,7 @@ align. Here are the standardizations applied to English terms in ConceptNet
     } This corrects some Unicode encoding glitches, as well as applying
     NFC normalization.
 \item The text is tokenized using Treebank tokenization
-    \cite{FINDTHIS-treebank-tokenization}.
+    \cite{marcus1993treebank}.
 \item Each token is lemmatized using a modification of WordNet's Morphy
     algorithm, which appears in the {\tt conceptnet5.language.english}
     module of ConceptNet 5.4's Python code. Because most data sources are not
