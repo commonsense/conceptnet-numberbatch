@@ -1,5 +1,5 @@
 CONFIG = {
     'datapath': 'data/',
-    'glove': 'glove.42B.300d',
+    'glove': 'glove.840B.300d',
     'conceptnet5': 'conceptnet5',
 }
