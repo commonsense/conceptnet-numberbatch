@@ -9,9 +9,6 @@ def build_from_conceptnet(labels, filename, verbose=True):
 
     mat = SparseMatrixBuilder()
 
-    if verbose:
-        print("Loading sparse associations")
-
     # Add pairwise associations
     data = SparseMatrixBuilder()
 
@@ -24,9 +21,6 @@ def build_from_conceptnet(labels, filename, verbose=True):
             value = float(value_str)
             mat[index1, index2] = value
             mat[index2, index1] = value
-
-    if verbose:
-        print("Building sparse matrix")
 
     return mat.tocsr(shape=(len(labels), len(labels)))
 

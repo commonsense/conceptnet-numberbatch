@@ -40,4 +40,4 @@ def main(vecs_in, assoc_in, vecs_out, verbose=True):
 
 if __name__ == '__main__':
     import sys
-    main(*sys.argv[1:])
+    main(sys.argv[1], sys.argv[2], sys.argv[3])

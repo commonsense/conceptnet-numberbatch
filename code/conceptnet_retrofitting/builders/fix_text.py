@@ -3,7 +3,7 @@ from conceptnet_retrofitting import loaders
 
 def main(labels_in, labels_out):
     loaders.save_labels(
-        [fix_text(label) for label in labels_in],
+        [fix_text(label).strip() for label in labels_in],
         labels_out,
     )
 

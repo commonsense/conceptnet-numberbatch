@@ -41,4 +41,7 @@ rule add_self_loops
 rule retrofit
   command = python -m conceptnet_retrofitting.builders.retrofit $in $out
 
+rule test
+  command = python -m conceptnet_retrofitting.evaluation.wordsim $in >$out
+
 #END OF RULES SECTION

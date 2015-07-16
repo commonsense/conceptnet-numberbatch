@@ -19,6 +19,8 @@ def build_conceptnet_retrofitting():
     add_self_loops(graph)
     retrofit(graph)
 
+    test(graph)
+
     make_ninja_file('rules.ninja', graph)
 
 def build_glove(graph):
@@ -96,6 +98,45 @@ def retrofit(graph):
         [glove_prefix+'.retrofit.npy'],
         'retrofit'
     )
+
+def test(graph):
+    raw_labels = glove_prefix+'.labels'
+    standardized_labels = glove_prefix+'.standardized.labels'
+    retrofit_labels = glove_prefix+'.with-assoc.labels'
+    for label_file, vector_files in {
+
+        glove_prefix+'.labels': [
+            glove_prefix+suffix
+            for suffix in [
+                '.npy',
+                '.l2-normalized.raw.npy',
+                '.l1-normalized.raw.npy'
+            ]
+        ],
+
+        glove_prefix+'.standardized.labels': [
+            glove_prefix+suffix
+            for suffix in [
+                '.standardized.npy',
+                '.l2-normalized.npy',
+                '.l1-normalized.npy'
+            ]
+        ],
+
+        glove_prefix+'.with-assoc.labels': [
+            glove_prefix+suffix
+            for suffix in [
+                '.retrofit.npy'
+            ]
+        ]
+
+    }.items():
+        for vector_file in vector_files:
+            graph['test_%s'%vector_file] = Dep(
+                [label_file, vector_file],
+                vector_file+'.evaluation',
+                'test'
+            )
 
 if __name__ == '__main__':
     build_conceptnet_retrofitting()
