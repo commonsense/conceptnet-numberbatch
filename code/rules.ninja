@@ -28,6 +28,9 @@ rule standardize_vecs
 rule l1_normalize
   command = python -m conceptnet_retrofitting.builders.l1norm $in $out
 
+rule l2_normalize
+  command = python -m conceptnet_retrofitting.builders.l2norm $in $out
+
 
 rule conceptnet_to_assoc
   command = python -m conceptnet_retrofitting.builders.build_assoc $in $out

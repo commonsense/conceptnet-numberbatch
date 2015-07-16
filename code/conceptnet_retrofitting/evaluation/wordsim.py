@@ -10,6 +10,7 @@ def evaluate(similarity_func, standard):
     for w1, w2, assoc in standard:
         ideal.append(assoc)
         actual.append(similarity_func(w1, w2))
+
     return spearmanr(np.array(ideal), np.array(actual))[0]
 
 def test_all(similarity_func):
@@ -63,13 +64,15 @@ def main(labels_in, vecs_in, verbose=True):
 
     labels = loaders.load_labels(labels_in)
 
+    standardize = labels[0].startswith('/c/')
+
     if verbose:
         print("Loading vectors")
     vecs = loaders.load_vecs(vecs_in)
 
     if verbose:
         print("Building LabelSet")
-    wv = WordVectors(labels, vecs)
+    wv = WordVectors(labels, vecs, standardize=standardize)
 
     test_all(wv.similarity)
 

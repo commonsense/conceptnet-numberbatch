@@ -24,8 +24,8 @@ def load_csr(filename):
     return sparse.csr_matrix((matrix['data'], matrix['indices'], matrix['indptr']), shape=matrix['shape'])
 
 
-def load_labels(filename):
-    return [line.strip() for line in open(filename, encoding='latin-1')]
+def load_labels(filename, encoding='utf-8'):
+    return [line.strip() for line in open(filename, encoding=encoding)]
 
 
 def save_labels(labels, filename):

@@ -7,8 +7,13 @@ def build_conceptnet_retrofitting():
     graph = DepGraph()
     build_glove(graph)
     #filter_glove(graph)
+
+    l1_normalize_raw_glove(graph)
+    l2_normalize_raw_glove(graph)
+
     standardize_glove(graph)
     l1_normalize_glove(graph)
+    l2_normalize_glove(graph)
 
     build_assoc(graph)
     add_self_loops(graph)
@@ -41,6 +46,27 @@ def standardize_glove(graph):
         [glove_prefix+suffix for suffix in ['.labels', '.npy']],
         [glove_prefix+'.standardized'+suffix for suffix in ['.labels', '.npy']],
         'standardize_vecs'
+    )
+
+def l2_normalize_raw_glove(graph):
+    graph['l2_normalize_raw_glove'] = Dep(
+        glove_prefix+'.npy',
+        glove_prefix+'.l2-normalized.raw.npy',
+        'l2_normalize'
+    )
+
+def l1_normalize_raw_glove(graph):
+    graph['l1_normalize_raw_glove'] = Dep(
+        glove_prefix+'.npy',
+        glove_prefix+'.l1-normalized.raw.npy',
+        'l1_normalize'
+    )
+
+def l2_normalize_glove(graph):
+    graph['l2_normalize_glove'] = Dep(
+        graph['standardize_glove'].outputs[1],
+        glove_prefix+'.l2-normalized.npy',
+        'l2_normalize'
     )
 
 def l1_normalize_glove(graph):

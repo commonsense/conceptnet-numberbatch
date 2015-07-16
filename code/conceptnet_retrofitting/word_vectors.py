@@ -23,12 +23,11 @@ class WordVectors:
         except KeyError:
             return 0
 
-    def to_vector(self, word):
+    def to_vector(self, word, return_default=True):
         if self._standardizer is None:
-            vec = self.vectors[self.labels.index(word)]
+            return self.vectors[self.labels.index(word)]
         else:
-            vec = self.vectors[self.labels.index(self._standardizer(word))]
-        return vec
+            return self.vectors[self.labels.index(self._standardizer(word))]
 
     def similar_to(self, word_or_vector, num=20):
         if isinstance(word_or_vector, str):
