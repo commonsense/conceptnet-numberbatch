@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.preprocessing import normalize
 
-def retrofit(word_vecs, sparse_assoc, iterations=10, verbose=True, orig_weight=1):
+def retrofit(word_vecs, sparse_assoc, iterations=10, verbose=False, orig_weight=1):
 
     orig_vecs = normalize(word_vecs, norm='l2', copy=False)
 
