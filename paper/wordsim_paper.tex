@@ -1,8 +1,12 @@
-\documentclass{article}
+\documentclass[12pt]{article}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{fullpage}
+\usepackage{url}
+\bibliographystyle{apalike}
+
 \title{Improving Word Vectors by Adding Lexical Knowledge}
 \author{Rob Speer \and Joshua Chin \and Catherine Havasi}
 \begin{document}
@@ -11,6 +15,8 @@
 We did stuff to GloVe and ConceptNet and got better stuff.
 \end{abstract}
 
+\sloppy
+
 \section{Introduction}
 blah blah blah
 
@@ -18,41 +24,132 @@ blah blah blah
 
 \subsection{Standardizing text}
 
+
 The way we choose to represent words and compare them for equality may seem
 like a trivial matter, but it can significantly affect evaluation results.
 Additionally, we can only properly combine two resources with a method such
-as retrofitting if their string representations are appropriate to compare
-to each other.
+as retrofitting if their string representations are comparable to each other.
 
-Thus, it's important to be clear about what operations have already been
-applied to the text in our data sources, and what further operations we
-apply to get the text into a standard form.
+The operations we apply to text would usually be called ``normalization'',
+but that word also refers to what we'll be doing to our vectors, so both
+here and in the code we call it ``standardization'' instead.
 
-In the 42B-token dataset provided by the GloVe project, all words are lowercased
-using a Unicode case-conversion algorithm
-\footnote{
-    It's unclear whether the text was lowercased using the simple
-    character-by-character algorithm defined in section 3.13 of
-    \cite{unicode2014}, or the context-sensitive algorithm defined in section
-    5.18, but fortunately they give the same results on the vocabulary of
-    GloVe.
-} and written to a file in UTF-8. No further standardization was applied,
-including NFC normalization. For example, there are two separate entries for
-the word ``ni\~{n}o'', one where ``\~{n}'' is spelled as one codepoint and one
-where it is an ``n'' followed by a combining tilde.
+\subsubsection{How GloVe is standardized}
 
-In the 840B-token dataset, the words are not normalized in any way, including
-lowercasing. It appears that the words were read as bytes from the Common Crawl
-dataset and written to a file as exactly the same bytes. These bytes are in the
-``encoding salad'' that one might expect from scraping arbitrary Web pages:
-most words are in UTF-8, but some are in single-byte encodings such as Latin-1
-or Windows-1252.
+The 42-billion-token version of GloVe, whose results are published in
+\cite{pennington2014glove}, has applied some simple standardizations
+to the text it extracts from Common Crawl:
 
-The intent of listing these details is not to criticize GloVe, it is simply to
-understand what has happened to the text so far, so that we can standardize the
-text in a way that matches another data source.
+\begin{itemize}
+\item The text is tokenized with the Stanford parser. Only single tokens are
+    used in GloVe.
+\item The words are lowercased using a Unicode case-conversion
+    algorithm.\footnote{
+        It's unclear whether the text was lowercased using the simple
+        character-by-character algorithm defined in section 3.13 of
+        \cite{unicode2014}, or the context-sensitive algorithm defined in section
+        5.18. Different programming languages make different choices here.
+        Fortunately, they give the same results on the vocabulary of GloVe.
+}
+\item Although not all of Common Crawl is in valid UTF-8 or even in a known
+    encoding, only words in valid UTF-8 are written to the file.
+\item No further standardization is applied. For example, the text is not all
+    in Unicode's Normalization Form C (NFC): there are two separate entries
+    for the word ``ni\~{n}o'', one where ``\~{n}'' is a single codepoint and
+    one where it is an ``n'' followed by a combining tilde.
+\end{itemize}
 
-ConceptNet is collected from a variety of different sources, and therefore has to
-use a quite aggressive form of normalization\ldots
+It is important to keep these standardizations in mind and also apply them to
+the word-similarity datasets, such as lowercasing the word ``OPEC'' in {\sc
+wordsim-353}.
+
+The 840B-token dataset is not lowercased, as described in
+\cite{pennington2014glove}, but it is also not all in UTF-8. It is possible
+that the tokens were written to the file exactly as they were found in
+Common Crawl, as bytes of ``encoding salad'', as one might expect from
+scraping arbitrary Web pages. They are still tokenized in a way that is
+reasonable for English.
+
+\subsubsection{How ConceptNet is standardized}
+
+An operation that is common in Web design is to ``slugify'' a title or
+headline, converting it to a reduced, not-necessarily-grammatical form
+that fits into a URL while keeping all the key words. ConceptNet's
+normalization is similar: it converts a term into a form that fits into
+a URI.
+
+The standardizations may seem byzantine, but their purpose is to align many
+different resources -- particularly on English terms, where they most often
+align. Here are the standardizations applied to English terms in ConceptNet
+5.4:
+
+\begin{itemize}
+% TODO: find a reference for Treebank tokenization
+\item The words and phrases that the data sources provide are first run
+    through the {\tt ftfy.fix\_text} function, in version 4.0 of the Python
+    module {\tt ftfy}.\footnote{
+        \url{http://github.com/LuminosoInsight/python-ftfy}
+    } This corrects some Unicode encoding glitches, as well as applying
+    NFC normalization.
+\item The text is tokenized using Treebank tokenization
+    \cite{FINDTHIS-treebank-tokenization}.
+\item Each token is lemmatized using a modification of WordNet's Morphy
+    algorithm, which appears in the {\tt conceptnet5.language.english}
+    module of ConceptNet 5.4's Python code. Because most data sources are not
+    tagged, it uses heuristics to choose which part of speech to normalize
+    the word as, plus exceptions that allow it to choose more common roots
+    when Morphy would choose a rare one.
+\item Tokens whose first character is not alphanumeric (according to Python
+    3's {\tt isalnum}) are removed.
+\item A very small list of stopwords (``a'', ``an'', and ``the'') are
+    removed, as well as ``to'' if it is the first word.
+\item Terms that would become the empty string due to the above steps are
+    returned to their original text.
+\item Spaces and slashes are replaced by underscores.
+\item The text is lowercased according to Python 3, which uses Unicode's
+    context-sensitive algorithm.
+\item The resulting standardized text is tagged with its language and turned
+    into a URI: the phrase ``giving an example'', for example, becomes
+    {\tt /c/en/give\_example}.
+\end{itemize}
+
+The complete implementation can be found in the
+{\tt conceptnet5.nodes.normalized\_concept\_uri} function of ConceptNet 5.4.
+
+The URIs are not entirely meant for human consumption, and are
+sometimes not grammatically accurate -- the term ``ground zero'' becomes
+{\tt /c/en/grind\_zero}, for example -- but the purpose is to unify
+surface texts that may appear in slightly different forms in different
+resources.
+
+When aligning GloVe and ConceptNet, then, we apply these standardizations on
+top of what has already been applied to GloVe, turning its tokens into
+ConceptNet URIs. The tokens are assumed to be in English.
+
+A possible drawback to this standardization process is that we will not be able
+to evaluate the result on Mikolov et al.'s syntactic analogy task
+\cite{mikolov2013word2vec}, as many of the analogies would become trivial
+analogies of the form ``A is to A as B is to B''. (We will discuss why
+analogies are not a goal of this system anyway in Section~\ref{analogies-meh}.)
+
+\section{Evaluation}
+
+
+
+\section{Discussion}
+
+\subsection{Analogies are not our goal}
+\label{analogies-meh}
+
+The analogy evaluation of \cite{mikolov2013word2vec} is an interesting
+emergent property to demonstrate of a system that has no syntactic or
+relational knowledge built into it. However, at the point where the system
+{\em does} have more knowledge built into it, it becomes somewhat of
+a meaningless exercise.
+
+The syntactic analogies \ldots
+
+\section{References}
+\bibliography{wordsim_paper}
 
 \end{document}

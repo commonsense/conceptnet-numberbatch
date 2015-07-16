@@ -1,4 +1,4 @@
 rule build_latex
-  command = pdflatex $in
+  command = pdflatex wordsim_paper && bibtex wordsim_paper && pdflatex wordsim_paper && pdflatex wordsim_paper
 
 build wordsim_paper.pdf: build_latex wordsim_paper.tex

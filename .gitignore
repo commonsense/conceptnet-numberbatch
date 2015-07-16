@@ -1,8 +1,12 @@
+.ninja_deps
+.ninja_log
+
+# LaTeX output
 paper/*.aux
 paper/*.log
 paper/*.pdf
-.ninja_deps
-.ninja_log
+paper/*.bbl
+paper/*.blg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

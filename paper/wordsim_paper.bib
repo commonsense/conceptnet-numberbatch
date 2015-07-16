@@ -1,17 +1,25 @@
 # Guidelines for putting things in this file:
 #
 # - Google Scholar can usually give you the BibTeX data for any paper.
+#   It usually provides a reasonable-looking ID of the form
+#   [author name][year][keyword], so let's follow this format as much as
+#   possible. The keyword it picks is the first word of the title; you
+#   can change it to something more memorable.
+#
 # - Add a 'url' entry indicating where you can read the paper online.
+#
 # - Add a 'comment' entry indicating why the paper is important and what key
 #   ideas we should cite it for.
+#
 # - Try to keep the papers organized into sections, so we know where to look
 #   when writing about particular topics.
+#
 # - Try to keep each section in chronological order, at least by year.
 
 # Existing implementations of word similarity
 # -------------------------------------------
 
-@article{mikolov2013efficient,
+@article{mikolov2013word2vec,
   author    = {Tomas Mikolov and
                Kai Chen and
                Greg Corrado and
@@ -23,9 +31,9 @@
   url       = {http://arxiv.org/abs/1301.3781},
   timestamp = {Thu, 07 May 2015 20:02:01 +0200},
   biburl    = {http://dblp.uni-trier.de/rec/bib/journals/corr/abs-1301-3781},
-  bibsource = {dblp computer science bibliography, http://dblp.org}
-  comment   = {
-    The first publication of word2vec, with its CBOW and skip-gram models.
+  bibsource = {dblp computer science bibliography, http://dblp.org},
+  comment = {
+      The first publication of word2vec, with its CBOW and skip-gram models.
   }
 }
 
@@ -38,7 +46,7 @@
   year={2014},
   url={http://www-nlp.stanford.edu/pubs/glove.pdf},
   comment={
-    GloVe is the best starting point for word embeddings in a vector space, in our view.
+      GloVe is the best starting point for word embeddings in a vector space, in our view.
   }
 }
 
@@ -53,7 +61,7 @@
   }
 }
 
-@article{levy2015improving,
+@article{levy2015embeddings,
   title={Improving distributional similarity with lessons learned from word embeddings},
   author={Levy, Omer and Goldberg, Yoav and Dagan, Ido},
   journal={Transactions of the Association for Computational Linguistics},
@@ -92,7 +100,7 @@
 # Evaluation data for word similarity
 # -----------------------------------
 
-@article{luong2013better,
+@article{luong2013rw,
   title={Better word representations with recursive neural networks for morphology},
   author={Luong, Minh-Thang and Socher, Richard and Manning, Christopher D},
   journal={CoNLL-2013},
@@ -122,13 +130,16 @@
     This is the paper underlying what eventually became Luminoso, though our
     methods have changed significantly.
 
+    The paper describes the "blending" operation in particular, which is how
+    we combine ConceptNet with domain-specific co-occurrences.
+
     Don't go looking in this paper for any kind of evaluation that can be
-    compared to anything else; the only task we evaluated was making inferences
-    over ConceptNet.
+    compared to anything else; the only task we evaluated was to infer
+    ConceptNet-like assertions.
   }
 }
 
-@inproceedings{speer2012representing,
+@inproceedings{speer2012conceptnet,
   title={Representing General Relational Knowledge in ConceptNet 5},
   author={Speer, Robert and Havasi, Catherine},
   booktitle={LREC},
