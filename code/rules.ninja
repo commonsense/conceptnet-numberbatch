@@ -18,9 +18,6 @@ pool memory_hogs
 rule glove_to_labels
   command = cut -d" " -f1 $in >$out
 
-rule fix_labels
-  command = cat $in | python -m conceptnet_retrofitting.builders.fix_text $out
-
 rule glove_to_vecs
   command = cut -d" " -f2- $in | python -m conceptnet_retrofitting.builders.build_vecs $out
   pool = memory_hogs
