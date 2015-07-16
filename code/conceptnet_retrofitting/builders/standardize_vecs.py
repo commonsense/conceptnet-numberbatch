@@ -1,7 +1,6 @@
 import numpy as np
 
 from conceptnet5.nodes import standardized_concept_uri
-from ftfy import fix_text
 
 from conceptnet_retrofitting.builders.label_set import LabelSet
 

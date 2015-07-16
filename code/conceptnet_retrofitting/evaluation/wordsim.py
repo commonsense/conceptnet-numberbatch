@@ -10,6 +10,7 @@ def evaluate(similarity_func, standard):
     for w1, w2, assoc in standard:
         ideal.append(assoc)
         actual.append(similarity_func(w1, w2))
+
     return spearmanr(np.array(ideal), np.array(actual))[0]
 
 def test_all(similarity_func):
@@ -42,7 +43,7 @@ def parse_file(filename, sep=None, preprocess_word=None):
 def parse_wordsim(filename='ws353.csv'):
     return parse_file(filename, sep=',')
 
-def parse_men3000(filename='men3000.csv'):
+def parse_men3000(filename='men3000-dev.csv'):
     return parse_file(filename, preprocess_word=lambda w: w.split('-')[0])
 
 def parse_rw(filename='rw.csv'):
@@ -58,18 +59,20 @@ def main(labels_in, vecs_in, verbose=True):
     from conceptnet_retrofitting import loaders
     from conceptnet_retrofitting.word_vectors import WordVectors
 
-    if verbose:
+    if verbose >= 2:
         print("Loading labels")
 
     labels = loaders.load_labels(labels_in)
 
-    if verbose:
+    standardize = labels[0].startswith('/c/')
+
+    if verbose >= 2:
         print("Loading vectors")
     vecs = loaders.load_vecs(vecs_in)
 
-    if verbose:
+    if verbose >= 2:
         print("Building LabelSet")
-    wv = WordVectors(labels, vecs)
+    wv = WordVectors(labels, vecs, standardize=standardize)
 
     test_all(wv.similarity)
 

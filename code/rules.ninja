@@ -14,7 +14,7 @@
 
 
 rule glove_to_labels
-  command = cut -d" " -f1 $in >$out
+  command = cut -d" " -f1 $in |  python -m conceptnet_retrofitting.builders.fix_text $out
 
 rule glove_to_vecs
   command = cut -d" " -f2- $in | python -m conceptnet_retrofitting.builders.build_vecs $out
@@ -28,6 +28,9 @@ rule standardize_vecs
 rule l1_normalize
   command = python -m conceptnet_retrofitting.builders.l1norm $in $out
 
+rule l2_normalize
+  command = python -m conceptnet_retrofitting.builders.l2norm $in $out
+
 
 rule conceptnet_to_assoc
   command = python -m conceptnet_retrofitting.builders.build_assoc $in $out
@@ -37,5 +40,8 @@ rule add_self_loops
 
 rule retrofit
   command = python -m conceptnet_retrofitting.builders.retrofit $in $out
+
+rule test
+  command = python -m conceptnet_retrofitting.evaluation.wordsim $in >$out
 
 #END OF RULES SECTION
