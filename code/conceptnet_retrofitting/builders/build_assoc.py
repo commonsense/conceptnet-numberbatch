@@ -14,7 +14,7 @@ def build_from_conceptnet(labels, filename, verbose=True):
 
     with open(filename, encoding='utf-8') as infile:
         for line in infile:
-            concept1, concept2, value_str = line.strip().split('\t')
+            concept1, concept2, value_str = line.strip().split('\t')[:3]
             index1 = labels.add(concept1)
             index2 = labels.add(concept2)
 
