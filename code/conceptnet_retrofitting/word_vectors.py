@@ -6,6 +6,7 @@ from sklearn.preprocessing import normalize
 class WordVectors:
 
     def __init__(self, labels, vectors, standardize=True):
+        assert(len(labels) == len(vectors))
         self.labels = LabelSet(labels)
         normalize(vectors, copy=False)
         self.vectors = vectors
