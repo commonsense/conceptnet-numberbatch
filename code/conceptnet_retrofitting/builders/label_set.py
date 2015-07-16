@@ -3,7 +3,7 @@ from collections import OrderedDict
 class LabelSet:
 
     def __init__(self, iterable=None):
-        self._seq =OrderedDict()
+        self._seq = OrderedDict()
         self._index = 0
 
         if iterable is not None:
