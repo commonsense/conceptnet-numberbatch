@@ -24,16 +24,10 @@ def build_conceptnet_retrofitting():
     make_ninja_file('rules.ninja', graph)
 
 def build_glove(graph):
-    graph['build_glove']['build_raw_glove_labels'] = Dep(
-        glove_prefix+'.txt',
-        glove_prefix+'.raw.labels',
-        'glove_to_labels'
-    )
-
     graph['build_glove']['build_glove_labels'] = Dep(
-        glove_prefix+'.raw.labels',
+        glove_prefix+'.txt',
         glove_prefix+'.labels',
-        'fix_labels'
+        'glove_to_labels'
     )
 
     graph['build_glove']['build_glove_vecs'] = Dep(
@@ -111,7 +105,7 @@ def test(graph):
     retrofit_labels = glove_prefix+'.with-assoc.labels'
     for label_file, vector_files in {
 
-        glove_prefix+'.raw.labels': [
+        glove_prefix+'.labels': [
             glove_prefix+suffix
             for suffix in [
                 '.npy',
