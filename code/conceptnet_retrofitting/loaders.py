@@ -25,8 +25,10 @@ def load_csr(filename):
 
 
 def load_labels(filename, encoding='utf-8'):
-    return [line.strip() for line in open(filename, encoding=encoding)]
-
+    try:
+        return [line.strip() for line in open(filename, encoding=encoding)]
+    except UnicodeDecodeError:
+        return[line.strip() for line in open(filename, encoding='latin-1')]
 
 def save_labels(labels, filename):
     with open(filename, mode='w') as file:
