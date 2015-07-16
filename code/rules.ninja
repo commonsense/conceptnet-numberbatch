@@ -12,6 +12,8 @@
 # This file will become the header of the larger build.ninja file, which also
 # contains the programatically-defined dependency graph.
 
+pool memory_hogs
+  depth = 1
 
 rule glove_to_labels
   command = cut -d" " -f1 $in >$out
@@ -21,19 +23,23 @@ rule fix_labels
 
 rule glove_to_vecs
   command = cut -d" " -f2- $in | python -m conceptnet_retrofitting.builders.build_vecs $out
+  pool = memory_hogs
 
 rule filter_vecs
   command = python -m conceptnet_retrofitting.builders.filter_vecs $in $out
+  pool = memory_hogs
 
 rule standardize_vecs
   command = python -m conceptnet_retrofitting.builders.standardize_vecs $in $out
+  pool = memory_hogs
 
 rule l1_normalize
   command = python -m conceptnet_retrofitting.builders.l1norm $in $out
+  pool = memory_hogs
 
 rule l2_normalize
   command = python -m conceptnet_retrofitting.builders.l2norm $in $out
-
+  pool = memory_hogs
 
 rule conceptnet_to_assoc
   command = python -m conceptnet_retrofitting.builders.build_assoc $in $out
@@ -43,8 +49,10 @@ rule add_self_loops
 
 rule retrofit
   command = python -m conceptnet_retrofitting.builders.retrofit $in $out
+  pool = memory_hogs
 
 rule test
   command = python -m conceptnet_retrofitting.evaluation.wordsim $in >$out
+  pool = memory_hogs
 
 #END OF RULES SECTION
