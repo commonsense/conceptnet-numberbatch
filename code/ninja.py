@@ -24,16 +24,10 @@ def build_conceptnet_retrofitting():
     make_ninja_file('rules.ninja', graph)
 
 def build_glove(graph):
-    graph['build_glove']['build_raw_glove_labels'] = Dep(
-        glove_prefix+'.txt',
-        glove_prefix+'.raw.labels',
-        'glove_to_labels'
-    )
-
     graph['build_glove']['build_glove_labels'] = Dep(
-        glove_prefix+'.raw.labels',
+        glove_prefix+'.txt',
         glove_prefix+'.labels',
-        'fix_labels'
+        'glove_to_labels'
     )
 
     graph['build_glove']['build_glove_vecs'] = Dep(
@@ -99,11 +93,17 @@ def add_self_loops(graph):
     )
 
 def retrofit(graph):
-    graph['retrofit'] = Dep(
-        [glove_prefix+'.l1-normalized.npy', conceptnet_prefix+'.self_loops.npz'],
-        [glove_prefix+'.retrofit.npy'],
-        'retrofit'
-    )
+    for norm in ['l1', 'l2', 'raw']:
+        if norm == 'raw':
+            vecs = '.standardized.npy'
+        else:
+            vecs = '.%s-normalized.npy'%norm
+
+        graph['retrofit'][norm] = Dep(
+            [glove_prefix+vecs, conceptnet_prefix+'.self_loops.npz'],
+            [glove_prefix+'.retrofit.%s.npy'%norm],
+            'retrofit'
+        )
 
 def test(graph):
     raw_labels = glove_prefix+'.labels'
@@ -111,7 +111,7 @@ def test(graph):
     retrofit_labels = glove_prefix+'.with-assoc.labels'
     for label_file, vector_files in {
 
-        glove_prefix+'.raw.labels': [
+        glove_prefix+'.labels': [
             glove_prefix+suffix
             for suffix in [
                 '.npy',
@@ -132,7 +132,9 @@ def test(graph):
         glove_prefix+'.with-assoc.labels': [
             glove_prefix+suffix
             for suffix in [
-                '.retrofit.npy'
+                '.retrofit.raw.npy',
+                '.retrofit.l2.npy',
+                '.retrofit.l1.npy'
             ]
         ]
 

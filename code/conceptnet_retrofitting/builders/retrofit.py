@@ -1,9 +1,10 @@
 import numpy as np
 from sklearn.preprocessing import normalize
 
-def retrofit(word_vecs, sparse_assoc, iterations=10, verbose=True, orig_weight=1):
+def retrofit(word_vecs, sparse_assoc, iterations=10, verbose=False, orig_weight=1):
 
     orig_vecs = normalize(word_vecs, norm='l2', copy=False)
+    orig_vecs *= orig_weight
 
     vecs = np.zeros(shape=(sparse_assoc.shape[0], orig_vecs.shape[1]))
     vecs[:orig_vecs.shape[0]] = orig_vecs
@@ -14,12 +15,12 @@ def retrofit(word_vecs, sparse_assoc, iterations=10, verbose=True, orig_weight=1
 
         vecs = sparse_assoc.dot(vecs)
         normalize(vecs, norm='l2', copy=False)
-        vecs[:len(orig_vecs)] += orig_weight*orig_vecs
+        vecs[:len(orig_vecs)] += orig_vecs
         vecs[:len(orig_vecs)] /= 1+orig_weight
 
     return vecs
 
-def main(vecs_in, assoc_in, vecs_out, verbose=True):
+def main(vecs_in, assoc_in, vecs_out, verbose=False):
     from conceptnet_retrofitting import loaders
 
     if verbose:
