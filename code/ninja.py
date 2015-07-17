@@ -93,11 +93,17 @@ def add_self_loops(graph):
     )
 
 def retrofit(graph):
-    graph['retrofit'] = Dep(
-        [glove_prefix+'.l1-normalized.npy', conceptnet_prefix+'.self_loops.npz'],
-        [glove_prefix+'.retrofit.npy'],
-        'retrofit'
-    )
+    for norm in ['l1', 'l2', 'raw']:
+        if norm == 'raw':
+            vecs = '.standardized.npy'
+        else:
+            vecs = '.%s-normalized.npy'%norm
+
+        graph['retrofit'][norm] = Dep(
+            [glove_prefix+vecs, conceptnet_prefix+'.self_loops.npz'],
+            [glove_prefix+'.retrofit.%s.npy'%norm],
+            'retrofit'
+        )
 
 def test(graph):
     raw_labels = glove_prefix+'.labels'
@@ -126,7 +132,9 @@ def test(graph):
         glove_prefix+'.with-assoc.labels': [
             glove_prefix+suffix
             for suffix in [
-                '.retrofit.npy'
+                '.retrofit.raw.npy',
+                '.retrofit.l2.npy',
+                '.retrofit.l1.npy'
             ]
         ]
 
