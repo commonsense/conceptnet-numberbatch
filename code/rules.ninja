@@ -50,6 +50,5 @@ rule retrofit
 
 rule test
   command = python -m conceptnet_retrofitting.evaluation.wordsim $in >$out
-  pool = memory_hogs
 
 #END OF RULES SECTION
