@@ -8,7 +8,8 @@ class WordVectors:
     def __init__(self, labels, vectors, standardize=True):
         assert(len(labels) == len(vectors))
         self.labels = LabelSet(labels)
-        normalize(vectors, copy=False)
+        if not isinstance(vectors, np.memmap):
+            normalize(vectors, copy=False)
         self.vectors = vectors
 
         if standardize:
@@ -26,9 +27,12 @@ class WordVectors:
 
     def to_vector(self, word, return_default=True):
         if self._standardizer is None:
-            return self.vectors[self.labels.index(word)]
+            vec = self.vectors[self.labels.index(word)]
         else:
-            return self.vectors[self.labels.index(self._standardizer(word))]
+            vec = self.vectors[self.labels.index(self._standardizer(word))]
+        if isinstance(vec, np.memmap):
+            return normalize(vec)[0]
+        return vec
 
     def similar_to(self, word_or_vector, num=20):
         if isinstance(word_or_vector, str):
