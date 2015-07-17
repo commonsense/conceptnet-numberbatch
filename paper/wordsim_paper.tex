@@ -41,10 +41,30 @@ We did stuff to GloVe and ConceptNet and got better stuff.
 \section{Introduction}
 blah blah blah
 
+\section{Background}
+\ldots introduce GloVe \ldots % TODO
+
+Learning processes such as GloVe produce results that can conveniently be
+re-used in other projects, because they output a labeled matrix of the learned
+embeddings of each word in the vocabulary.
+\citeauthor{faruqui2014retrofitting} \shortcite{faruqui2014retrofitting}
+introduced the ``retrofitting'' procedure, which adjusts such dense matrices of
+embeddings based on external knowledge from a sparse semantic network.
+
+\citeauthor{faruqui2014retrofitting} used PPDB \cite{ganitkevitch2013ppdb} as
+the external source of semantic knowledge, but we found that ConceptNet
+\cite{speer2012conceptnet}, a resource which combines a variety of forms of
+crowd-sourced and expert-created knowledge, should fit well with this process
+while greatly increasing the scope of its vocabulary.
+
+\ldots introduce ConceptNet \ldots % TODO
+
+
 \section{Methods}
 
 \subsection{Standardizing text}
 
+% TODO: condense this as much as possible
 
 The way we choose to represent words and compare them for equality may seem
 like a trivial matter, but it can significantly affect evaluation results.
