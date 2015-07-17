@@ -1,4 +1,5 @@
 import os
+import math
 
 from scipy.stats import spearmanr
 import numpy as np
@@ -14,14 +15,14 @@ def evaluate(similarity_func, standard):
     return spearmanr(np.array(ideal), np.array(actual))[0]
 
 def test_all(similarity_func):
-    print("wordsim-353")
-    print(evaluate(similarity_func, parse_wordsim()))
-    print("men-3000")
-    print(evaluate(similarity_func, parse_men3000()))
-    print("rg-65")
-    print(evaluate(similarity_func, parse_rg65()))
     print("rw")
     print(evaluate(similarity_func, parse_rw()))
+    print("men-3000")
+    print(evaluate(similarity_func, parse_men3000()))
+    print("wordsim-353")
+    print(evaluate(similarity_func, parse_wordsim()))
+    print("rg-65")
+    print(evaluate(similarity_func, parse_rg65()))
     print("mc-30")
     print(evaluate(similarity_func, parse_mc30()))
 
@@ -68,7 +69,7 @@ def main(labels_in, vecs_in, verbose=True):
 
     if verbose >= 2:
         print("Loading vectors")
-    vecs = loaders.load_vecs(vecs_in)
+    vecs = loaders.load_vec_memmap(vecs_in)
 
     if verbose >= 2:
         print("Building LabelSet")
