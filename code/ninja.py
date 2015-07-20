@@ -30,6 +30,18 @@ class GloveLabel:
         out = ['glove', self.standardization, 'labels']
         return CONFIG['datapath'] + '.'.join(str(x) for x in out)
 
+implicit = {
+    'glove_to_vecs': ['conceptnet_retrofitting/builders/build_vecs.py'],
+    'filter_vecs': ['conceptnet_retrofitting/builders/filter_vecs.py'],
+    'standardize_vecs': ['conceptnet_retrofitting/builders/standardize_vecs.py'],
+    'l1_normalize': ['conceptnet_retrofitting/builders/l1norm.py'],
+    'l2_normalize': ['conceptnet_retrofitting/builders/l2norm.py'],
+    'conceptnet_to_assoc': ['conceptnet_retrofitting/builders/build_assoc.py'],
+    'add_self_loops': ['conceptnet_retrofitting/builders/self_loops.py'],
+    'retrofit': ['conceptnet_retrofitting/builders/retrofit.py'],
+    'test': ['conceptnet_retrofitting/evaluation/wordsim.py'],
+    'tests_to_latex': ['conceptnet_retrofitting/builders/latex_results.py'],
+}
 
 conceptnet_prefix = CONFIG['datapath']+CONFIG['conceptnet5']
 def build_conceptnet_retrofitting():
@@ -50,7 +62,7 @@ def build_conceptnet_retrofitting():
     test(graph)
     latex_results(graph)
 
-    make_ninja_file('rules.ninja', graph)
+    make_ninja_file('rules.ninja', graph, implicit)
 
 def build_glove(graph):
     input = CONFIG['datapath'] + CONFIG['glove'] + '.txt'
