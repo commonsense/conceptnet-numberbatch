@@ -76,7 +76,6 @@ def standardize_glove(graph):
         ],
         'standardize_vecs'
     )
-    print(GloveVector(standardization='standardized'))
 
 
 def l2_normalize_raw_glove(graph):
