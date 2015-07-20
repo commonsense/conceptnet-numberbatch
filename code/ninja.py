@@ -20,7 +20,8 @@ def build_conceptnet_retrofitting():
     retrofit(graph)
 
     test(graph)
-
+    latex_results(graph)
+    
     make_ninja_file('rules.ninja', graph)
 
 def build_glove(graph):
@@ -145,6 +146,17 @@ def test(graph):
                 vector_file+'.evaluation',
                 'test'
             )
+
+def latex_results(graph):
+    inputs = []
+    for dep in graph['test'].values():
+        inputs += dep.outputs
+
+    graph['latex_results'] = Dep(
+        inputs,
+        CONFIG['datapath']+'evaluations.latex',
+        'tests_to_latex'
+    )
 
 if __name__ == '__main__':
     build_conceptnet_retrofitting()
