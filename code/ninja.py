@@ -15,7 +15,7 @@ class GloveVector:
         self.filetype = filetype
 
     def __repr__(self):
-        out = ['Glove', self.normalization, self.standardization]
+        out = ['glove', self.normalization, self.standardization]
         if self.standardization == 'retrofit' and self.retrofit:
             out.append(self.retrofit)
         out.append(self.filetype)
@@ -27,7 +27,7 @@ class GloveLabel:
         self.standardization = standardization
 
     def __repr__(self):
-        out = ['Glove', self.standardization, 'labels']
+        out = ['glove', self.standardization, 'labels']
         return CONFIG['datapath'] + '.'.join(str(x) for x in out)
 
 
@@ -69,10 +69,13 @@ def build_glove(graph):
 
 def standardize_glove(graph):
     graph['standardize_glove'] = Dep(
-        outputs(graph['build_glove']),
         [
+            GloveLabel(),
+            GloveVector()
+        ],
+        [
+            GloveLabel('standardized'),
             GloveVector(standardization='standardized'),
-            GloveLabel('standardized')
         ],
         'standardize_vecs'
     )
