@@ -5,9 +5,9 @@ from os.path import exists
 class Dep(namedtuple('dep', ['inputs', 'outputs', 'rule', 'params', 'use_existing'])):
 
     def __new__(cls, inputs, outputs, rule, params=None, use_existing=False):
-        if isinstance(inputs, str):
+        if not isinstance(inputs, list):
             inputs = [inputs]
-        if isinstance(outputs, str):
+        if not isinstance(outputs, list):
             outputs = [outputs]
         if params is None:
             params = {}
@@ -40,11 +40,21 @@ def to_ninja_deps(graph):
 
     return "\n\n".join(commands)
 
+def outputs(graph):
+    out = []
+    for val in graph.values():
+        if isinstance(val, Dep):
+            out += val.outputs
+        else:
+            out += outputs(val)
+    return out
+
 def to_ninja_dep(dep):
     lines = []
 
     lines.append('build {outputs}: {rule} {inputs}'.format(
-        outputs=' '.join(dep.outputs), rule=dep.rule, inputs=' '.join(dep.inputs)
+        outputs=' '.join(map(str, dep.outputs)), rule=dep.rule,
+        inputs=' '.join(map(str, dep.inputs))
     ))
 
     for key, val in dep.params.items():
