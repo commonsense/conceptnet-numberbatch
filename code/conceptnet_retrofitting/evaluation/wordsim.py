@@ -20,7 +20,7 @@ def test_all(similarity_func):
     print("men-3000")
     print(evaluate(similarity_func, parse_men3000()))
     print("wordsim-353")
-    print(evaluate(similarity_func, parse_wordsim()))
+    print(evaluate(similarity_func, parse_wordsim353()))
     print("rg-65")
     print(evaluate(similarity_func, parse_rg65()))
     print("mc-30")
@@ -41,7 +41,7 @@ def parse_file(filename, sep=None, preprocess_word=None):
             yield w1, w2, float(val)
 
 
-def parse_wordsim(filename='ws353.csv'):
+def parse_wordsim353(filename='ws353.csv'):
     return parse_file(filename, sep=',')
 
 def parse_men3000(filename='men3000-dev.csv'):
