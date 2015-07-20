@@ -1,29 +1,70 @@
-\documentclass[12pt]{article}
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{amssymb}
+\def\year{2015}
+\documentclass[letterpaper]{article}
+\usepackage{aaai}
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
 \usepackage{graphicx}
-\usepackage{fullpage}
 \usepackage{url}
-\bibliographystyle{apalike}
+\frenchspacing
+\setlength{\pdfpagewidth}{8.5in}
+\setlength{\pdfpageheight}{11in}
+\pdfinfo{
+/Title Improving Word Vectors by Adding Lexical Knowledge
+/Author Rob Speer, Joshua Chin, and Catherine Havasi}
+\setcounter{secnumdepth}{0}  
+\bibliographystyle{aaai}
 
 \title{Improving Word Vectors by Adding Lexical Knowledge}
-\author{Rob Speer \and Joshua Chin \and Catherine Havasi}
+\author{Robert Speer\\
+    Luminoso Technologies, Inc.\\
+    675 Massachusetts Ave.\\
+    Cambridge, MA 02139\\
+    \texttt{rspeer@luminoso.com}
+\And
+    Joshua Chin\\
+    {\em academic address goes here}
+\And
+    Catherine Havasi\\
+    Luminoso Technologies, Inc.\\
+    675 Massachusetts Ave.\\
+    Cambridge, MA 02139\\
+    \texttt{havasi@luminoso.com}
+}
+
 \begin{document}
 \maketitle
 \begin{abstract}
 We did stuff to GloVe and ConceptNet and got better stuff.
 \end{abstract}
 
-\sloppy
-
 \section{Introduction}
 blah blah blah
+
+\section{Background}
+\ldots introduce GloVe \ldots % TODO
+
+Learning processes such as GloVe produce results that can conveniently be
+re-used in other projects, because they output a labeled matrix of the learned
+embeddings of each word in the vocabulary.
+\citeauthor{faruqui2014retrofitting} \shortcite{faruqui2014retrofitting}
+introduced the ``retrofitting'' procedure, which adjusts such dense matrices of
+embeddings based on external knowledge from a sparse semantic network.
+
+\citeauthor{faruqui2014retrofitting} used PPDB \cite{ganitkevitch2013ppdb} as
+the external source of semantic knowledge, but we found that ConceptNet
+\cite{speer2012conceptnet}, a resource which combines a variety of forms of
+crowd-sourced and expert-created knowledge, should fit well with this process
+while greatly increasing the scope of its vocabulary.
+
+\ldots introduce ConceptNet \ldots % TODO
+
 
 \section{Methods}
 
 \subsection{Standardizing text}
 
+% TODO: condense this as much as possible
 
 The way we choose to represent words and compare them for equality may seem
 like a trivial matter, but it can significantly affect evaluation results.
@@ -128,8 +169,8 @@ ConceptNet URIs. The tokens are assumed to be in English.
 A possible drawback to this standardization process is that we will not be able
 to evaluate the result on Mikolov et al.'s syntactic analogy task
 \cite{mikolov2013word2vec}, as many of the analogies would become trivial
-analogies of the form ``A is to A as B is to B''. (We will discuss why
-analogies are not a goal of this system anyway in Section~\ref{analogies-meh}.)
+analogies of the form ``A is to A as B is to B''. (We will discuss below
+why analogies are not a goal of this system anyway.)
 
 \section{Evaluation}
 

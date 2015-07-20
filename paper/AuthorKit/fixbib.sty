@@ -1,0 +1,138 @@
+%%%% This sty file contains all necessary bibliographic code to 
+%%%%  produce AAAI / AI Magazine author-year style referecnes.
+%%%%  Stolen from ijcai97.sty by Dan Weld 1/27/99
+
+% Lists
+\leftmargini 2em
+\leftmarginii 2em
+\leftmarginiii 1em 
+\leftmarginiv 0.5em
+\leftmarginv 0.5em 
+\leftmarginvi 0.5em
+
+\leftmargin\leftmargini
+\labelsep 5pt
+\labelwidth\leftmargini\advance\labelwidth-\labelsep
+
+\def\@listI{\leftmargin\leftmargini 
+\parsep 2pt plus 1pt minus 0.5pt%
+\topsep 4pt plus 1pt minus 2pt%
+\itemsep 2pt plus 1pt minus 0.5pt%
+\partopsep 1pt plus 0.5pt minus 0.5pt}
+
+\let\@listi\@listI
+\@listi 
+
+\def\@listii{\leftmargin\leftmarginii
+   \labelwidth\leftmarginii\advance\labelwidth-\labelsep
+   \parsep 1pt plus 0.5pt minus 0.5pt
+   \topsep 2pt plus 1pt minus 0.5pt
+   \itemsep \parsep}
+\def\@listiii{\leftmargin\leftmarginiii
+    \labelwidth\leftmarginiii\advance\labelwidth-\labelsep
+    \parsep 0pt plus 1pt
+    \partopsep 0.5pt plus 0pt minus 0.5pt
+    \topsep 1pt plus 0.5pt minus 0.5pt 
+    \itemsep \topsep}
+\def\@listiv{\leftmargin\leftmarginiv
+     \labelwidth\leftmarginiv\advance\labelwidth-\labelsep}
+\def\@listv{\leftmargin\leftmarginv
+     \labelwidth\leftmarginv\advance\labelwidth-\labelsep}
+\def\@listvi{\leftmargin\leftmarginvi
+     \labelwidth\leftmarginvi\advance\labelwidth-\labelsep}
+
+% We're never going to need a table of contents, so just flush it to
+% save space --- suggested by drstrip@sandia-2
+%\def\addcontentsline#1#2#3{}
+
+%%%% named.sty
+
+\typeout{Named Citation Style, version of 30 November 1994}
+
+% This file implements citations for the ``named'' bibliography style.
+%  Place it in a file called named.sty in the TeX search path.  (Placing it
+% in the same directory as the LaTeX document should also work.)
+
+% Prepared by Peter F. Patel-Schneider, with the assistance of several,
+% since forgotten, LaTeX hackers.
+% This style is NOT guaranteed to work.  It is provided in the hope
+% that it will make the preparation of papers easier.
+%
+% There are undoubtably bugs in this style.  If you make bug fixes,
+% improvements, etc.  please let me know.  My e-mail address is:
+%       pfps@research.att.com
+
+% The preparation of this file was supported by Schlumberger Palo Alto
+% Research and AT\&T Bell Laboratories.
+
+% This file can be modified and used in other conferences as long
+% as credit to the authors and supporting agencies is retained, this notice
+% is not changed, and further modification or reuse is not restricted.
+
+% The ``named'' bibliography style creates citations with labels like
+%       \citeauthoryear{author-info}{year}
+% these labels are processed by the following commands:
+%       \cite{keylist}
+%               which produces citations with both author and year,
+%               enclosed in square brackets
+%       \shortcite{keylist}
+%               which produces citations with year only,
+%               enclosed in square brackets
+%       \citeauthor{key}
+%               which produces the author information only
+%       \citeyear{key}
+%               which produces the year information only
+
+\def\leftcite{\@up[}\def\rightcite{\@up]}
+
+\def\cite{\def\citeauthoryear##1##2{\def\@thisauthor{##1}%
+             \ifx \@lastauthor \@thisauthor \relax \else##1, \fi ##2}\@icite}
+\def\shortcite{\def\citeauthoryear##1##2{##2}\@icite}
+
+\def\citeauthor{\def\citeauthoryear##1##2{##1}\@nbcite}
+\def\citeyear{\def\citeauthoryear##1##2{##2}\@nbcite}
+
+% internal macro for citations with [] and with breaks between citations
+% used in \cite and \shortcite
+\def\@icite{\leavevmode\def\@citeseppen{-1000}%
+ \def\@cite##1##2{\leftcite\nobreak\hskip 0in{##1\if@tempswa , ##2\fi}\rightcite}%
+ \@ifnextchar [{\@tempswatrue\@citex}{\@tempswafalse\@citex[]}}
+% internal macro for citations without [] and with no breaks
+% used in \citeauthor and \citeyear
+\def\@nbcite{\leavevmode\def\@citeseppen{1000}%
+ \def\@cite##1##2{{##1\if@tempswa , ##2\fi}}%
+ \@ifnextchar [{\@tempswatrue\@citex}{\@tempswafalse\@citex[]}}
+
+% don't box citations, separate with ; and a space
+% also, make the penalty between citations a parameter, 
+% it may be a good place to break
+\def\@citex[#1]#2{%
+  \def\@lastauthor{}\def\@citea{}%
+  \@cite{\@for\@citeb:=#2\do
+    {\@citea\def\@citea{;\penalty\@citeseppen\ }%
+     \if@filesw\immediate\write\@auxout{\string\citation{\@citeb}}\fi
+     \@ifundefined{b@\@citeb}{\def\@thisauthor{}{\bf ?}\@warning
+       {Citation `\@citeb' on page \thepage \space undefined}}%
+     {\csname b@\@citeb\endcsname}\let\@lastauthor\@thisauthor}}{#1}}
+
+% raise the brackets in bibliography labels
+\def\@biblabel#1{\def\citeauthoryear##1##2{##1, ##2}\@up{[}#1\@up{]}\hfill}
+
+\def\@up#1{\leavevmode\raise.2ex\hbox{#1}}
+
+% Optional changes
+
+%%%% use parentheses in the reference list and citations
+%\def\leftcite{(}\def\rightcite{)}
+%\def\@biblabel#1{\def\citeauthoryear##1##2{##1, ##2}(#1)\hfill}
+
+%%%% no key in the reference list
+%\def\@lbibitem[#1]#2{\item\if@filesw 
+%      { \def\protect##1{\string ##1\space}\immediate
+%        \write\@auxout{\string\bibcite{#2}{#1}}}\fi\ignorespaces}
+%\def\thebibliography#1{\section*{References\@mkboth
+%  {REFERENCES}{REFERENCES}}\list
+%  {}{\labelwidth 0pt\leftmargin\labelwidth \itemsep 0.5ex}
+%    \def\newblock{\hskip .11em plus .33em minus .07em}
+%    \sloppy\clubpenalty4000\widowpenalty4000
+%    \sfcode`\.=1000\relax}
