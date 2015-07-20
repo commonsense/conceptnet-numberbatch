@@ -51,4 +51,10 @@ rule retrofit
 rule test
   command = python -m conceptnet_retrofitting.evaluation.wordsim $in >$out
 
-#END OF RULES SECTION
+rule tests_to_latex
+  command = python -m conceptnet_retrofitting.builders.latex_results $in $out
+
+rule rebuild_ninja
+  command = python -m ninja
+
+build build.ninja: rebuild_ninja | ninja.py rules.ninja
