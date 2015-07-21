@@ -1,9 +1,8 @@
-from collections import OrderedDict
-
 class LabelSet:
 
     def __init__(self, iterable=None):
-        self._seq = OrderedDict()
+        self._list = []
+        self._dict = {}
         self._index = 0
 
         if iterable is not None:
@@ -11,22 +10,22 @@ class LabelSet:
                 self.add(elem)
 
     def add(self, item):
-        if item not in self._seq:
-            self.append(item)
+        if item not in self._dict:
+            self._list.append(item)
+            self._dict[item] = len(self._list) - 1
         return self._seq[item]
-
-    def append(self, item):
-        self._seq[item] = self._index
-        self._index += 1
 
     def index(self, item):
-        return self._seq[item]
+        return self._dict[item]
+
+    def __getitem__(self, index):
+        return self._list[index]
 
     def __len__(self):
-        return len(self._seq)
+        return len(self._list)
 
     def __iter__(self):
-        return iter(self._seq)
+        return iter(self._list)
 
     def __contains__(self, item):
-        return item in self._seq
+        return item in self._dict

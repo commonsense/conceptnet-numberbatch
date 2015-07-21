@@ -26,18 +26,15 @@ class WordVectors:
             return 0
 
     def to_vector(self, word, return_default=True):
-        if self._standardizer is None:
-            vec = self.vectors[self.labels.index(word)]
-        else:
-            vec = self.vectors[self.labels.index(self._standardizer(word))]
+        if self._standardizer is not None:
+            word = self._standardizer(word)
+        vec = self.vectors[self.labels.index(word)]
         if isinstance(vec, np.memmap):
             return normalize(vec)[0]
         return vec
 
     def similar_to(self, word_or_vector, num=20):
         if isinstance(word_or_vector, str):
-            if self._standardizer is not None:
-                word_or_vector = self._standardizer(word_or_vector)
             vec = self.to_vector(word_or_vector)
         else:
             vec = word_or_vector
