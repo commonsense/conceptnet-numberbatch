@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import sparse
 
+from conceptnet_retrofitting.word_vectors import WordVectors
 
 def load_vecs(filename):
     return np.load(filename)
@@ -33,3 +34,14 @@ def load_labels(filename, encoding='utf-8'):
 def save_labels(labels, filename):
     with open(filename, mode='w') as file:
          file.write('\n'.join(labels))
+
+def load_word_vectors(
+    labels_in='data/glove.retrofit.labels',
+    vecs_in='data/glove.l1.retrofit.labels',
+    ):
+
+    labels = load_labels(labels_in)
+    standardize = labels[0].startswith('/c/')
+    vecs = load_vec_memmap(vecs_in)
+
+    return WordVectors(labels, vecs, standardize=standardize)

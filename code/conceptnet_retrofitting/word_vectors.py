@@ -26,7 +26,8 @@ class WordVectors:
             return 0
 
     def to_vector(self, word, return_default=True):
-        if self._standardizer is not None:
+        if self._standardizer is not None and \
+            not word.startswith('/c/'):
             word = self._standardizer(word)
         vec = self.vectors[self.labels.index(word)]
         if isinstance(vec, np.memmap):
