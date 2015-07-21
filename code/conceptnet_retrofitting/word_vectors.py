@@ -33,12 +33,21 @@ class WordVectors:
             return normalize(vec)[0]
         return vec
 
-    def similar_to(self, word_or_vector, num=20):
+    def similar_to(self, word_or_vector, num=20, only=None):
         if isinstance(word_or_vector, str):
             vec = self.to_vector(word_or_vector)
         else:
             vec = word_or_vector
 
         sim = self.vectors.dot(vec)
-        indices = np.argsort(sim)[::-1][:num]
-        return [(self.labels[index], sim[index]) for index in indices]
+        indices = np.argsort(sim)[::-1]
+
+        out = []
+        for index in indices:
+            if len(out) == num:
+                return out
+            if only is not None and not only(self.labels[index]):
+                continue
+            out.append((self.labels[index], sim[index]))
+
+        return out
