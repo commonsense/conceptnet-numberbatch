@@ -13,7 +13,7 @@ class LabelSet:
         if item not in self._dict:
             self._list.append(item)
             self._dict[item] = len(self._list) - 1
-        return self._seq[item]
+        return self._dict[item]
 
     def index(self, item):
         return self._dict[item]
