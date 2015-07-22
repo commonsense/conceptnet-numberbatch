@@ -58,24 +58,7 @@ def parse_mc30(filename='mc30.csv'):
 
 def main(labels_in, vecs_in, verbose=True):
     from conceptnet_retrofitting import loaders
-    from conceptnet_retrofitting.word_vectors import WordVectors
-
-    if verbose >= 2:
-        print("Loading labels")
-
-    labels = loaders.load_labels(labels_in)
-
-    standardize = labels[0].startswith('/c/')
-
-    if verbose >= 2:
-        print("Loading vectors")
-    vecs = loaders.load_vec_memmap(vecs_in)
-
-    if verbose >= 2:
-        print("Building LabelSet")
-    wv = WordVectors(labels, vecs, standardize=standardize)
-
-    test_all(wv.similarity)
+    test_all(loaders.load_word_vectors(labels_in, vecs_in).similarity)
 
 if __name__ == '__main__':
     import sys
