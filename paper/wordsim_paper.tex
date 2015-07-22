@@ -12,7 +12,7 @@
 \pdfinfo{
 /Title Improving Word Vectors by Adding Lexical Knowledge
 /Author Rob Speer, Joshua Chin, and Catherine Havasi}
-\setcounter{secnumdepth}{0}  
+\setcounter{secnumdepth}{0}
 \bibliographystyle{aaai}
 
 \title{Improving Word Vectors by Adding Lexical Knowledge}
@@ -42,6 +42,8 @@ We did stuff to GloVe and ConceptNet and got better stuff.
 blah blah blah
 
 \section{Background}
+
+\subsection{GloVe}
 \ldots introduce GloVe \ldots % TODO
 
 Learning processes such as GloVe produce results that can conveniently be
@@ -57,7 +59,41 @@ the external source of semantic knowledge, but we found that ConceptNet
 crowd-sourced and expert-created knowledge, should fit well with this process
 while greatly increasing the scope of its vocabulary.
 
-\ldots introduce ConceptNet \ldots % TODO
+\subsection{ConceptNet}
+ConceptNet 5 \cite{speer2012conceptnet} is a semantic network of terms
+connected by labeled relations. Its terms are words or multiple-word phrases
+in a variety of natural language. For continuity with previous work,
+these terms are often referred to as {\em concepts}.
+
+ConceptNet originated as a machine-parsed version of the early crowd-sourcing
+project called Open Mind Common Sense (OMCS) \cite{singh2002omcs}, and has expanded
+to include several other data sources, both crowd-sourced and expert created.
+In the latest version, ConceptNet 5.4, the data sources it includes are:
+
+\begin{itemize}
+\item Knowledge collected as English sentences on the original OMCS website,
+    and later parsed with a pattern-matching parser
+\item Sister projects to OMCS that collected similar sentences in Portuguese,
+    Dutch, and some Korean and Japanese \cite{anacleto2006portuguese}
+    \cite{eckhardt2008dutch} \cite{TODO-globalmind}
+\item ``Games with a purpose'' that collect relational knowledge, such as
+    Verbosity \cite{vonahn2006verbosity} in English, {\em nadya.jp}
+    \cite{TODOnadya} in Japanese, and the PTT pet game \cite{kuo2009petgame}
+    in Taiwanese Chinese
+\item WordNet 3.0 \cite{fellbaum1998wordnet}
+\item A parsed version of Wiktionary, whose parser is developed as part of the
+    ConceptNet 5 codebase
+\item Verbosity \cite{suranaTODOverbosity}, an online ``game with a purpose''
+    that collected English relational knowledge
+\item JMDict \cite{TODOjmdict}, a Japanese multilingual dictionary
+\item OpenCyc \cite{TODOcyc} as interpreted via Umbel \cite{TODOumbel}
+\end{itemize}
+
+ConceptNet 5.4 also includes a mapping of DBPedia \cite{auer2007dbpedia} into
+its term space, but this is kept separate in such a way that it is not used
+in this paper.
+
+% TODO ConceptNet image
 
 
 \section{Methods}
@@ -85,19 +121,9 @@ to the text it extracts from Common Crawl:
 \item The text is tokenized with the Stanford parser. Only single tokens are
     used in GloVe.
 \item The words are lowercased using a Unicode case-conversion
-    algorithm.\footnote{
-        It's unclear whether the text was lowercased using the simple
-        character-by-character algorithm defined in section 3.13 of
-        \cite{unicode2014}, or the context-sensitive algorithm defined in section
-        5.18. Different programming languages make different choices here.
-        Fortunately, they give the same results on the vocabulary of GloVe.
-}
+    algorithm.
 \item Although not all of Common Crawl is in valid UTF-8 or even in a known
     encoding, only words in valid UTF-8 are written to the file.
-\item No further standardization is applied. For example, the text is not all
-    in Unicode's Normalization Form C (NFC): there are two separate entries
-    for the word ``ni\~{n}o'', one where ``\~{n}'' is a single codepoint and
-    one where it is an ``n'' followed by a combining tilde.
 \end{itemize}
 
 It is important to keep these standardizations in mind and also apply them to
