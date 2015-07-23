@@ -106,12 +106,19 @@ embeddings incorporate the strengths of both ConceptNet and GloVe, and extend
 their vocabulary to the union of ConceptNet and GloVe, allowing embeddings that
 were originally only trained on English to be extended to other languages.
 
+
 \subsection{Standardizing text}
 
-The way we choose to represent words and compare them for equality may seem
-like a trivial matter, but it can significantly affect evaluation results.
-Additionally, we can only properly combine two resources with a method such
-as retrofitting if their string representations are comparable to each other.
+As \citeauthor{levy2015embeddings} \shortcite{levy2015embeddings} note,
+``[\ldots] much of the performance gains of word embeddings are due to certain
+system design choices and hyperparameter optimizations, rather than the
+embedding algorithms themselves.'' While it is presented as a negative result,
+this simply emphasizes the importance of these system design choices.
+
+Indeed, we have found that choices about how to handle text have a significant
+impact on evaluation results. Additionally, we can only properly combine two
+resources with a method such as retrofitting if their string representations
+are comparable to each other.
 
 The operations we apply to text would usually be called ``normalization'',
 but that word also refers to what we'll be doing to our vectors, so both
