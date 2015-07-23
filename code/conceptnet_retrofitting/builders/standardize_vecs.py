@@ -17,7 +17,7 @@ def standardize_vecs(labels, vecs):
         vec /= (index + 1)
 
         if label not in standardized_labels:
-            standardized_labels.append(label)
+            standardized_labels.add(label)
             standardized_vecs.append(vec)
         else:
             index = standardized_labels.index(label)
