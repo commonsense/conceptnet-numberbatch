@@ -1,4 +1,6 @@
 \def\year{2015}
+\def\thetitle{Improving Word Vectors by Adding Lexical Knowledge}
+
 \documentclass[letterpaper]{article}
 \usepackage{aaai}
 \usepackage{times}
@@ -10,12 +12,12 @@
 \setlength{\pdfpagewidth}{8.5in}
 \setlength{\pdfpageheight}{11in}
 \pdfinfo{
-/Title Improving Word Vectors by Adding Lexical Knowledge
+/Title \thetitle
 /Author Rob Speer, Joshua Chin, and Catherine Havasi}
 \setcounter{secnumdepth}{0}
 \bibliographystyle{aaai}
 
-\title{Improving Word Vectors by Adding Lexical Knowledge}
+\title{\thetitle}
 \author{Robert Speer\\
     Luminoso Technologies, Inc.\\
     675 Massachusetts Ave.\\
@@ -90,17 +92,21 @@ In the latest version, ConceptNet 5.4, the data sources it includes are:
 \end{itemize}
 
 ConceptNet 5.4 also includes a mapping of DBPedia \cite{auer2007dbpedia} into
-its term space, but this is kept separate in such a way that it is not used
-in this paper.
+its term space, but it is not used for word associations, so its presence does
+not affect the results in this paper.
 
-% TODO ConceptNet image
+% TODO: ConceptNet image
 
 
 \section{Methods}
 
-\subsection{Standardizing text}
+Here, we create a matrix that assigns embeddings in a 300-dimensional vector
+space to terms by combining data from ConceptNet and GloVe. The resulting word
+embeddings incorporate the strengths of both ConceptNet and GloVe, and extend
+their vocabulary to the union of ConceptNet and GloVe, allowing embeddings that
+were originally only trained on English to be extended to other languages.
 
-% TODO: condense this as much as possible
+\subsection{Standardizing text}
 
 The way we choose to represent words and compare them for equality may seem
 like a trivial matter, but it can significantly affect evaluation results.
@@ -110,6 +116,53 @@ as retrofitting if their string representations are comparable to each other.
 The operations we apply to text would usually be called ``normalization'',
 but that word also refers to what we'll be doing to our vectors, so both
 here and in the code we call it ``standardization'' instead.
+
+\subsubsection{How ConceptNet is standardized}
+
+Here are the standardizations applied to all terms in ConceptNet 5.4:
+
+\begin{itemize}
+\item The words and phrases that the data sources provide are first run
+    through the {\tt ftfy.fix\_text} function, in version 4.0 of the Python
+    module {\tt ftfy}.\footnote{
+        \url{http://github.com/LuminosoInsight/python-ftfy}
+    } This corrects some Unicode encoding glitches, as well as applying
+    NFC normalization.
+\item The text is tokenized using a regular expression that splits it at
+    characters whose major Unicode category is Z (whitespace), P (punctuation),
+    S (symbols), or C (control characters).
+\item If the text is English, each token is lemmatized using a modification of
+    WordNet's Morphy algorithm, which appears in the {\tt conceptnet5.language.english}
+    module of ConceptNet 5.4's Python code. This converts inflected words such
+    as ``creating'' to their root words that appear in WordNet, such as
+    ``create''.
+    % Because most data sources are not tagged with parts of speech,
+    % it uses heuristics to choose which part of speech to lemmatize the word as,
+    % plus exceptions that allow it to choose more common roots when Morphy would
+    % give multiple options.
+\item If the text is English, a very small list of stopwords (``a'', ``an'',
+    and ``the'') are removed, as well as ``to'' if it is the first word.
+\item Spaces and slashes are replaced by underscores.
+\item The text is lowercased according to the Unicode case-mapping algorithm
+    that is implemented in Python 3.4.
+\item The resulting standardized text is tagged with its language and turned
+    into a URI: the phrase ``giving an example'', for example, becomes
+    {\tt /c/en/give\_example}.
+\end{itemize}
+
+The complete implementation can be found in the
+{\tt conceptnet5.nodes.normalized\_concept\_uri} function of ConceptNet 5.4.
+
+The URIs are not entirely meant for human consumption, and are
+sometimes not grammatically accurate -- the term ``ground zero'' becomes
+{\tt /c/en/grind\_zero}, for example -- but the purpose is to unify
+surface texts that may appear in slightly different forms in different
+resources.
+
+A drawback to this standardization process is that we will not be able
+to evaluate the result on Mikolov et al.'s syntactic analogy task
+\cite{mikolov2013word2vec}, as many of the analogies would become trivial
+analogies of the form ``A is to A as B is to B''.
 
 \subsubsection{How GloVe is standardized}
 
@@ -126,9 +179,9 @@ to the text it extracts from Common Crawl:
     encoding, only words in valid UTF-8 are written to the file.
 \end{itemize}
 
-It is important to keep these standardizations in mind and also apply them to
-the word-similarity datasets, such as lowercasing the word ``OPEC'' in {\sc
-wordsim-353}.
+When evaluating GloVe, it is important to keep these standardizations in mind
+and also apply them to the word-similarity datasets, such as lowercasing the
+word ``OPEC'' in {\sc wordsim-353}.
 
 The 840B-token dataset is not lowercased, as described in
 \cite{pennington2014glove}, but it is also not all in UTF-8. It is possible
@@ -137,70 +190,37 @@ Common Crawl, as bytes of ``encoding salad'', as one might expect from
 scraping arbitrary Web pages. They are still tokenized in a way that is
 reasonable for English.
 
-\subsubsection{How ConceptNet is standardized}
+\subsubsection{Aligning ConceptNet and Glove}
 
-An operation that is common in Web design is to ``slugify'' a title or
-headline, converting it to a reduced, not-necessarily-grammatical form
-that fits into a URL while keeping all the key words. ConceptNet's
-normalization is similar: it converts a term into a form that fits into
-a URI.
+ConceptNet's standardization process is stronger than GloVe's, so we align them
+by applying the ConceptNet standardizations to the GloVe labels as well, turning
+its tokens into ConceptNet URIs. The GloVe tokens are assumed to be in English.
 
-The standardizations may seem byzantine, but their purpose is to align many
-different resources -- particularly on English terms, where they most often
-align. Here are the standardizations applied to English terms in ConceptNet
-5.4:
+This has the effect that many separate rows of the GloVe matrix get the same
+label, such as when the same word appears with a different capitalization. A
+few options for dealing with these merged labels come to mind:
 
-\begin{itemize}
-\item The words and phrases that the data sources provide are first run
-    through the {\tt ftfy.fix\_text} function, in version 4.0 of the Python
-    module {\tt ftfy}.\footnote{
-        \url{http://github.com/LuminosoInsight/python-ftfy}
-    } This corrects some Unicode encoding glitches, as well as applying
-    NFC normalization.
-\item The text is tokenized using Treebank tokenization
-    \cite{marcus1993treebank}.
-\item Each token is lemmatized using a modification of WordNet's Morphy
-    algorithm, which appears in the {\tt conceptnet5.language.english}
-    module of ConceptNet 5.4's Python code. Because most data sources are not
-    tagged, it uses heuristics to choose which part of speech to normalize
-    the word as, plus exceptions that allow it to choose more common roots
-    when Morphy would choose a rare one.
-\item Tokens whose first character is not alphanumeric (according to Python
-    3's {\tt isalnum}) are removed.
-\item A very small list of stopwords (``a'', ``an'', and ``the'') are
-    removed, as well as ``to'' if it is the first word.
-\item Terms that would become the empty string due to the above steps are
-    returned to their original text.
-\item Spaces and slashes are replaced by underscores.
-\item The text is lowercased according to Python 3, which uses Unicode's
-    context-sensitive algorithm.
-\item The resulting standardized text is tagged with its language and turned
-    into a URI: the phrase ``giving an example'', for example, becomes
-    {\tt /c/en/give\_example}.
-\end{itemize}
+\begin{enumerate}
+\item Keep only the row with the highest frequency in GloVe.
+\item Average the rows together.
+\item Take a weighted average that favors higher-frequency rows.
+\end{enumerate}
 
-The complete implementation can be found in the
-{\tt conceptnet5.nodes.normalized\_concept\_uri} function of ConceptNet 5.4.
+The weighted average turns out to be the best approach, as our evaluation will
+show. The multiple rows contain valuable data that should not simply be
+discarded, but lower-frequency rows tend to have lower-quality data.
 
-The URIs are not entirely meant for human consumption, and are
-sometimes not grammatically accurate -- the term ``ground zero'' becomes
-{\tt /c/en/grind\_zero}, for example -- but the purpose is to unify
-surface texts that may appear in slightly different forms in different
-resources.
-
-When aligning GloVe and ConceptNet, then, we apply these standardizations on
-top of what has already been applied to GloVe, turning its tokens into
-ConceptNet URIs. The tokens are assumed to be in English.
-
-A possible drawback to this standardization process is that we will not be able
-to evaluate the result on Mikolov et al.'s syntactic analogy task
-\cite{mikolov2013word2vec}, as many of the analogies would become trivial
-analogies of the form ``A is to A as B is to B''. (We will discuss below
-why analogies are not a goal of this system anyway.)
+The word frequency data is not distributed with the GloVe matrix, but
+the rows are clearly in descending order of frequency. We approximate the
+frequency distribution by assuming that the tokens are distributed according to
+Zipf's law \cite{TODOzipf}: the $n$th token in rank order has a frequency
+proportional to $1/n$.
 
 \section{Evaluation}
 
-
+% TODO: lots of stuff
+% TODO: evaluate other row-combining metrics
+% TODO: retrofit PPDB instead of ConceptNet and compare
 
 \section{Discussion}
 
@@ -215,7 +235,6 @@ a meaningless exercise.
 
 The syntactic analogies \ldots
 
-\section{References}
 \bibliography{wordsim_paper}
 
 \end{document}
