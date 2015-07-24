@@ -16,6 +16,22 @@
 #
 # - Try to keep each section in chronological order, at least by year.
 
+# Knowledge sources for ConceptNet
+# --------------------------------
+@article{nakahara2011nadya,
+  title={
+    日本でのコモンセンス知識獲得を目的とした{ W}eb ゲームの開発と評価
+    { }[{D}evelopment and Evaluation of a {W}eb-Based Game for Common-Sense Knowledge Acquisition in {J}apan]
+  },
+  author={Kazuhiro Nakahara and Shigeo Yamada},
+  journal={Unisys 技報},
+  volume={30},
+  number={4},
+  pages={295--305},
+  year={2011},
+  publisher={日本ユニシス}
+}
+
 # Existing implementations of word similarity
 # -------------------------------------------
 
@@ -166,6 +182,18 @@
   comment={The publication of the WordSim-353 datset}
 }
 
+@inproceedings{huang2012scws,
+  author = {Eric H. Huang and Richard Socher and Christopher D. Manning and Andrew Y. Ng},
+  title = {{Improving Word Representations via Global Context and Multiple Word Prototypes}},
+  booktitle = {Annual Meeting of the Association for Computational Linguistics (ACL)},
+  year = 2012,
+  url={http://www.socher.org/index.php/Main/ImprovingWordRepresentationsViaGlobalContextAndMultipleWordPrototypes},
+  comment={
+    The publication of the SCWS dataset, which compares words in context, even
+    though we may need to ignore the context.
+  }
+}
+
 @article{luong2013rw,
   title={Better word representations with recursive neural networks for morphology},
   author={Luong, Minh-Thang and Socher, Richard and Manning, Christopher D},
@@ -180,7 +208,7 @@
 @article{bruni2014men,
   title={Multimodal Distributional Semantics.},
   author={Bruni, Elia and Tran, Nam-Khanh and Baroni, Marco},
-  journal={J. Artif. Intell. Res.(JAIR)},
+  journal={J. Artif. Intell. Res. (JAIR)},
   volume={49},
   pages={1--47},
   year={2014},
@@ -224,3 +252,18 @@
   comment={The most recent publication of ConceptNet.}
 }
 
+# General background
+# ------------------
+
+@book{zipf1949human,
+  title={Human behavior and the principle of least effort: an introduction to human ecology},
+  author={Zipf, G.K.},
+  lccn={49007787},
+  url={https://books.google.com/books?id=1tx9AAAAIAAJ},
+  year={1949},
+  publisher={Addison-Wesley Press},
+  comment={
+    The book that gave us Zipf's law. Apparently considered a bad work
+    of anthropology but an excellent work of corpus linguistics.
+  }
+}

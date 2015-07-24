@@ -8,6 +8,7 @@ DISPLAYED_NAMES = {
     'wordsim-353': 'WS-353',
     'rg-65': 'RG-65',
     'mc-30': 'MC-30',
+    'scws': 'SCWS'
 }
 
 
