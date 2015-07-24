@@ -1,6 +1,9 @@
 \def\year{2015}
 \def\thetitle{Improving Word Vectors by Adding Lexical Knowledge}
 
+% Update this when our score changes. Maybe we can even automate this.
+\def\scoreRW{.584}
+
 \documentclass[letterpaper]{article}
 \usepackage{aaai}
 \usepackage{times}
@@ -37,7 +40,18 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-We did stuff to GloVe and ConceptNet and got better stuff.
+Embeddings of natural-language words in a vector space are useful for a variety
+of tasks in semantics. Embeddings learned from unstructured text can be
+combined with structured knowledge to achieve performance that neither source
+would achieve on its own, as shown by \citeauthor{faruqui2014retrofitting}
+\shortcite{faruqui2014retrofitting}. In this paper, we show the effectiveness
+of combining the GloVe embeddings \cite{pennington2014glove} with the
+crowd-sourced semantic network ConceptNet \cite{speer2012conceptnet}, with
+some changes to the GloVe embeddings and \citeauthor{faruqui2014retrofitting}'s
+``retrofitting'' algorithm. The resulting vector space has a larger vocabulary
+than either source, and achieves state-of-the-art performance on multiple word
+similarity evaluations, including an unprecedented score of $\rho = \scoreRW{}$
+on \citeauthor{luong2013rw}'s rare words evaluation.
 \end{abstract}
 
 \section{Introduction}
