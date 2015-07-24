@@ -3,34 +3,48 @@ from collections import defaultdict
 from conceptnet_retrofitting.ninja.ninja_util import (
     Dep, DepGraph, make_ninja_file, outputs
 )
-from conceptnet_retrofitting.ninja.config import CONFIG
 
 
-# TODO: clean up these classes; their names are confusing and I'm not sure
-# why they need to be classes anyway
+CONFIG = {
+    'source-data-path': 'source-data/',
+    'build-data-path': 'build-data/',
+    'glove-versions': ['42B.300d', '840B.300d'],
+    'conceptnet': 'conceptnet5'
+}
 
-class GloveVector:
-    def __init__(self, normalization='none', standardization='raw', retrofit=None,
+
+class GloveVectors:
+    """
+    A reference to a file containing a matrix of GloVe embeddings.
+    """
+    def __init__(self, version, *, normalization='none',
+                 standardization='raw', retrofit=None,
                  filetype='npy'):
+        self.version = version
         self.normalization = normalization
         self.standardization = standardization
         self.retrofit = retrofit
         self.filetype = filetype
 
     def __repr__(self):
-        out = ['glove', self.normalization, self.standardization]
+        out = ['glove', self.version, self.normalization, self.standardization]
         if self.standardization == 'retrofit' and self.retrofit:
             out.append(self.retrofit)
         out.append(self.filetype)
         return CONFIG['build-data-path'] + '.'.join(out)
 
 
-class GloveLabel:
-    def __init__(self, standardization='raw'):
+class GloveLabels:
+    """
+    A reference to a file containing the labels corresponding to a
+    GloveVectors file.
+    """
+    def __init__(self, version, *, standardization='raw'):
+        self.version = version
         self.standardization = standardization
 
     def __repr__(self):
-        out = ['glove', self.standardization, 'labels']
+        out = ['glove', self.version, self.standardization, 'labels']
         return CONFIG['build-data-path'] + '.'.join(str(x) for x in out)
 
 
@@ -47,16 +61,13 @@ implicit = {
     'tests_to_latex': ['conceptnet_retrofitting/builders/latex_results.py'],
 }
 
+
 def build_conceptnet_retrofitting():
     graph = DepGraph()
     build_glove(graph)
 
-    l1_normalize_raw_glove(graph)
-    l2_normalize_raw_glove(graph)
-
     standardize_glove(graph)
-    l1_normalize_glove(graph)
-    l2_normalize_glove(graph)
+    normalize_glove(graph)
 
     build_assoc(graph)
     add_self_loops(graph)
@@ -67,69 +78,56 @@ def build_conceptnet_retrofitting():
 
     make_ninja_file('rules.ninja', graph, implicit)
 
-def build_glove(graph):
-    input = CONFIG['source-data-path'] + CONFIG['glove'] + '.txt'
-    graph['build_glove']['build_glove_labels'] = Dep(
-        input,
-        GloveLabel(),
-        'glove_to_labels'
-    )
 
-    graph['build_glove']['build_glove_vecs'] = Dep(
-        input,
-        GloveVector(),
-        'glove_to_vecs'
-    )
+def build_glove(graph):
+    for version in CONFIG['glove-versions']:
+        input = CONFIG['source-data-path'] + 'glove.%s.txt' % version
+        graph['build_glove']['build_glove_labels'][version] = Dep(
+            input,
+            GloveLabels(version=version),
+            'glove_to_labels'
+        )
+        graph['build_glove']['build_glove_vecs'][version] = Dep(
+            input,
+            GloveVectors(version=version),
+            'glove_to_vecs'
+        )
 
 
 def standardize_glove(graph):
-    graph['standardize_glove'] = Dep(
-        [
-            GloveLabel(),
-            GloveVector()
-        ],
-        [
-            GloveLabel('standardized'),
-            GloveVector(standardization='standardized'),
-        ],
-        'standardize_vecs'
-    )
+    for version in CONFIG['glove-versions']:
+        graph['standardize_glove'][version] = Dep(
+            [
+                GloveLabels(version=version),
+                GloveVectors(version=version)
+            ],
+            [
+                GloveLabels(version=version, standardization='standardized'),
+                GloveVectors(version=version, standardization='standardized'),
+            ],
+            'standardize_vecs'
+        )
 
 
-def l2_normalize_raw_glove(graph):
-    graph['l2_normalize_raw_glove'] = Dep(
-        GloveVector(),
-        GloveVector(normalization='l2'),
-        'l2_normalize'
-    )
+def normalize_glove(graph):
+    for version in CONFIG['glove-versions']:
+        for norm in ('l1', 'l2'):
+            for s13n in ('raw', 'standardized'):
+                graph['normalize_glove'][version][norm][s13n] = Dep(
+                    GloveVectors(version=version, standardization=s13n),
+                    GloveVectors(version=version, normalization=norm, standardization=s13n),
+                    '%s_normalize' % norm
+                )
 
-def l1_normalize_raw_glove(graph):
-    graph['l1_normalize_raw_glove'] = Dep(
-        GloveVector(),
-        GloveVector(normalization='l1'),
-        'l1_normalize'
-    )
-
-def l2_normalize_glove(graph):
-    graph['l2_normalize_glove'] = Dep(
-        GloveVector(standardization='standardized'),
-        GloveVector(standardization='standardized', normalization='l2'),
-        'l2_normalize'
-    )
-
-def l1_normalize_glove(graph):
-    graph['l1_normalize_glove'] = Dep(
-        GloveVector(standardization='standardized'),
-        GloveVector(standardization='standardized', normalization='l1'),
-        'l1_normalize'
-    )
 
 def build_assoc(graph):
+    version = '840B.300d'
     graph['conceptnet_to_assoc'] = Dep(
-        [GloveLabel('standardized'), CONFIG['source-data-path'] + CONFIG['conceptnet'] + '.csv'],
-        [GloveLabel('retrofit'), CONFIG['build-data-path'] + CONFIG['conceptnet'] + '.npz'],
+        [GloveLabels(version=version, standardization='standardized'), CONFIG['source-data-path'] + CONFIG['conceptnet'] + '.csv'],
+        [GloveLabels(version=version, standardization='retrofit'), CONFIG['build-data-path'] + CONFIG['conceptnet'] + '.npz'],
         'conceptnet_to_assoc'
     )
+
 
 def add_self_loops(graph):
     conceptnet_prefix = CONFIG['build-data-path'] + CONFIG['conceptnet']
@@ -139,34 +137,38 @@ def add_self_loops(graph):
         'add_self_loops'
     )
 
+
 def retrofit(graph):
     conceptnet_prefix = CONFIG['build-data-path'] + CONFIG['conceptnet']
+    version = '840B.300d'
     for norm in ['l1', 'l2', 'none']:
         graph['retrofit'][norm] = Dep(
             [
-                GloveVector(standardization='standardized', normalization=norm),
+                GloveVectors(version=version, standardization='standardized', normalization=norm),
                 conceptnet_prefix + '.self_loops.npz'
             ],
-            GloveVector(standardization='retrofit', normalization=norm),
+            GloveVectors(version=version, standardization='retrofit', normalization=norm),
             'retrofit'
         )
+
 
 def test(graph):
     vector_files = defaultdict(list)
     for file in outputs(graph):
-        if not isinstance(file, GloveVector):
+        if not isinstance(file, GloveVectors):
             continue
-        vector_files[file.standardization].append(file)
+        vector_files[file.version, file.standardization].append(file)
 
-    for standardization, files in vector_files.items():
-        label = GloveLabel(standardization)
+    for (version, standardization), files in vector_files.items():
+        label = GloveLabels(version=version, standardization=standardization)
         for file in files:
             out = copy.copy(file)
             out.filetype = 'evaluation'
 
-            graph['test']['test_%s'%file] = Dep(
+            graph['test']['test_%s' % file] = Dep(
                 [label, file], out, 'test'
             )
+
 
 def latex_results(graph):
     inputs = []
@@ -177,5 +179,7 @@ def latex_results(graph):
         'tests_to_latex'
     )
 
+
 if __name__ == '__main__':
     build_conceptnet_retrofitting()
+
