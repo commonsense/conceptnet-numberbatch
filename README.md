@@ -33,7 +33,7 @@ track them when they change:
 
     git remote add SERVERNAME SERVERNAME:/data/annex/
 
-- Make sure you can connect to buffy without a password. In my case, that
+- Make sure you can connect to the server without a password. In my case, that
   required me to add `eval ssh-agent` to the end of my `.bashrc`.
 
 - Get the files:
