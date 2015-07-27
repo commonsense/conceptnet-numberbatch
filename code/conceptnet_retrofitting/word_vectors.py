@@ -1,13 +1,15 @@
 import numpy as np
 
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet_retrofitting.builders.label_set import LabelSet
 from sklearn.preprocessing import normalize
+
 
 def conceptnet_standardizer(label):
     return standardized_concept_uri('en', label)
 
-class WordVectors:
 
+class WordVectors:
     def __init__(self, labels, vectors, standardizer=conceptnet_standardizer):
         assert(len(labels) == len(vectors))
         self.labels = LabelSet(labels)

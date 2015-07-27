@@ -58,15 +58,8 @@ def parse_rg65(filename='rg-65.csv'):
 def parse_mc30(filename='mc30.csv'):
     return parse_file(filename)
 
-def parse_scws(filename='scws.csv'):
-    with open(os.path.join(directory, 'data', filename)) as file:
-        for line in file:
-            parts = line.strip().split('\t')
-            w1 = parts[1]
-            w2 = parts[3]
-            val = float(parts[7])
-            if w1 != w2:
-                yield w1, w2, float(val)
+def parse_scws(filename='scws-star.csv'):
+    return parse_file(filename)
 
 def main(labels_in, vecs_in, verbose=True):
     from conceptnet_retrofitting import loaders
