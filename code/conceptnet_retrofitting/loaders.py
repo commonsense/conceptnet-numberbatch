@@ -41,7 +41,9 @@ def load_word_vectors(
     ):
 
     labels = load_labels(labels_in)
-    standardize = labels[0].startswith('/c/')
     vecs = load_vec_memmap(vecs_in)
 
-    return WordVectors(labels, vecs, standardize=standardize)
+    if labels[0].startswith('/c/'):
+        return WordVectors(labels, vecs)
+    else:
+        return WordVectors(labels, vecs, str.lower)
