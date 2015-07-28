@@ -155,7 +155,7 @@ of ConceptNet 5.4:
         \url{http://github.com/LuminosoInsight/python-ftfy}
     } This corrects ``mojibake'' (a Unicode glitch that arises when reading
     text in the wrong encoding), as well as applying NFC normalization.\footnote{
-        For example, we consider ``ni\~{n}o'' to be a single
+        For example, ConceptNet considers ``ni\~{n}o'' to be a single
         label, regardless of whether it is spelled as the four codepoints
         {\tt n i \~{n} o}, the five codepoints {\tt n i n \textasciitilde{} o}
         where the fourth is a combining character,
@@ -205,7 +205,7 @@ to the text it extracts from Common Crawl:
 
 When evaluating GloVe, it is important to keep these standardizations in mind
 and also apply them to the word-similarity datasets, such as lowercasing the
-word ``OPEC'' in {\sc wordsim-353}.
+word ``OPEC'' in WordSim-353.
 
 The 840B-token dataset is not lowercased, as described in
 \cite{pennington2014glove}, but it is also not all in UTF-8. It is possible
@@ -302,9 +302,8 @@ on development and test data.
 
 % TODO: we have to actually do the above before we submit
 
-% TODO: lots of stuff
+% TODO: compare PPDB to ConceptNet
 % TODO: evaluate other row-combining metrics
-% TODO: retrofit PPDB instead of ConceptNet and compare
 
 \section{Discussion}
 
