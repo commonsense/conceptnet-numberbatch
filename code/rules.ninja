@@ -30,6 +30,9 @@ rule standardize_vecs
   command = python -m conceptnet_retrofitting.builders.standardize_vecs $in $out
   pool = memory_hogs
 
+rule standardize_assoc
+  command = python -m conceptnet_retrofitting.builders.standardize_assoc $in $out
+
 rule l1_normalize
   command = python -m conceptnet_retrofitting.builders.l1norm $in $out
   pool = memory_hogs
@@ -38,7 +41,7 @@ rule l2_normalize
   command = python -m conceptnet_retrofitting.builders.l2norm $in $out
   pool = memory_hogs
 
-rule conceptnet_to_assoc
+rule network_to_assoc
   command = python -m conceptnet_retrofitting.builders.build_assoc $in $out
 
 rule add_self_loops
