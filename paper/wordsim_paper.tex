@@ -261,8 +261,8 @@ variety of word-similarity gold standards:
     similarity judgments for 2034 word pairs, with a bias toward uncommon words.
 \item SCWS*. SCWS \cite{huang2012scws} contains crowd-sourced similarity
     judgments for 2003 word pairs in the context of sentences, while SCWS* is
-    the modification of it described by \citeauthor{luong2013rw}
-    \shortcite{luong2013rw} to disregard the context in order to evaluate
+    the modification of it described by \newcite{luong2013rw}
+    to disregard the context in order to evaluate
     systems that cannot make use of context. SCWS* discards the pairs of
     identical words that are only distinguished by context, leaving 1759 pairs.
 \item WordSim-353 \cite{finkelstein2001ws}, a widely-used corpus of similarity
@@ -340,15 +340,15 @@ The syntactic analogies \ldots %TODO
 
 \subsection{The limits of similarity judgments}
 
-\citeauthor{bruni2014men} \shortcite{bruni2014men} describe a substitute for
+\newcite{bruni2014men} describe a substitute for
 inter-annotator agreement on their MEN-3000 dataset:
 
 \begin{quote}
-The Spearman correlation of the two authors is at 0.68, the correlation of their
+``The Spearman correlation of the two authors is at 0.68, the correlation of their
 average ratings with the MEN scores is at 0.84. On the one hand, this high
 correlation suggests that MEN contains meaningful semantic ratings. On the
 other, it can also be taken as an upper bound on what computational models can
-realistically achieve when simulating the human MEN judgments.
+realistically achieve when simulating the human MEN judgments.''
 \end{quote}
 
 Our model achieves a MEN score of \scoreMEN{}, after re-introducing the
