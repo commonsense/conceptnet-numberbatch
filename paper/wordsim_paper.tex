@@ -41,6 +41,9 @@
 %    \texttt{havasi@luminoso.com}
 %}
 
+% TODO: look for instances of the word 'similarity' and decide whether we mean
+% 'relatedness'
+
 \begin{document}
 \maketitle
 \begin{abstract}
@@ -123,7 +126,6 @@ space to terms by combining data from ConceptNet and GloVe. The resulting word
 embeddings incorporate the strengths of both ConceptNet and GloVe, and extend
 their vocabulary to the union of ConceptNet and GloVe, allowing embeddings that
 were originally only trained on English to be extended to other languages.
-
 
 \subsection{Standardizing text}
 
@@ -246,6 +248,43 @@ standardization process is that we will not be able to evaluate the result on
 Mikolov et al.'s syntactic analogy task \cite{mikolov2013word2vec}, as many of
 the analogies would become trivial analogies of the form
 ``A is to A as B is to B''.
+
+\subsection{ConceptNet as an association matrix}
+
+In order to apply the retrofitting method, we need to consider the data in
+ConceptNet as a sparse, symmetric matrix of associations between terms. What
+ConceptNet provides is more complex than that, as it connects terms with a
+variety of not-necessarily-symmetric, labeled relations.
+
+\newcite{havasi2010color} introduced a vector space embedding of ConceptNet,
+``spectral association'', that disregarded the relation labels for the purpose
+of measuring the relatedness of terms. Previous embeddings of ConceptNet, such
+as that of \newcite{speer2008analogyspace}, preserved the relations but were
+suited mostly for direct similarity and inference, not for relatedness. Because
+most evaluation data for word similarity is also evaluating relatedness, we
+erase the labels as in spectral association.
+
+Negated relations and antonym relations, such as the relations expressed by
+``a person does not have a tail'' and ``hot is the opposite of cold'', are
+typically handled specially; a detail of spectral association is that negated
+relations were assigned negative values in the matrix. Intuitively, negated
+relations between two terms should not increase their relatedness. Perhaps
+these relations should in fact decrease relatedness -- while ``hot'' and
+``cold'' are similar in many ways, people providing judgments of relatedness
+are likely to consider them less related because of the obvious contrast
+between them.
+
+However, association matrices are better behaved, especially under
+normalization, when they contain no negative entries. In our method, we simply
+omit all instances of negative and antonym relations in ConceptNet.
+
+Each remaining assertion in ConceptNet corresponds to two entries in a sparse
+association matrix $S$. ConceptNet assigns a confidence score, or weight, to each
+assertion. An assertion that relates term $i$ to term $j$ with weight $w$ will
+contribute $w$ to the value of $S_ij$ and $S_ji$. If another assertion relates
+the same terms with a different relation, it will add to that value.
+
+\subsection{Retrofitting}
 
 \section{Evaluation}
 
