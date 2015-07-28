@@ -58,8 +58,12 @@ coverage.xml
 *.mo
 *.pot
 
-# Django stuff:
+# Django stuff
 *.log
+
+# Editor stuff
+*~
+*.swp
 
 # Sphinx documentation
 docs/_build/
@@ -70,3 +74,4 @@ target/
 build.ninja
 
 code/data
+code/build-data

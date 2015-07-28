@@ -21,6 +21,8 @@ def test_all(similarity_func):
     print(evaluate(similarity_func, parse_men3000()))
     print("wordsim-353")
     print(evaluate(similarity_func, parse_wordsim353()))
+    print("scws")
+    print(evaluate(similarity_func, parse_scws()))
     print("rg-65")
     print(evaluate(similarity_func, parse_rg65()))
     print("mc-30")
@@ -54,6 +56,9 @@ def parse_rg65(filename='rg-65.csv'):
     return parse_file(filename)
 
 def parse_mc30(filename='mc30.csv'):
+    return parse_file(filename)
+
+def parse_scws(filename='scws-star.csv'):
     return parse_file(filename)
 
 def main(labels_in, vecs_in, verbose=True):

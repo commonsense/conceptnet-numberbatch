@@ -1,22 +1,22 @@
 import numpy as np
 
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet_retrofitting.builders.label_set import LabelSet
 from sklearn.preprocessing import normalize
 
-class WordVectors:
 
-    def __init__(self, labels, vectors, standardize=True):
+def conceptnet_standardizer(label):
+    return standardized_concept_uri('en', label)
+
+
+class WordVectors:
+    def __init__(self, labels, vectors, standardizer=conceptnet_standardizer):
         assert(len(labels) == len(vectors))
         self.labels = LabelSet(labels)
         if not isinstance(vectors, np.memmap):
             normalize(vectors, copy=False)
         self.vectors = vectors
-
-        if standardize:
-            from conceptnet5.nodes import standardized_concept_uri
-            self._standardizer = lambda label: standardized_concept_uri('en', label)
-        else:
-            self._standardizer = None
+        self._standardizer = standardizer
 
 
     def similarity(self, word1, word2):
@@ -26,8 +26,7 @@ class WordVectors:
             return 0
 
     def to_vector(self, word, return_default=True):
-        if self._standardizer is not None and \
-            not word.startswith('/c/'):
+        if self._standardizer is not None:
             word = self._standardizer(word)
         vec = self.vectors[self.labels.index(word)]
         if isinstance(vec, np.memmap):

@@ -1,12 +1,17 @@
 \def\year{2015}
 \def\thetitle{Improving Word Vectors by Adding Lexical Knowledge}
 
+% Update this when our score changes. Maybe we can even automate this.
+\def\scoreRW{.584}
+
 \documentclass[letterpaper]{article}
 \usepackage{aaai}
 \usepackage{times}
 \usepackage{helvet}
 \usepackage{courier}
 \usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{CJKutf8}
 \usepackage{url}
 \frenchspacing
 \setlength{\pdfpagewidth}{8.5in}
@@ -18,26 +23,37 @@
 \bibliographystyle{aaai}
 
 \title{\thetitle}
-\author{Robert Speer\\
-    Luminoso Technologies, Inc.\\
-    675 Massachusetts Ave.\\
-    Cambridge, MA 02139\\
-    \texttt{rspeer@luminoso.com}
-\And
-    Joshua Chin\\
-    {\em academic address goes here}
-\And
-    Catherine Havasi\\
-    Luminoso Technologies, Inc.\\
-    675 Massachusetts Ave.\\
-    Cambridge, MA 02139\\
-    \texttt{havasi@luminoso.com}
-}
+%\author{Robert Speer\\
+%    Luminoso Technologies, Inc.\\
+%    675 Massachusetts Ave.\\
+%    Cambridge, MA 02139\\
+%    \texttt{rspeer@luminoso.com}
+%\And
+%    Joshua Chin\\
+%    {\em academic address goes here}
+%\And
+%    Catherine Havasi\\
+%    Luminoso Technologies, Inc.\\
+%    675 Massachusetts Ave.\\
+%    Cambridge, MA 02139\\
+%    \texttt{havasi@luminoso.com}
+%}
 
 \begin{document}
 \maketitle
 \begin{abstract}
-We did stuff to GloVe and ConceptNet and got better stuff.
+Embeddings of natural-language words in a vector space are useful for a variety
+of tasks in semantics. Embeddings learned from unstructured text can be
+combined with structured knowledge to achieve performance that neither source
+would achieve on its own, as shown by \citeauthor{faruqui2014retrofitting}
+\shortcite{faruqui2014retrofitting}. In this paper, we show the effectiveness
+of combining the GloVe embeddings \cite{pennington2014glove} with the
+crowd-sourced semantic network ConceptNet \cite{speer2012conceptnet}, with
+some changes to the GloVe embeddings and \citeauthor{faruqui2014retrofitting}'s
+``retrofitting'' algorithm. The resulting vector space has a larger vocabulary
+than either source, and achieves state-of-the-art performance on multiple word
+similarity evaluations, including an unprecedented score of $\rho = \scoreRW{}$
+on \citeauthor{luong2013rw}'s rare words evaluation.
 \end{abstract}
 
 \section{Introduction}
@@ -69,8 +85,8 @@ these terms are often referred to as {\em concepts}.
 
 ConceptNet originated as a machine-parsed version of the early crowd-sourcing
 project called Open Mind Common Sense (OMCS) \cite{singh2002omcs}, and has expanded
-to include several other data sources, both crowd-sourced and expert created.
-In the latest version, ConceptNet 5.4, the data sources it includes are:
+to include several other data sources, both crowd-sourced and expert-created.
+The data sources included in ConceptNet 5.4 are:
 
 \begin{itemize}
 \item Knowledge collected as English sentences on the original OMCS website,
@@ -80,15 +96,13 @@ In the latest version, ConceptNet 5.4, the data sources it includes are:
     \cite{eckhardt2008dutch} \cite{TODO-globalmind}
 \item ``Games with a purpose'' that collect relational knowledge, such as
     Verbosity \cite{vonahn2006verbosity} in English, {\em nadya.jp}
-    \cite{TODOnadya} in Japanese, and the PTT pet game \cite{kuo2009petgame}
+    \cite{nakahara2011nadya} in Japanese, and the PTT pet game \cite{kuo2009petgame}
     in Taiwanese Chinese
 \item WordNet 3.0 \cite{fellbaum1998wordnet}
 \item A parsed version of Wiktionary, whose parser is developed as part of the
     ConceptNet 5 codebase
-\item Verbosity \cite{suranaTODOverbosity}, an online ``game with a purpose''
-    that collected English relational knowledge
 \item JMDict \cite{TODOjmdict}, a Japanese multilingual dictionary
-\item OpenCyc \cite{TODOcyc} as interpreted via Umbel \cite{TODOumbel}
+\item OpenCyc \cite{TODOcyc} as represented in Umbel \cite{TODOumbel}
 \end{itemize}
 
 ConceptNet 5.4 also includes a mapping of DBPedia \cite{auer2007dbpedia} into
@@ -106,12 +120,19 @@ embeddings incorporate the strengths of both ConceptNet and GloVe, and extend
 their vocabulary to the union of ConceptNet and GloVe, allowing embeddings that
 were originally only trained on English to be extended to other languages.
 
+
 \subsection{Standardizing text}
 
-The way we choose to represent words and compare them for equality may seem
-like a trivial matter, but it can significantly affect evaluation results.
-Additionally, we can only properly combine two resources with a method such
-as retrofitting if their string representations are comparable to each other.
+As \citeauthor{levy2015embeddings} \shortcite{levy2015embeddings} note,
+``[\ldots] much of the performance gains of word embeddings are due to certain
+system design choices and hyperparameter optimizations, rather than the
+embedding algorithms themselves.'' While it is presented as a negative result,
+this simply emphasizes the importance of these system design choices.
+
+Indeed, we have found that choices about how to handle text have a significant
+impact on evaluation results. Additionally, we can only properly combine two
+resources with a method such as retrofitting if their string representations
+are comparable to each other.
 
 The operations we apply to text would usually be called ``normalization'',
 but that word also refers to what we'll be doing to our vectors, so both
@@ -119,7 +140,9 @@ here and in the code we call it ``standardization'' instead.
 
 \subsubsection{How ConceptNet is standardized}
 
-Here are the standardizations applied to all terms in ConceptNet 5.4:
+Here are the standardizations applied to all terms in ConceptNet 5.4, as
+implemented in the {\tt conceptnet5.nodes.normalized\_concept\_uri} function
+of ConceptNet 5.4:
 
 \begin{itemize}
 \item The words and phrases that the data sources provide are first run
@@ -150,19 +173,10 @@ Here are the standardizations applied to all terms in ConceptNet 5.4:
     {\tt /c/en/give\_example}.
 \end{itemize}
 
-The complete implementation can be found in the
-{\tt conceptnet5.nodes.normalized\_concept\_uri} function of ConceptNet 5.4.
-
-The URIs are not entirely meant for human consumption, and are
+The resulting URIs are not entirely meant for human consumption, and are
 sometimes not grammatically accurate -- the term ``ground zero'' becomes
-{\tt /c/en/grind\_zero}, for example -- but the purpose is to unify
-surface texts that may appear in slightly different forms in different
-resources.
-
-A drawback to this standardization process is that we will not be able
-to evaluate the result on Mikolov et al.'s syntactic analogy task
-\cite{mikolov2013word2vec}, as many of the analogies would become trivial
-analogies of the form ``A is to A as B is to B''.
+{\tt /c/en/grind\_zero}, for example -- but they unify surface texts that may
+appear in slightly different forms in different resources.
 
 \subsubsection{How GloVe is standardized}
 
@@ -213,16 +227,76 @@ discarded, but lower-frequency rows tend to have lower-quality data.
 The word frequency data is not distributed with the GloVe matrix, but
 the rows are clearly in descending order of frequency. We approximate the
 frequency distribution by assuming that the tokens are distributed according to
-Zipf's law \cite{TODOzipf}: the $n$th token in rank order has a frequency
+Zipf's law \cite{zipf1949human}: the $n$th token in rank order has a frequency
 proportional to $1/n$.
 
+In order to evaluate the combined word vectors, it is necessary for us to apply
+the same standardizations to the evaluation data. A drawback to this
+standardization process is that we will not be able to evaluate the result on
+Mikolov et al.'s syntactic analogy task \cite{mikolov2013word2vec}, as many of
+the analogies would become trivial analogies of the form
+``A is to A as B is to B''.
+
 \section{Evaluation}
+
+\subsection{Word similarity data sets}
+
+% TODO: introduce the similarity data sets
+
+\begin{table*}[t]
+\centering
+\input{../code/build-data/evaluations.latex}
+\caption{
+    Results on the word similarity task, shown as the Spearman rank correlation
+    ($\rho$) between the learned embeddings and various human-annotated corpora.
+    Here we compare the performance of GloVe in its original form, GloVe with
+    its labels standardized and merged like ConceptNet, and GloVe combined with
+    ConceptNet by retrofitting, for various normalizations of the GloVe vectors.
+}
+\label{eval-retro-standardize}
+\end{table*}
+
+In striving to maximize an evaluation metric, it is important to hold out some
+data, to avoid overfitting to the test data by modifying the algorithm and its
+parameters. The metrics we focused on improving were our rank correlation with
+MEN-3000, which emphasizes having high-quality representations of common words,
+and RW, which emphasizes having a broad vocabulary.
+
+MEN-3000
+comes with a training/test split, where 1000 of the 3000 word pairs are held
+out for testing. We applied a similar split to RW, setting aside a sample
+of $1/3$ of its word pairs for testing. The test set was not used in our
+evaluations until the final run before submitting this article. While
+Table~\ref{eval-retro-standardize} shows our correlation with the development
+and test data combined, Table~\ref{eval-heldout-test} compares our performance
+on development and test data.
+
+% TODO: we have to actually do the above before we submit
 
 % TODO: lots of stuff
 % TODO: evaluate other row-combining metrics
 % TODO: retrofit PPDB instead of ConceptNet and compare
 
 \section{Discussion}
+
+When applying ConceptNet's standardization procedure to the labels of GloVe's
+840B-token dataset, we achieved an unexpected benefit of cleaning up the data
+so it performs much better on the rare words evaluation.
+
+When we run our evaluation without modifying the labels on the GloVe 42B-token
+embeddings, we reproduce the results published in \cite{pennington2014glove}.
+This same evaluation, when run on the 840B-token embeddings, produces
+surprisingly poor results, implying that some of these rare words appear in
+forms that have low-quality embeddings. When we standardize the GloVe labels
+and combine them using the Zipf estimate, however, the result outperforms the
+42B-token embeddings.
+
+We conclude from this that it is important to combine the information learned
+from multiple forms of a word, including differences in inflection and
+capitalization, instead of relying on a single word form to have the correct
+vector. However, even if too many word forms were distingushed in the GloVe
+learning process, re-combining the word forms after the fact is sufficient to
+repair the data.
 
 \subsection{Analogies are not our goal}
 \label{analogies-meh}
@@ -235,6 +309,8 @@ a meaningless exercise.
 
 The syntactic analogies \ldots
 
+\begin{CJK*}{UTF8}{min}
 \bibliography{wordsim_paper}
+\end{CJK*}
 
 \end{document}

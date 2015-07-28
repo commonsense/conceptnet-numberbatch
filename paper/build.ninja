@@ -1,4 +1,4 @@
 rule build_latex
   command = pdflatex wordsim_paper && bibtex wordsim_paper && pdflatex wordsim_paper && pdflatex wordsim_paper || rm wordsim_paper.pdf wordsim_paper.bbl
 
-build wordsim_paper.pdf: build_latex wordsim_paper.tex | wordsim_paper.bib
+build wordsim_paper.pdf: build_latex wordsim_paper.tex | wordsim_paper.bib ../code/build-data/evaluations.latex
