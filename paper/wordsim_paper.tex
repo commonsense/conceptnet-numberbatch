@@ -3,6 +3,7 @@
 
 % Update this when our score changes. Maybe we can even automate this.
 \def\scoreRW{.584}
+\def\scoreMEN{.854}
 
 \documentclass[letterpaper]{article}
 \usepackage{acl2012}
@@ -152,8 +153,14 @@ of ConceptNet 5.4:
     through the {\tt ftfy.fix\_text} function, in version 4.0 of the Python
     module {\tt ftfy}.\footnote{
         \url{http://github.com/LuminosoInsight/python-ftfy}
-    } This corrects some Unicode encoding glitches, as well as applying
-    NFC normalization.
+    } This corrects ``mojibake'' (a Unicode glitch that arises when reading
+    text in the wrong encoding), as well as applying NFC normalization.\footnote{
+        For example, we consider ``ni\~{n}o'' to be a single
+        label, regardless of whether it is spelled as the four codepoints
+        {\tt n i \~{n} o}, the five codepoints {\tt n i n \textasciitilde{} o}
+        where the fourth is a combining character,
+        or the five corrupted codepoints {\tt n i \~{A} \textpm{} o}.
+    }
 \item The text is tokenized using a regular expression that splits it at
     characters whose major Unicode category is Z (whitespace), P (punctuation),
     S (symbols), or C (control characters).
@@ -244,7 +251,26 @@ the analogies would become trivial analogies of the form
 
 \subsection{Word similarity data sets}
 
-% TODO: introduce the similarity data sets
+We evaluate our model's performance at identifying similar words using a
+variety of word-similarity gold standards:
+
+\begin{itemize}
+\item MEN-3000 \cite{bruni2014men}, crowd-sourced similarity judgments for 3000
+    word pairs.
+\item The Stanford Rare Words (RW) dataset \cite{luong2013rw}, crowd-sourced
+    similarity judgments for 2034 word pairs, with a bias toward uncommon words.
+\item SCWS*. SCWS \cite{huang2012scws} contains crowd-sourced similarity
+    judgments for 2003 word pairs in the context of sentences, while SCWS* is
+    the modification of it described by \citeauthor{luong2013rw}
+    \shortcite{luong2013rw} to disregard the context in order to evaluate
+    systems that cannot make use of context. SCWS* discards the pairs of
+    identical words that are only distinguished by context, leaving 1759 pairs.
+\item WordSim-353 \cite{finkelstein2001ws}, a widely-used corpus of similarity
+    judgments for 353 word pairs.
+\item RG-65 \cite{rubinstein1965rg}, a classic corpus of similarity judgments
+    for 65 word pairs.
+\item MC-30 \cite{miller1991mc}, similarity judgments for 30 word pairs.
+\end{itemize}
 
 \begin{table*}[t]
 \centering
@@ -310,7 +336,36 @@ relational knowledge built into it. However, at the point where the system
 {\em does} have more knowledge built into it, it becomes somewhat of
 a meaningless exercise.
 
-The syntactic analogies \ldots
+The syntactic analogies \ldots %TODO
+
+\subsection{The limits of similarity judgments}
+
+\citeauthor{bruni2014men} \shortcite{bruni2014men} describe a substitute for
+inter-annotator agreement on their MEN-3000 dataset:
+
+\begin{quote}
+The Spearman correlation of the two authors is at 0.68, the correlation of their
+average ratings with the MEN scores is at 0.84. On the one hand, this high
+correlation suggests that MEN contains meaningful semantic ratings. On the
+other, it can also be taken as an upper bound on what computational models can
+realistically achieve when simulating the human MEN judgments.
+\end{quote}
+
+Our model achieves a MEN score of \scoreMEN{}, after re-introducing the
+held-out test data, putting its performance above that upper bound. In many
+circumstances, this would be an indication that the model has overfit to the
+MEN data. However, we have tried to eliminate the possibility of overfitting.
+The MEN data is never used as an input to the system; we did not use the
+held-out data when setting parameters; and the same system that performs above
+the claimed upper bound of MEN also performs the highest on all the other data
+sets we tried.
+
+We postulate instead that similarity evaluations become easier to match
+computationally when averaged over the judgments of many people. The two
+authors agreed more with the average of the crowd than they did with each other;
+if more people's judgments had been averaged in with the authors, perhaps the
+correlation would have been even higher. We suspect that the true upper bound
+of the MEN evaluation is higher than claimed.
 
 \begin{CJK*}{UTF8}{min}
 \bibliography{wordsim_paper}
