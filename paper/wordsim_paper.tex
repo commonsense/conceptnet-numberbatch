@@ -5,10 +5,11 @@
 \def\scoreRW{.584}
 
 \documentclass[letterpaper]{article}
-\usepackage{aaai}
+\usepackage{acl2012}
 \usepackage{times}
-\usepackage{helvet}
-\usepackage{courier}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{CJKutf8}
@@ -20,7 +21,7 @@
 /Title \thetitle
 /Author Rob Speer, Joshua Chin, and Catherine Havasi}
 \setcounter{secnumdepth}{0}
-\bibliographystyle{aaai}
+\bibliographystyle{acl2012}
 
 \title{\thetitle}
 %\author{Robert Speer\\
@@ -45,15 +46,15 @@
 Embeddings of natural-language words in a vector space are useful for a variety
 of tasks in semantics. Embeddings learned from unstructured text can be
 combined with structured knowledge to achieve performance that neither source
-would achieve on its own, as shown by \citeauthor{faruqui2014retrofitting}
-\shortcite{faruqui2014retrofitting}. In this paper, we show the effectiveness
+would achieve on its own, as shown by \newcite{faruqui2014retrofitting}.
+In this paper, we show the effectiveness
 of combining the GloVe embeddings \cite{pennington2014glove} with the
 crowd-sourced semantic network ConceptNet \cite{speer2012conceptnet}, with
-some changes to the GloVe embeddings and \citeauthor{faruqui2014retrofitting}'s
-``retrofitting'' algorithm. The resulting vector space has a larger vocabulary
+some changes to the GloVe embeddings and the ``retrofitting'' algorithm.
+The resulting vector space has a larger vocabulary
 than either source, and achieves state-of-the-art performance on multiple word
 similarity evaluations, including an unprecedented score of $\rho = \scoreRW{}$
-on \citeauthor{luong2013rw}'s rare words evaluation.
+on an evaluation of rare words.
 \end{abstract}
 
 \section{Introduction}
@@ -67,11 +68,11 @@ blah blah blah
 Learning processes such as GloVe produce results that can conveniently be
 re-used in other projects, because they output a labeled matrix of the learned
 embeddings of each word in the vocabulary.
-\citeauthor{faruqui2014retrofitting} \shortcite{faruqui2014retrofitting}
+\newcite{faruqui2014retrofitting}
 introduced the ``retrofitting'' procedure, which adjusts such dense matrices of
 embeddings based on external knowledge from a sparse semantic network.
 
-\citeauthor{faruqui2014retrofitting} used PPDB \cite{ganitkevitch2013ppdb} as
+\newcite{faruqui2014retrofitting} used PPDB \cite{ganitkevitch2013ppdb} as
 the external source of semantic knowledge, but we found that ConceptNet
 \cite{speer2012conceptnet}, a resource which combines a variety of forms of
 crowd-sourced and expert-created knowledge, should fit well with this process
@@ -124,7 +125,7 @@ were originally only trained on English to be extended to other languages.
 
 \subsection{Standardizing text}
 
-As \citeauthor{levy2015embeddings} \shortcite{levy2015embeddings} note,
+As \newcite{levy2015embeddings} note,
 ``[\ldots] much of the performance gains of word embeddings are due to certain
 system design choices and hyperparameter optimizations, rather than the
 embedding algorithms themselves.'' While it is presented as a negative result,
