@@ -2,8 +2,8 @@
 \def\thetitle{Improving Word Vectors by Adding Lexical Knowledge}
 
 % Update this when our score changes. Maybe we can even automate this.
-\def\scoreRW{.584}
-\def\scoreMEN{.854}
+\def\scoreRW{.591}
+\def\scoreMEN{.858}
 
 \documentclass[letterpaper]{article}
 \usepackage{acl2012}
@@ -216,7 +216,7 @@ Common Crawl, as bytes of ``encoding salad'', as one might expect from
 scraping arbitrary Web pages. They are still tokenized in a way that is
 reasonable for English.
 
-\subsubsection{Aligning ConceptNet and Glove}
+\subsubsection{Aligning ConceptNet and GloVe}
 
 ConceptNet's standardization process is stronger than GloVe's, so we align them
 by applying the ConceptNet standardizations to the GloVe labels as well, turning
@@ -334,8 +334,9 @@ variety of not-necessarily-symmetric, labeled relations.
 of measuring the relatedness of terms. Previous embeddings of ConceptNet, such
 as that of \newcite{speer2008analogyspace}, preserved the relations but were
 suited mostly for direct similarity and inference, not for relatedness. Because
-most evaluation data for word similarity is also evaluating relatedness, we
-erase the labels as in spectral association.
+most evaluation data for word similarity is also evaluating relatedness, unless
+there has been a specific effort to separate them \cite{agirre2009similarity},
+we erase the labels as in spectral association.
 
 Negated relations and antonym relations, such as the relations expressed by
 ``a person does not have a tail'' and ``hot is the opposite of cold'', are
@@ -357,9 +358,24 @@ assertion. An assertion that relates term $i$ to term $j$ with weight $w$ will
 contribute $w$ to the value of $S_{ij}$ and $S_{ji}$. If another assertion relates
 the same terms with a different relation, it will add to that value.
 
+%TODO: describe the scaling of datasets
+
 \section{Evaluation}
 
 \subsection{Word Similarity Datasets}
+
+\begin{table*}[t]
+\centering
+\input{../code/build-data/evaluations.latex}
+\caption{
+    Results on the word similarity task, shown as the Spearman rank correlation
+    ($\rho$) between the learned embeddings and various human-annotated corpora.
+    Here we compare the performance of GloVe in its original form, GloVe with
+    its labels standardized and merged like ConceptNet, and GloVe combined with
+    ConceptNet by retrofitting, for various normalizations of the GloVe vectors.
+}
+\label{eval-retro-standardize}
+\end{table*}
 
 We evaluate our model's performance at identifying similar words using a
 variety of word-similarity gold standards:
@@ -382,18 +398,7 @@ variety of word-similarity gold standards:
 \item MC-30 \cite{miller1991mc}, similarity judgments for 30 word pairs.
 \end{itemize}
 
-\begin{table*}[t]
-\centering
-\input{../code/build-data/evaluations.latex}
-\caption{
-    Results on the word similarity task, shown as the Spearman rank correlation
-    ($\rho$) between the learned embeddings and various human-annotated corpora.
-    Here we compare the performance of GloVe in its original form, GloVe with
-    its labels standardized and merged like ConceptNet, and GloVe combined with
-    ConceptNet by retrofitting, for various normalizations of the GloVe vectors.
-}
-\label{eval-retro-standardize}
-\end{table*}
+% TODO: foreign language datasets
 
 In striving to maximize an evaluation metric, it is important to hold out some
 data, to avoid overfitting to the test data by modifying the algorithm and its
@@ -436,16 +441,16 @@ vector. However, even if too many word forms were distingushed in the GloVe
 learning process, re-combining the word forms after the fact is sufficient to
 repair the data.
 
-\subsection{Analogies Are Not Our Goal}
-\label{analogies-meh}
-
-The analogy evaluation of \cite{mikolov2013word2vec} is an interesting
-emergent property to demonstrate of a system that has no syntactic or
-relational knowledge built into it. However, at the point where the system
-{\em does} have more knowledge built into it, it becomes somewhat of
-a meaningless exercise.
-
-The syntactic analogies \ldots %TODO
+%\subsection{Analogies Are Not Our Goal}
+%\label{analogies-meh}
+%
+%The analogy evaluation of \cite{mikolov2013word2vec} is an interesting
+%emergent property to demonstrate of a system that has no syntactic or
+%relational knowledge built into it. However, at the point where the system
+%{\em does} have more knowledge built into it, it becomes somewhat of
+%a meaningless exercise.
+%
+%The syntactic analogies \ldots %TODO
 
 \subsection{The Limits of Similarity Judgments}
 
