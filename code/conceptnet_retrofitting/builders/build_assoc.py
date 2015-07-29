@@ -2,6 +2,7 @@ from sklearn.preprocessing import normalize
 from conceptnet_retrofitting.builders.sparse_matrix_builder import SparseMatrixBuilder
 from conceptnet_retrofitting.builders.label_set import LabelSet
 
+
 def build_from_conceptnet(labels, filename, verbose=True):
     """
     Generates a sparse association matrix from a conceptnet5 csv file.
@@ -14,7 +15,7 @@ def build_from_conceptnet(labels, filename, verbose=True):
 
     with open(filename, encoding='utf-8') as infile:
         for line in infile:
-            concept1, concept2, value_str, *_ = line.strip().split('\t')
+            concept1, concept2, value_str, dataset, relation = line.strip().split('\t')
             index1 = labels.add(concept1)
             index2 = labels.add(concept2)
 
@@ -28,6 +29,7 @@ def build_from_conceptnet(labels, filename, verbose=True):
 
     return mat.tocsr(shape=(len(labels), len(labels)))
 
+
 def main(label_in, conceptnet_in, label_out, assoc_out):
     from conceptnet_retrofitting import loaders
 
@@ -36,6 +38,7 @@ def main(label_in, conceptnet_in, label_out, assoc_out):
 
     loaders.save_labels(labels, label_out)
     loaders.save_csr(assoc, assoc_out)
+
 
 if __name__ == '__main__':
     import sys
