@@ -33,6 +33,9 @@ rule standardize_vecs
 rule standardize_assoc
   command = python -m conceptnet_retrofitting.builders.standardize_assoc $in $out
 
+rule concatenate
+  command = cat $in > $out
+
 rule l1_normalize
   command = python -m conceptnet_retrofitting.builders.l1norm $in $out
   pool = memory_hogs
