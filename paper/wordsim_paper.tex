@@ -284,6 +284,20 @@ assertion. An assertion that relates term $i$ to term $j$ with weight $w$ will
 contribute $w$ to the value of $S_{ij}$ and $S_{ji}$. If another assertion relates
 the same terms with a different relation, it will add to that value.
 
+\subsection{Normalization}
+
+As briefly mentioned by \citeauthor{pennington2014glove}, $L_2$ normalization of
+the columns of the GloVe matrix often provides a notable increase in performance.
+$L_2$ normalization can be generalized to arbitrary $L_p$ normalization by
+dividing a vector by its $p$-norm. The $p$-norm of an $n$-element vector is
+defined by
+
+$$ \left\|\mathbf{x}\right\|_p
+  = \sum_{i=1}^n \left|x_i\right|^p$$
+
+Our tests show that $L_1$ normalization provides a consisent performance
+increase over $L_2$ normalization in almost all variations of GloVe.
+
 \subsection{Retrofitting}
 
 \section{Evaluation}
