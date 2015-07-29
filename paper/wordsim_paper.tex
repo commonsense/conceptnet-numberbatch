@@ -253,14 +253,19 @@ the analogies would become trivial analogies of the form
 \subsection{Normalization}
 
 As briefly mentioned by \newcite{pennington2014glove}, $L_2$ normalization of
-the columns of the GloVe matrix often provides a notable increase in performance.
-$L_2$ normalization can be generalized to arbitrary $L_p$ normalization by
-dividing a vector by its $p$-norm. The $p$-norm of an $n$-element vector is
-defined by
+the columns of the GloVe matrix often provides a notable increase in
+performance. $L_2$ normalization can be generalized to arbitrary
+$L_p$ normalization by dividing a vector by its $p$-norm. The $p$-norm of an
+$n$-element vector is defined by
 
 $$ \left\|\mathbf{x}\right\|_p
   = \sum_{i=1}^n \left|x_i\right|^p$$
 
+Normalization attempts to promote discriminative features of word vectors.
+Features with high $p$-norms are less discriminative and therefore less useful.
+However, while $L_2$ normalization provides an improvement over the un-normalized
+vectors, it weights outliers very highly, which are the features that we want to
+preserve. $L_1$ on the other hand provides an equal weighing for all inputs.
 Our tests show that $L_1$ normalization provides a consisent performance
 increase over $L_2$ normalization in almost all variations of GloVe.
 
@@ -271,9 +276,9 @@ lexicon. While the original formulation expresses the problem in terms of a set
 of edges, we have found it more convenient to express it in terms of matrices.
 Let $v$ denote the size of the vocabulary, $S$ be a $v \times v$ matrix
 denoting the semantic lexicon, and $W^0$ be a $v \times n$ matrix denoting the
-original word vectors with $L_2$ normalized rows. If a word does not have an
+original word vectors. If a word does not have an
 corresponding word vector, it is assigned the zero vector. Retrofitting
-generates a $W^n$ with $L_2$ normalized rows that minimizes
+generates a $W^n$ that minimizes
 
 $$
 \Psi \left( W^n \right) = \sum_{i=0}^v \left[
@@ -302,6 +307,16 @@ $$
 
 where $\oslash$ denotes row-wise division, $\odot$ denotes row-wise
 multiplication and $\vec{1}$ is a vector of all ones.
+
+\subsubsection{Row Normalized Retrofitting}
+
+The magnitude of a vector acts as an implicit $\alpha$ in retrofitting.
+The $L_2$ norms of the GloVe vectors span several orders of magnitudes.
+Nonsense associations within the semantic lexicon between a vector with a large
+$L_2$ norm and a vector with small $L_2$ norm could remove much of the semantic
+information contained within the small vector. Therefore, we $L_2$ normalize
+the rows of the word vectors both before and during the retrofitting process,
+which yields an increase in performance.
 
 \subsection{ConceptNet as an association matrix}
 
