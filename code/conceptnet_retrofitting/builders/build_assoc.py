@@ -1,6 +1,14 @@
 from sklearn.preprocessing import normalize
 from conceptnet_retrofitting.builders.sparse_matrix_builder import SparseMatrixBuilder
 from conceptnet_retrofitting.builders.label_set import LabelSet
+from collections import defaultdict
+
+
+def coarse_dataset(dataset):
+    if dataset.startswith('/d/globalmind') or dataset.startswith('/d/dbpedia'):
+        dataset = '/d/conceptnet'
+    dataset_label = dataset.split('/')[2]
+    return dataset_label
 
 
 def build_from_conceptnet(labels, filename, verbose=True):
@@ -10,8 +18,14 @@ def build_from_conceptnet(labels, filename, verbose=True):
 
     mat = SparseMatrixBuilder()
 
-    # Add pairwise associations
-    data = SparseMatrixBuilder()
+    # Scale the values by dataset
+    dataset_totals = defaultdict(float)
+    with open(filename, encoding='utf-8') as infile:
+        for line in infile:
+            concept1, concept2, value_str, dataset, relation = line.strip().split('\t')
+            value = float(value_str)
+            dataset_label = coarse_dataset(dataset)
+            dataset_totals[dataset_label] += value
 
     with open(filename, encoding='utf-8') as infile:
         for line in infile:
@@ -19,11 +33,8 @@ def build_from_conceptnet(labels, filename, verbose=True):
             index1 = labels.add(concept1)
             index2 = labels.add(concept2)
 
-            value = float(value_str)
-            # A tweak that seems to help:
-            #
-            # if dataset.startswith('/d/verbosity'):
-            #     value = value * 10
+            dataset_label = coarse_dataset(dataset)
+            value = float(value_str) / dataset_totals[dataset_label]
             mat[index1, index2] = value
             mat[index2, index1] = value
 
