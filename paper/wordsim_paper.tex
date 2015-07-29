@@ -127,7 +127,7 @@ embeddings incorporate the strengths of both ConceptNet and GloVe, and extend
 their vocabulary to the union of ConceptNet and GloVe, allowing embeddings that
 were originally only trained on English to be extended to other languages.
 
-\subsection{Standardizing text}
+\subsection{Standardizing Text}
 
 As \newcite{levy2015embeddings} note,
 ``[\ldots] much of the performance gains of word embeddings are due to certain
@@ -144,7 +144,7 @@ The operations we apply to text would usually be called ``normalization'',
 but that word also refers to what we'll be doing to our vectors, so both
 here and in the code we call it ``standardization'' instead.
 
-\subsubsection{How ConceptNet is standardized}
+\subsubsection{How ConceptNet is Standardized}
 
 Here are the standardizations applied to all terms in ConceptNet 5.4, as
 implemented in the {\tt conceptnet5.nodes.normalized\_concept\_uri} function
@@ -190,7 +190,7 @@ sometimes not grammatically accurate -- the term ``ground zero'' becomes
 {\tt /c/en/grind\_zero}, for example -- but they unify surface texts that may
 appear in slightly different forms in different resources.
 
-\subsubsection{How GloVe is standardized}
+\subsubsection{How GloVe is Standardized}
 
 The 42-billion-token version of GloVe, whose results are published in
 \cite{pennington2014glove}, has applied some simple standardizations
@@ -287,7 +287,7 @@ $$
 \right]
 $$
 
-Where $\alpha_i$ is a column weight vector. In our tests, we let
+where $\alpha_i$ is a column weight vector. In our tests, we let
 
 $$
 \alpha_i =
@@ -309,17 +309,20 @@ where $\oslash$ denotes row-wise division, $\odot$ denotes row-wise
 multiplication, $\vec{1}$ is a vector of all ones and $W^0$ are the original
 word vectors.
 
-\subsubsection{Row Normalized Retrofitting}
+\subsubsection{Row-Normalized Retrofitting}
 
 The magnitude of a vector acts as an implicit $\alpha$ in retrofitting.
-The $L_2$ norms of the GloVe vectors span several orders of magnitudes.
+The $L_2$ norms of the GloVe vectors span several orders of magnitude.
 Nonsense associations within the semantic lexicon between a vector with a large
 $L_2$ norm and a vector with small $L_2$ norm could remove much of the semantic
-information contained within the small vector. Therefore, we $L_2$ normalize
+information contained within the small vector. Therefore, we $L_2$-normalize
 the rows of the word vectors both before and during the retrofitting process,
 which yields an increase in performance.
 
-\subsection{ConceptNet as an association matrix}
+\subsection{Self-Loops}
+%TODO Check if Self Loops actually help
+
+\subsection{ConceptNet as an Association Matrix}
 
 In order to apply the retrofitting method, we need to consider the data in
 ConceptNet as a sparse, symmetric matrix of associations between terms. What
@@ -354,13 +357,9 @@ assertion. An assertion that relates term $i$ to term $j$ with weight $w$ will
 contribute $w$ to the value of $S_{ij}$ and $S_{ji}$. If another assertion relates
 the same terms with a different relation, it will add to that value.
 
-\subsection{Self Loops}
-%TODO Check if Self Loops actually help
-
-
 \section{Evaluation}
 
-\subsection{Word similarity data sets}
+\subsection{Word Similarity Datasets}
 
 We evaluate our model's performance at identifying similar words using a
 variety of word-similarity gold standards:
@@ -437,7 +436,7 @@ vector. However, even if too many word forms were distingushed in the GloVe
 learning process, re-combining the word forms after the fact is sufficient to
 repair the data.
 
-\subsection{Analogies are not our goal}
+\subsection{Analogies Are Not Our Goal}
 \label{analogies-meh}
 
 The analogy evaluation of \cite{mikolov2013word2vec} is an interesting
@@ -448,7 +447,7 @@ a meaningless exercise.
 
 The syntactic analogies \ldots %TODO
 
-\subsection{The limits of similarity judgments}
+\subsection{The Limits of Similarity Judgments}
 
 \newcite{bruni2014men} describe a substitute for
 inter-annotator agreement on their MEN-3000 dataset:
