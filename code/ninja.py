@@ -9,7 +9,7 @@ CONFIG = {
     'source-data-path': 'source-data/',
     'build-data-path': 'build-data/',
     'glove-versions': ['42B.300d', '840B.300d'],
-    'retrofit-items': ['conceptnet5', 'ppdb-xl-lexical-standardized']
+    'retrofit-items': ['conceptnet5', 'ppdb-xl-lexical-standardized', 'cnet-ppdb-combined']
 }
 
 
@@ -119,6 +119,15 @@ def standardize_ppdb(graph):
         CONFIG['source-data-path'] + 'ppdb-xl-lexical.csv',
         CONFIG['build-data-path'] + 'ppdb-xl-lexical-standardized.csv',
         'standardize_assoc'
+    )
+
+    graph['combine_cnet_ppdb'] = Dep(
+        [
+            CONFIG['source-data-path'] + 'conceptnet5.csv',
+            CONFIG['build-data-path'] + 'ppdb-xl-lexical-standardized.csv'
+        ],
+        CONFIG['build-data-path'] + 'cnet-ppdb-combined.csv',
+        'concatenate'
     )
 
 
