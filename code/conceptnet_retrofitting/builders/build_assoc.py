@@ -5,6 +5,8 @@ from collections import defaultdict
 
 
 def coarse_dataset(dataset):
+    if '/' not in dataset:
+        return dataset
     if dataset.startswith('/d/globalmind') or dataset.startswith('/d/dbpedia'):
         dataset = '/d/conceptnet'
     dataset_label = dataset.split('/')[2]
@@ -20,12 +22,14 @@ def build_from_conceptnet(labels, filename, verbose=True):
 
     # Scale the values by dataset
     dataset_totals = defaultdict(float)
+    dataset_counts = defaultdict(int)
     with open(filename, encoding='utf-8') as infile:
         for line in infile:
             concept1, concept2, value_str, dataset, relation = line.strip().split('\t')
             value = float(value_str)
             dataset_label = coarse_dataset(dataset)
             dataset_totals[dataset_label] += value
+            dataset_counts[dataset_label] += 1
 
     with open(filename, encoding='utf-8') as infile:
         for line in infile:
@@ -34,7 +38,7 @@ def build_from_conceptnet(labels, filename, verbose=True):
             index2 = labels.add(concept2)
 
             dataset_label = coarse_dataset(dataset)
-            value = float(value_str) / dataset_totals[dataset_label]
+            value = float(value_str) / (dataset_totals[dataset_label] / dataset_counts[dataset_label])
             mat[index1, index2] = value
             mat[index2, index1] = value
 
