@@ -17,7 +17,7 @@ def standardize_assoc(assoc_in, assoc_out):
                 item1, item2 = line.split('\t')
                 s1 = standardized_concept_uri('en', item1)
                 s2 = standardized_concept_uri('en', item2)
-                transformed = '%s\t%s\t1\texternal\t/r/RelatedTo' % (s1, s2)
+                transformed = '\t'.join([s1, s2, '1', 'external', '/r/RelatedTo'])
                 print(transformed, file=out)
 
 
