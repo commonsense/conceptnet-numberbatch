@@ -4,8 +4,6 @@ import math
 from scipy.stats import spearmanr
 import numpy as np
 
-import warnings
-
 directory = os.path.dirname(os.path.abspath(__file__))
 
 tests = [
@@ -54,7 +52,6 @@ def evaluate(similarity_func, standard, lang=None):
 
 def main(labels_in, vecs_in, verbose=True):
     from conceptnet_retrofitting import loaders
-    #warnings.simplefilter("error")
     test_all(loaders.load_word_vectors(labels_in, vecs_in).similarity)
 
 if __name__ == '__main__':
