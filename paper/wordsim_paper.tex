@@ -249,6 +249,76 @@ Mikolov et al.'s syntactic analogy task \cite{mikolov2013word2vec}, as many of
 the analogies would become trivial analogies of the form
 ``A is to A as B is to B''.
 
+
+\subsection{Normalization}
+
+As briefly mentioned by \newcite{pennington2014glove}, $L_2$ normalization of
+the columns of the GloVe matrix often provides a notable increase in
+performance. $L_2$ normalization can be generalized to arbitrary
+$L_p$ normalization by dividing a vector by its $p$-norm. The $p$-norm of an
+$n$-element vector is defined by
+
+$$ \left\|\mathbf{x}\right\|_p
+  = \sum_{i=1}^n \left|x_i\right|^p$$
+
+Normalization attempts to promote discriminative features of word vectors.
+Features with high $p$-norms are less discriminative and therefore less useful.
+However, while $L_2$ normalization provides an improvement over the un-normalized
+vectors, it weights outliers very highly, which are the features that we want to
+preserve. $L_1$ on the other hand provides an equal weighing for all inputs.
+Our tests show that $L_1$ normalization provides a consisent performance
+increase over $L_2$ normalization in almost all variations of GloVe.
+
+\subsection{Retrofitting}
+
+Retrofitting \cite{faruqui2014retrofitting} is a process of combining existing word vectors with a semantic
+lexicon. While the original formulation expresses the problem in terms of a set
+of edges, we have found it more convenient to express it in terms of matrices.
+Let $v$ denote the size of the vocabulary, $S$ be a $v \times v$ matrix
+denoting the semantic lexicon, and $W$ be a $v \times n$ matrix denoting the
+original word vectors. If a word does not have an
+corresponding word vector, it is assigned the zero vector. Retrofitting
+generates a $W'$ that minimizes
+
+$$
+\Psi \left( W' \right) = \sum_{i=0}^v \left[
+  \alpha_i \left\|  w'_i - w_i \right\| ^ 2
+  + \sum_{j=0}^v s_{ij} \left\| w'_i - w'_j \right\| ^ 2
+\right]
+$$
+
+Where $\alpha_i$ is a column weight vector. In our tests, we let
+
+$$
+\alpha_i =
+  \begin{cases}
+    0 & \text{if $W^0_i = \vec{0}$} \\
+    1 & \text{otherwise}
+  \end{cases}
+$$
+
+Notice that $\Psi$ is convex and can be solved by a simple iterative updating
+method:
+
+$$
+W^{k+1} = \left( S W^k + \alpha \odot W^0 \right)
+\oslash \left( \vec{1} + \alpha \right)
+$$
+
+where $\oslash$ denotes row-wise division, $\odot$ denotes row-wise
+multiplication, $\vec{1}$ is a vector of all ones and $W^0$ are the original
+word vectors.
+
+\subsubsection{Row Normalized Retrofitting}
+
+The magnitude of a vector acts as an implicit $\alpha$ in retrofitting.
+The $L_2$ norms of the GloVe vectors span several orders of magnitudes.
+Nonsense associations within the semantic lexicon between a vector with a large
+$L_2$ norm and a vector with small $L_2$ norm could remove much of the semantic
+information contained within the small vector. Therefore, we $L_2$ normalize
+the rows of the word vectors both before and during the retrofitting process,
+which yields an increase in performance.
+
 \subsection{ConceptNet as an association matrix}
 
 In order to apply the retrofitting method, we need to consider the data in
@@ -284,7 +354,9 @@ assertion. An assertion that relates term $i$ to term $j$ with weight $w$ will
 contribute $w$ to the value of $S_{ij}$ and $S_{ji}$. If another assertion relates
 the same terms with a different relation, it will add to that value.
 
-\subsection{Retrofitting}
+\subsection{Self Loops}
+%TODO Check if Self Loops actually help
+
 
 \section{Evaluation}
 
