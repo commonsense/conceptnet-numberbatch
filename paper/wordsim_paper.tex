@@ -275,15 +275,15 @@ Retrofitting \cite{faruqui2014retrofitting} is a process of combining existing w
 lexicon. While the original formulation expresses the problem in terms of a set
 of edges, we have found it more convenient to express it in terms of matrices.
 Let $v$ denote the size of the vocabulary, $S$ be a $v \times v$ matrix
-denoting the semantic lexicon, and $W^0$ be a $v \times n$ matrix denoting the
+denoting the semantic lexicon, and $W$ be a $v \times n$ matrix denoting the
 original word vectors. If a word does not have an
 corresponding word vector, it is assigned the zero vector. Retrofitting
-generates a $W^n$ that minimizes
+generates a $W'$ that minimizes
 
 $$
-\Psi \left( W^n \right) = \sum_{i=0}^v \left[
-  \alpha_i \left\|  W^n_i - W^0_i \right\| ^ 2
-  + \sum_{j=0}^v S_{ij} \left\| W^n_i - W^n_j \right\| ^ 2
+\Psi \left( W' \right) = \sum_{i=0}^v \left[
+  \alpha_i \left\|  w'_i - w_i \right\| ^ 2
+  + \sum_{j=0}^v s_{ij} \left\| w'_i - w'_j \right\| ^ 2
 \right]
 $$
 
@@ -292,8 +292,8 @@ Where $\alpha_i$ is a column weight vector. In our tests, we let
 $$
 \alpha_i =
   \begin{cases}
-    0 & W^0_i = \vec{0} \\
-    1 & otherwise
+    0 & \text{if $W^0_i = \vec{0}$} \\
+    1 & \text{otherwise}
   \end{cases}
 $$
 
@@ -306,7 +306,8 @@ W^{k+1} = \left( S W^k + \alpha \odot W^0 \right)
 $$
 
 where $\oslash$ denotes row-wise division, $\odot$ denotes row-wise
-multiplication and $\vec{1}$ is a vector of all ones.
+multiplication, $\vec{1}$ is a vector of all ones and $W^0$ are the original
+word vectors.
 
 \subsubsection{Row Normalized Retrofitting}
 
