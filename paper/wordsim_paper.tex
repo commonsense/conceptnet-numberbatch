@@ -300,6 +300,42 @@ increase over $L_2$ normalization in almost all variations of GloVe.
 
 \subsection{Retrofitting}
 
+Retrofitting is a process of combining existing word vectors with a semantic
+lexicon. While the original formulation expresses the problem in terms of a set
+of edges, we have found it more convenient to express it in terms of matrices.
+Let $v$ denote the size of the vocabulary, $S$ be a $v \times v$ matrix
+denoting the semantic lexicon, and $W^0$ be a $v \times n$ matrix denoting the
+original word vectors. If a word does not have an corresponding word vector,
+it is assigned the zero vector. Retrofitting generates a $W^n$ that minimizes
+
+$$
+\Psi \left( W^n \right) = \sum_{i=0}^v \left[
+  \alpha_i \left\|  W^n_i - W^0_i \right\| ^ 2
+  + \sum_{j=0}^v \S_{ij} \left\| W^n_i - W^n_j \right\| ^ 2
+\right]
+$$
+
+Where $alpha_i$ acts as weight vector. In our tests, we let
+
+$$
+\alpha_i =
+  \begin{cases}
+    0 & W^0_i = \vec{0} \\
+    1 & otherwise
+  \end{cases}
+$$
+
+Notice that $\Psi$ is convex and can be solved by a simple iterative updating
+method:
+
+$$
+q^{k+1} = \left( \beta q^k + \alpha^T q^0 \right)
+\oslash \left( \vec{1} + \alpha \right)
+$$
+
+where $\oslash$ denotes element-wise division and $\vec{1}$ is a vector of all
+ones.
+
 \section{Evaluation}
 
 \subsection{Word similarity data sets}
