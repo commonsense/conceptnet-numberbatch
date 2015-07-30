@@ -565,7 +565,7 @@ variety of word-similarity gold standards:
 \item MC-30 \cite{miller1991mc}, similarity judgments for 30 word pairs.
 \end{itemize}
 
-% TODO: foreign language datasets
+% TODO: describe foreign language datasets
 
 In striving to maximize an evaluation metric, it is important to hold out some
 data, to avoid overfitting to the test data by modifying the algorithm and its
@@ -632,14 +632,14 @@ other, it can also be taken as an upper bound on what computational models can
 realistically achieve when simulating the human MEN judgments.''
 \end{quote}
 
-Our model achieves a MEN score of \scoreMEN{}, after re-introducing the
+Our model achieves a MEN score of \scoreMEN{} on the
 held-out test data, putting its performance above that upper bound. In many
 circumstances, this would be an indication that the model has overfit to the
 MEN data. However, we have tried to eliminate the possibility of overfitting.
-The MEN data is never used as an input to the system; we did not use the
-held-out data when setting parameters; and the same system that performs above
-the claimed upper bound of MEN also performs the highest on all the other data
-sets we tried.
+The MEN data is never used as an input to the system; we did not use or even
+look at the held-out data when setting parameters; and the same system that
+performs above the claimed upper bound of MEN also performs the highest on all
+the other data sets we tried.
 
 We postulate instead that similarity evaluations become easier to match
 computationally when averaged over the judgments of many people. The two
