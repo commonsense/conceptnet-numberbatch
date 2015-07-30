@@ -1,6 +1,6 @@
 import numpy as np
 
-from conceptnet5.nodes import standardized_concept_uri
+from conceptnet_retrofitting.standardization import standardize
 from conceptnet_retrofitting.builders.label_set import LabelSet
 
 
@@ -15,8 +15,8 @@ def standardize_assoc(assoc_in, assoc_out):
             line = line.rstrip('\n')
             if line:
                 item1, item2 = line.split('\t')
-                s1 = standardized_concept_uri('en', item1)
-                s2 = standardized_concept_uri('en', item2)
+                s1 = standardize(item1)
+                s2 = standardize(item2)
                 transformed = '\t'.join([s1, s2, '1', 'external', '/r/RelatedTo'])
                 print(transformed, file=out)
 

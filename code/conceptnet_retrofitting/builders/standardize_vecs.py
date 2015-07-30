@@ -1,7 +1,6 @@
 import numpy as np
 
-from conceptnet5.nodes import standardized_concept_uri
-
+from conceptnet_retrofitting.standardization import standardize
 from conceptnet_retrofitting.builders.label_set import LabelSet
 
 def standardize_vecs(labels, vecs):
@@ -10,7 +9,7 @@ def standardize_vecs(labels, vecs):
 
     for index, (label, vec) in enumerate(zip(labels, vecs)):
         try:
-            label = standardized_concept_uri('en', label)
+            label = standardize(label)
         except ValueError:
             continue
 
