@@ -7,8 +7,14 @@ import numpy as np
 directory = os.path.dirname(os.path.abspath(__file__))
 
 tests = [
-    ('rw', {'filename': 'rw.csv',}),
-    ('men-3000', {'filename': 'men3000-dev.csv',
+    ('rw-dev', {'filename': 'rw.csv',}),
+    ('rw-test', {'filename': 'heldout/rw.csv'}),
+    ('rw-both', {'filename': ['rw.csv', 'heldout/rw.csv']}),
+    ('men-3000-dev', {'filename': 'men3000-dev.csv',
+                  'preprocess_word' : lambda w: w.split('-')[0]}),
+    ('men-3000-test', {'filename': 'heldout/men3000-test.csv',
+                  'preprocess_word' : lambda w: w.split('-')[0]}),
+    ('men-3000-both', {'filename': ['men3000-dev.csv', 'heldout/men3000-test.csv'],
                   'preprocess_word' : lambda w: w.split('-')[0]}),
     ('wordsim-353', {'filename': 'ws353.csv', 'sep':','}),
     ('wordsim-353-ar', {'filename': 'ws353.ar.csv'}, 'ar'),
@@ -29,18 +35,21 @@ def test_all(similarity_func):
         print(evaluate(similarity_func, parse_file(**file_info), lang))
 
 def parse_file(filename, sep=None, preprocess_word=None):
-    with open(os.path.join(directory, 'data', filename)) as file:
-        for line in file:
-            if sep is None:
-                w1, w2, val, *_ = line.strip().split()
-            else:
-                w1, w2, val, *_ = line.strip().split(sep)
+    if isinstance(filename, str):
+        filename = [filename]
+    for name in filename:
+        with open(os.path.join(directory, 'data', name)) as file:
+            for line in file:
+                if sep is None:
+                    w1, w2, val, *_ = line.strip().split()
+                else:
+                    w1, w2, val, *_ = line.strip().split(sep)
 
-            if preprocess_word is not None:
-                w1 = preprocess_word(w1)
-                w2 = preprocess_word(w2)
+                if preprocess_word is not None:
+                    w1 = preprocess_word(w1)
+                    w2 = preprocess_word(w2)
 
-            yield w1, w2, float(val)
+                yield w1, w2, float(val)
 
 def evaluate(similarity_func, standard, lang=None):
     actual, ideal = [], []
