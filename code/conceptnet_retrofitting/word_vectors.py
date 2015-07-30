@@ -34,6 +34,10 @@ class WordVectors:
         return vec
 
     def similar_to(self, word_or_vector, num=20, only=None):
+
+        if isinstance(self.vectors, np.memmap):
+            self.vectors = normalize(self.vectors)
+
         if isinstance(word_or_vector, str):
             vec = self.to_vector(word_or_vector)
         else:
