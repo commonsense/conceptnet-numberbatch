@@ -57,6 +57,10 @@ def evaluate(similarity_func, standard, lang=None):
         ideal.append(assoc)
         actual.append(similarity_func(w1, w2, lang=lang))
 
+    # Spearmanr will crash if all the values are 0
+    if all(x==0 for x in actual):
+        return 0
+
     return spearmanr(np.array(ideal), np.array(actual))[0]
 
 def main(labels_in, vecs_in, verbose=True):
