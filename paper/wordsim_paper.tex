@@ -398,6 +398,8 @@ $[2]$&GloVe 840B   & $L_1$ & CN5.4*    & CN5.4    &        .444 &       .765 &  
 \label{eval-multilingual}
 \end{table*}
 
+% These are evaluated on the development data only. Re-running them with the
+% held-out test data doesn't make temporal sense.
 \begin{table*}[t]
 \centering
 \begin{tabular}{llrrrrrr}
@@ -408,7 +410,7 @@ Unmodified      &                     & .587 &      .858 &    .818 &  .668 &   .
 \midrule
 Row-merging     & First row only      & .563 &      .827 &    .787 &  .649 &   .822 &   .794 \\
 Row-merging     & Unweighted avg.     & .526 &      .844 &    .751 &  .586 &   .841 &   .836 \\
-\midrule
+Retrofitting    & No self-loops       & .570 &      .855 &    .790 &  .676 &   .873 &   .853 \\
 Sources         & Drop ConceptNet 4   & .588 &      .857 &    .816 &  .669 &   .855 &   .848 \\
 Sources         & Drop JMDict         & .585 &      .858 &    .819 &  .666 &   .851 &   .840 \\
 Sources         & Drop OpenCyc        & .587 &      .858 &    .819 &  .668 &   .852 &   .845 \\
