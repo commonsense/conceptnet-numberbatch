@@ -4,7 +4,7 @@ from conceptnet_retrofitting.standardization.english import english_filter
 from conceptnet_retrofitting.standardization.tokenizer import simple_tokenize
 
 def standardize(text, lang='en', remove_accents=True):
-    if NFD_normalize and (lang=='es' or text.startswith('/c/es/')):
+    if remove_accents and (lang=='es' or text.startswith('/c/es/')):
         text = normalize('NFD', text).encode('ascii', errors='ignore').decode()
     if not text.startswith('/c/'):
         return standardized_concept_uri(text, lang)
@@ -32,6 +32,8 @@ LCODE_ALIASES = {
 }
 
 def standardized_concept_uri(text, lang='en'):
-    name = '_'.join([english_filter(token) if lang=='en' else token
-                     for token in simple_tokenize(text)])
-    return '/'.join(['/c', LCODE_ALIASES.get(lang, lang), name])
+    tokens = simple_tokenize(text)
+    if lang == 'en':
+        tokens = english_filter(tokens)
+
+    return '/'.join(['/c', LCODE_ALIASES.get(lang, lang), '_'.join(tokens)])

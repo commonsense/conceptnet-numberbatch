@@ -6,7 +6,6 @@ def load_range(filename):
 
 EMOJI_RANGE = load_range('emoji.txt')
 NON_PUNCT_RANGE = load_range('non_punct.txt')
-COMBINING_MARK_RANGE = load_range('combining_mark.txt')
 
 TOKEN_RE = re.compile("{0}|{1}+(?:'{1}+)*".format(EMOJI_RANGE, NON_PUNCT_RANGE))
 
