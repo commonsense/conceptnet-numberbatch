@@ -1,9 +1,9 @@
 \def\year{2015}
-\def\thetitle{Improving Word Vectors by Adding Lexical Knowledge}
+\def\thetitle{Improving Word Vectors by Adding Broad, Structured Knowledge}
 
 % Update this when our score changes. Maybe we can even automate this.
-\def\scoreRW{.591}
-\def\scoreMEN{.858}
+\def\scoreRW{.589}
+\def\scoreMEN{.860}
 
 \documentclass[letterpaper]{article}
 \usepackage{acl2012}
@@ -48,33 +48,82 @@
 \maketitle
 \begin{abstract}
 Embeddings of natural-language words in a vector space are useful for a variety
-of tasks in semantics. Embeddings learned from unstructured text can be
-combined with structured knowledge to achieve performance that neither source
-would achieve on its own, as shown by \newcite{faruqui2014retrofitting}.
-In this paper, we show the effectiveness
-of combining the GloVe embeddings \cite{pennington2014glove} with the
-crowd-sourced semantic network ConceptNet \cite{speer2012conceptnet}, with
-some changes to the GloVe embeddings and the ``retrofitting'' algorithm.
-The resulting vector space has a larger vocabulary
-than either source, and achieves state-of-the-art performance on multiple word
-similarity evaluations, including an unprecedented score of $\rho = \scoreRW{}$
-on an evaluation of rare words.
+of tasks in semantics, and these embeddings are often evaluated on their ability
+to rank similar words. In this paper, we show the effectiveness of combining
+existing embeddings learned by GloVe with structured knowledge from the semantic
+network ConceptNet 5, taking care to merge them into a common word
+representation. The resulting vector space has a larger vocabulary than either
+source, works on non-English words and multiple-word phrases, and achieves
+state-of-the-art performance on word similarity evaluations, including an
+unprecedented score of $\rho = \scoreRW{}$ on the Stanford rare-words
+evaluation.
 \end{abstract}
 
 \section{Introduction}
-blah blah blah
+Embeddings of natural-language terms in a vector space are useful for a variety
+of tasks in semantics. The goal is to represent words or phrases in a vector
+space with hundreds of dimensions, such that the cosine similarity between
+these vectors is higher when the words are more similar. This kind of vector
+space has been useful in applications such as information retrieval
+applications such as search and topic detection, dating back to the
+introduction of latent semantic analysis \cite{deerwester1990lsa}. In recent
+years, there has been a surge of interest in natural-language embeddings, as
+machine-learning techniques such as \newcite{mikolov2013word2vec}'s word2vec
+began to show dramatic improvements.
+
+A recent result from \newcite{faruqui2014retrofitting} introduced a technique
+known as ``retrofitting'', which combines embeddings learned from the
+distributional semantics of unstructured text with a source of structured
+connections between words, achieving performance on word-similarity evaluations
+that neither source would achieve on its own.
+
+We have expanded the retrofitting technique to operate on the union of two
+vocabularies, rather than the intersection. Combining this technique with some
+subtle but important normalizations to the input data, we achieve state-of-the-art
+performance when combining the distributional
+embeddings learned by GloVe \cite{pennington2014glove} from the Common Crawl
+\cite{TODOcrawl} with the structured word and phrase associations in ConceptNet
+5 \cite{speer2012conceptnet}. These new embeddings outperform many other
+recently-published methods, when compared to various human judgments of word
+similarity on both common and rare words.
+
+In all, we take a three-pronged approach to improving word similarity. We will
+show that these methods all improve performance on word-similarity evaluations,
+even when applied separately, and that the best improvement comes from applying
+all of them at once:
+
+\begin{itemize}
+\item Normalizing the features of the GloVe matrix with $L_1$ instead of $L_2$
+    normalization, providing a bonus to more selective features
+\item Transforming the matrix labels with a text ``standardization'' function,
+    unifying variations and inflections of the same word
+\item Applying a variation of retrofitting to introduce a broad variety of
+    structured semantic knowledge from ConceptNet 5.4
+\end{itemize}
+
+The family of techniques that includes word2vec and GloVe is sometimes popularly
+referred to as ``deep learning'', but this seems to be a buzzword with a vague
+referent. The multi-layered neural networks that ``deep learning'' was
+originally intended to refer to \cite{hinton2006deep} tend to be absent in these
+successful semantic representations.
+
+For the purpose of semantics, what seems to be more important thus far than
+multiple levels of learning is the ability to efficiently take in lots of input
+from a variety of sources. Combining multiple forms of knowledge to create the
+embeddings furthers this goal. Perhaps it would be clearer to refer to this
+family of techniques as ``wide learning'' instead.
 
 \section{Background}
 
 \subsection{GloVe}
 
 GloVe \cite{pennington2014glove} is a an unsupervised learning algorithm that
-trains vector representation of words. The algorithm operates on a global
-word-word cooccurrence matrix $C$. Let $v$ denote the size of the vocabulary.
-It attempts to train $W$ and $\tilde{W}$, both $v \times n$ matrix, that
-denote the word vectors and context vectors respectively and $b$ and
+trains vector representations of words. The algorithm operates on a global
+word-word co-occurrence matrix $C$. Let $v$ denote the size of the vocabulary.
+It trains $W$ and $\tilde{W}$, both $v \times n$ matrices, that
+denote the word vectors and context vectors respectively, and $b$ and
 $\tilde{b}$, both $v$-length vectors representing the word and context biases
-respectively. It attempts to minimize
+respectively. It aims to minimize
 
 $$
 \sum_{i=1,j=1}^v
@@ -82,7 +131,7 @@ $$
   \left( W_i^T \tilde{W}_j + b_i + \tilde{b}_j - \log{C_{ij}} \right)^2
 $$
 
-where $f$ acts as a weighing function of the form
+where $f$ acts as a weighting function of the form
 
 $$
 f \left( x \right) =
@@ -92,21 +141,22 @@ f \left( x \right) =
   \end{cases}
 $$
 
-\newcite{pennington2014glove} experimentally determined $x_{max}=100$ and
-$\alpha=0.75$.
+The GloVe authors experimentally determined $x_{max}=100$ and $\alpha=0.75$.
 
 Learning processes such as GloVe produce results that can conveniently be
 re-used in other projects, because they output a labeled matrix of the learned
-embeddings of each word in the vocabulary.
+embeddings of each word in the vocabulary. The embeddings that GloVe learns
+from data sources such as the Common Crawl are distributed on the GloVe web
+page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}.
+
 \newcite{faruqui2014retrofitting}
 introduced the ``retrofitting'' procedure, which adjusts such dense matrices of
 embeddings based on external knowledge from a sparse semantic network.
-
-\newcite{faruqui2014retrofitting} used PPDB \cite{ganitkevitch2013ppdb} as
-the external source of semantic knowledge, but we found that ConceptNet
-\cite{speer2012conceptnet}, a resource which combines a variety of forms of
-crowd-sourced and expert-created knowledge, should fit well with this process
-while greatly increasing the scope of its vocabulary.
+They used PPDB \cite{ganitkevitch2013ppdb} as
+the external source of semantic knowledge. We found using ConceptNet as the
+external knowledge source to be more effective, and that slight further
+improvements could be achieved on some evaluations by adding both
+ConceptNet and PPDB, as shown in Table~\ref{eval-retro-standardize}.
 
 \subsection{ConceptNet}
 ConceptNet 5 \cite{speer2012conceptnet} is a semantic network of terms
@@ -285,9 +335,11 @@ the analogies would become trivial analogies of the form
 \toprule
 Note &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    WS-353 &      SCWS &    RG-65 &    MC-30 \\
 \midrule
+$[1]$&Levy SVD     & ---   & ---       & ---      &     .514 &     .778 &           &           &          &          \\
+\midrule
      &GloVe 42B    & ---   & ---       & ---      &     .391 &     .734 &      .632 &      .440 &     .817 &     .777 \\
      &GloVe 42B    & ---   & CN5.4     & ---      &     .373 &     .763 &      .646 &      .444 &     .810 &     .762 \\
-$[1]$&GloVe 42B    & $L_2$ & ---       & ---      &     .489 &     .813 &      .759 &      .595 &     .829 &     .836 \\
+$[2]$&GloVe 42B    & $L_2$ & ---       & ---      &     .489 &     .813 &      .759 &      .595 &     .829 &     .836 \\
      &GloVe 42B    & $L_2$ & CN5.4     & ---      &     .494 &     .809 &      .765 &      .587 &     .779 &     .815 \\
      &GloVe 42B    & $L_1$ & ---       & ---      &     .497 &     .817 &      .766 &      .606 &     .826 &     .829 \\
      &GloVe 42B    & $L_1$ & CN5.4     & ---      &     .518 &     .834 &      .794 &      .619 &     .814 &     .828 \\
@@ -306,7 +358,7 @@ $[1]$&GloVe 42B    & $L_2$ & ---       & ---      &     .489 &     .813 &      .
      &GloVe 840B   & $L_2$ & CN5.4     & CN5.4    &     .575 &     .841 &      .794 &      .631 &     .805 &     .836 \\
      &GloVe 840B   & $L_2$ & CN5.4     & Both     &     .580 &     .841 &      .794 &      .634 &     .801 &     .829 \\
      &GloVe 840B   & $L_1$ & CN5.4     & PPDB     &     .565 &     .852 &      .806 & {\bf .674}&     .821 &     .824 \\
-$[2]$&GloVe 840B   & $L_1$ & CN5.4     & CN5.4    &     .587 &{\bf .858}& {\bf .818}&      .668 &{\bf .852}&{\bf .845}\\
+$[3]$&GloVe 840B   & $L_1$ & CN5.4     & CN5.4    &     .587 &{\bf .858}& {\bf .818}&      .668 &{\bf .852}&{\bf .845}\\
      &GloVe 840B   & $L_1$ & CN5.4     & Both     &{\bf .591}&{\bf .858}&      .817 &      .671 &     .846 &     .842 \\
 \bottomrule
 \end{tabular}
@@ -318,37 +370,61 @@ $[2]$&GloVe 840B   & $L_1$ & CN5.4     & CN5.4    &     .587 &{\bf .858}& {\bf .
     ``Text std.'' indicates whether labels are left in their original form or
     standardized according to ConceptNet 5.4. ``Retrofit'' indicates which data
     is added using retrofitting.\\
-    {\bf Notes}: $[1]$ These results correspond to those published by \newcite{pennington2014glove}.
-    $[2]$ These results are the ones we will use for further experimentation, such as in Table~\ref{eval-variations}.
+    {\bf Notes}: $[1]$ Results from \newcite{levy2015embeddings}, for comparison. $[2]$ These results correspond to those published by \newcite{pennington2014glove}.
+    $[3]$ These results are the ones we will use for further experimentation, such as in Table~\ref{eval-variations}.
 }
 \label{eval-retro-standardize}
 \end{table*}
 
 \begin{table*}[t]
 \centering
-\begin{tabular}{lrrrrrr}
+\begin{tabular}{lllllrrrr}
 \toprule
-Modification        &   RW &  MEN-3000 &  WS-353 &  SCWS &  RG-65 &  MC-30 \\
+Note &Embeddings   & Norm  & Text std. & Retrofit & WS-353 [es] & MC-30 [es] & RG-65 [de] & RG-65 [fr] \\
 \midrule
-Unmodified          & .587 &      .858 &    .818 &  .668 &   .852 &   .845 \\
+$[1]$&Skip-grams   & $L_2$ & ---       & UWN      &             &       .591 &       .603 &       .606 \\
+$[2]$&GloVe 840B   & $L_1$ & CN5.4*    & CN5.4    &        .444 &       .765 &       .673 &       .781 \\
+\bottomrule
+\end{tabular}
+
+\caption{
+    Multilingual evaluation results.
+    {\bf Notes}: $[1]$ These are the published results of retrofitting
+    Universal WordNet onto skip-gram embeddings from Wikipedia
+    \cite{faruqui2014retrofitting}, for comparison. $[2]$ This is similar to our
+    selected system from Table~\ref{eval-retro-standardize}, but with text
+    standardization modified to remove accents in Spanish.
+}
+\label{eval-multilingual}
+\end{table*}
+
+% These are evaluated on the development data only. Re-running them with the
+% held-out test data doesn't make temporal sense.
+\begin{table*}[t]
+\centering
+\begin{tabular}{llrrrrrr}
+\toprule
+Mod. type       & Modification        &   RW &  MEN-3000 &  WS-353 &  SCWS &  RG-65 &  MC-30 \\
 \midrule
-First row only      & .563 &      .827 &    .787 &  .649 &   .822 &   .794 \\
-Unweighted row avg. & .526 &      .844 &    .751 &  .586 &   .841 &   .836 \\
+Unmodified      &                     & .587 &      .858 &    .818 &  .668 &   .852 &   .845 \\
 \midrule
-Drop ConceptNet 4   & .588 &      .857 &    .816 &  .669 &   .855 &   .848 \\
-Drop JMDict         & .585 &      .858 &    .819 &  .666 &   .851 &   .840 \\
-Drop OpenCyc        & .587 &      .858 &    .819 &  .668 &   .852 &   .845 \\
-Drop Verbosity      & .587 &      .853 &    .814 &  .668 &   .852 &   .837 \\
-Drop Wiktionary     & .541 &      .865 &    .818 &  .664 &   .867 &   .852 \\
-Drop WordNet        & .586 &      .858 &    .817 &  .667 &   .852 &   .845 \\
-Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .852 &   .840 \\
+Row-merging     & First row only      & .563 &      .827 &    .787 &  .649 &   .822 &   .794 \\
+Row-merging     & Unweighted avg.     & .526 &      .844 &    .751 &  .586 &   .841 &   .836 \\
+Retrofitting    & No self-loops       & .570 &      .855 &    .790 &  .676 &   .873 &   .853 \\
+Sources         & Drop ConceptNet 4   & .588 &      .857 &    .816 &  .669 &   .855 &   .848 \\
+Sources         & Drop JMDict         & .585 &      .858 &    .819 &  .666 &   .851 &   .840 \\
+Sources         & Drop OpenCyc        & .587 &      .858 &    .819 &  .668 &   .852 &   .845 \\
+Sources         & Drop Verbosity      & .587 &      .853 &    .814 &  .668 &   .852 &   .837 \\
+Sources         & Drop Wiktionary     & .541 &      .865 &    .818 &  .664 &   .867 &   .852 \\
+Sources         & Drop WordNet        & .586 &      .858 &    .817 &  .667 &   .852 &   .845 \\
+Sources         & Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .852 &   .840 \\
 \bottomrule
 \end{tabular}
 \caption{
     The effects of various modifications to the embeddings, including
     changing the way that embeddings are merged after standardization, and
-    dropping various components of ConceptNet. ``ConceptNet 4''
-    represents a combination of ported data sources that are difficult to
+    dropping various knowledge sources from ConceptNet. ``ConceptNet 4''
+    represents a combination of ported sources that are difficult to
     separate: Open Mind Common Sense, GlobalMind, and nadya.jp.
 }
 \label{eval-variations}
@@ -489,7 +565,7 @@ variety of word-similarity gold standards:
 \item MC-30 \cite{miller1991mc}, similarity judgments for 30 word pairs.
 \end{itemize}
 
-% TODO: foreign language datasets
+% TODO: describe foreign language datasets
 
 In striving to maximize an evaluation metric, it is important to hold out some
 data, to avoid overfitting to the test data by modifying the algorithm and its
@@ -556,14 +632,14 @@ other, it can also be taken as an upper bound on what computational models can
 realistically achieve when simulating the human MEN judgments.''
 \end{quote}
 
-Our model achieves a MEN score of \scoreMEN{}, after re-introducing the
+Our model achieves a MEN score of \scoreMEN{} on the
 held-out test data, putting its performance above that upper bound. In many
 circumstances, this would be an indication that the model has overfit to the
 MEN data. However, we have tried to eliminate the possibility of overfitting.
-The MEN data is never used as an input to the system; we did not use the
-held-out data when setting parameters; and the same system that performs above
-the claimed upper bound of MEN also performs the highest on all the other data
-sets we tried.
+The MEN data is never used as an input to the system; we did not use or even
+look at the held-out data when setting parameters; and the same system that
+performs above the claimed upper bound of MEN also performs the highest on all
+the other data sets we tried.
 
 We postulate instead that similarity evaluations become easier to match
 computationally when averaged over the judgments of many people. The two
