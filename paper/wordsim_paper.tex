@@ -325,6 +325,15 @@ Mikolov et al.'s syntactic analogy task \cite{mikolov2013word2vec}, as many of
 the analogies would become trivial analogies of the form
 ``A is to A as B is to B''.
 
+Due to a quirk in some of the evaluation data, we must apply one more
+standardization to all labels, even though it is not necessary in ConceptNet
+or in GloVe. The Spanish translations of word-similarity evaluations
+\cite{TODOspanish} turn out to be written without any accents on the letters,
+such as ``telefono'' instead of ``tel\'{e}fono''.
+In order to recognize these as the correct words instead of out-of-vocabulary
+words, we need to re-standardize all Spanish terms in ConceptNet to omit all
+of the accents.
+
 % Let's have a bit of an interlude for tables. They don't belong with this
 % section but they need to be able to appear early enough in the paper despite
 % LaTeX's constraints.
@@ -383,17 +392,15 @@ $[3]$&GloVe 840B   & $L_1$ & CN5.4     & CN5.4    &     .587 &{\bf .858}& {\bf .
 Note &Embeddings   & Norm  & Text std. & Retrofit & WS-353 [es] & MC-30 [es] & RG-65 [de] & RG-65 [fr] \\
 \midrule
 $[1]$&Skip-grams   & $L_2$ & ---       & UWN      &             &       .591 &       .603 &       .606 \\
-$[2]$&GloVe 840B   & $L_1$ & CN5.4*    & CN5.4    &        .444 &       .765 &       .673 &       .781 \\
+     &GloVe 840B   & $L_1$ & CN5.4     & CN5.4    &        .444 &       .765 &       .673 &       .781 \\
 \bottomrule
 \end{tabular}
 
 \caption{
     Multilingual evaluation results.
-    {\bf Notes}: $[1]$ These are the published results of retrofitting
+    {\bf Note}: $[1]$ These are the published results of retrofitting
     Universal WordNet onto skip-gram embeddings from Wikipedia
-    \cite{faruqui2014retrofitting}, for comparison. $[2]$ This is similar to our
-    selected system from Table~\ref{eval-retro-standardize}, but with text
-    standardization modified to remove accents in Spanish.
+    \cite{faruqui2014retrofitting}, for comparison.
 }
 \label{eval-multilingual}
 \end{table*}
@@ -636,14 +643,15 @@ Our model achieves a MEN score of \scoreMEN{} on the
 held-out test data, putting its performance above that upper bound. In many
 circumstances, this would be an indication that the model has overfit to the
 MEN data. However, we have tried to eliminate the possibility of overfitting.
-The MEN data is never used as an input to the system; we did not use or even
-look at the held-out data when setting parameters; and the same system that
-performs above the claimed upper bound of MEN also performs the highest on all
-the other data sets we tried.
+The MEN data is never used as an input to the system; the same system also
+achieves good results on all other data sets; and we did not use or even
+look at the held-out data when setting parameters. Strikingly, the evaluation
+score on MEN goes {\em up} when the held-out data is introduced.
 
 We postulate instead that similarity evaluations become easier to match
-computationally when averaged over the judgments of many people. The two
-authors agreed more with the average of the crowd than they did with each other;
+computationally when averaged over the judgments of many people. Notice, for
+example, that the two MEN-3000 authors who provided their own ratings
+agreed more with the average of the crowd than they did with each other.
 if more people's judgments had been averaged in with the authors, perhaps the
 correlation would have been even higher. We suspect that the true upper bound
 of the MEN evaluation is higher than claimed.
