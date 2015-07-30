@@ -8,8 +8,18 @@ from conceptnet_retrofitting.ninja.ninja_util import (
 CONFIG = {
     'source-data-path': 'source-data/',
     'build-data-path': 'build-data/',
-    'glove-versions': ['42B.300d', '840B.300d'],
-    'retrofit-items': ['conceptnet5', 'ppdb-xl-lexical-standardized', 'cnet-ppdb-combined']
+    'glove-versions': ['840B.300d', '42B.300d'],
+    'neg-filters': ['jmdict', 'opencyc', 'openmind', 'verbosity', 'wiktionary', 'wordnet'],
+    'pos-filters': ['wiktionary'],
+    'retrofit-items': ['conceptnet5',
+                       'conceptnet5-minus-jmdict',
+                       'conceptnet5-minus-opencyc',
+                       'conceptnet5-minus-openmind',
+                       'conceptnet5-minus-verbosity',
+                       'conceptnet5-minus-wiktionary',
+                       'conceptnet5-minus-wordnet',
+                       'conceptnet5-wiktionary-only',
+                       'ppdb-xl-lexical-standardized', 'cnet-ppdb-combined']
 }
 
 
@@ -62,7 +72,7 @@ implicit = {
     'add_self_loops': ['conceptnet_retrofitting/builders/self_loops.py'],
     'retrofit': ['conceptnet_retrofitting/builders/retrofit.py'],
     'test': ['conceptnet_retrofitting/evaluation/wordsim.py'],
-    'tests_to_latex': ['conceptnet_retrofitting/builders/latex_results.py'],
+    'tests_to_latex': ['conceptnet_retrofitting/evaluation/latex_results.py'],
 }
 
 
@@ -75,6 +85,7 @@ def build_conceptnet_retrofitting():
     normalize_glove(graph)
 
     build_assoc(graph)
+    filter_conceptnet(graph)
     add_self_loops(graph)
     retrofit(graph)
 
@@ -155,6 +166,33 @@ def build_assoc(graph):
         )
 
 
+def regex_for_dataset(dataset):
+    if dataset == 'openmind':
+        filter_expr = '/d/(globalmind|conceptnet)'
+    else:
+        filter_expr = '/d/' + dataset
+    return filter_expr
+
+
+def filter_conceptnet(graph):
+    for dataset in CONFIG['pos-filters']:
+        filter_expr = regex_for_dataset(dataset)
+        graph['filter_assoc']['pos'][dataset] = Dep(
+            CONFIG['source-data-path'] + 'conceptnet5.csv',
+            CONFIG['build-data-path'] + 'conceptnet5-%s-only.csv' % dataset,
+            'filter_assoc_pos', params={'filter': filter_expr}
+        )
+
+    for dataset in CONFIG['neg-filters']:
+        filter_expr = regex_for_dataset(dataset)
+        graph['filter_assoc']['neg'][dataset] = Dep(
+            CONFIG['source-data-path'] + 'conceptnet5.csv',
+            CONFIG['build-data-path'] + 'conceptnet5-minus-%s.csv' % dataset,
+            'filter_assoc_neg', params={'filter': filter_expr}
+        )
+
+
+
 def add_self_loops(graph):
     for network in CONFIG['retrofit-items']:
         graph['add_self_loops'][network] = Dep(
@@ -168,6 +206,9 @@ def retrofit(graph):
     version = '840B.300d'
     for network in CONFIG['retrofit-items']:
         for norm in ['l1', 'l2', 'none']:
+            if 'conceptnet5-' in network and norm != 'l1':
+                # use only the l1 norm when trying dropping out datasets
+                continue
             graph['retrofit'][norm][network] = Dep(
                 [
                     GloveVectors(version=version, standardization='standardized', normalization=norm),

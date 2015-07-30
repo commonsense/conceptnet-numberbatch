@@ -22,6 +22,12 @@ rule glove_to_vecs
   command = cut -d" " -f2- $in | python -m conceptnet_retrofitting.builders.build_vecs $out
   pool = memory_hogs
 
+rule filter_assoc_neg
+  command = egrep -v '$filter' $in > $out
+
+rule filter_assoc_pos
+  command = egrep '$filter' $in > $out
+
 rule filter_vecs
   command = python -m conceptnet_retrofitting.builders.filter_vecs $in $out
   pool = memory_hogs
@@ -58,7 +64,7 @@ rule test
   command = python -m conceptnet_retrofitting.evaluation.wordsim $in >$out
 
 rule tests_to_latex
-  command = python -m conceptnet_retrofitting.builders.latex_results $in $out
+  command = python -m conceptnet_retrofitting.evaluation.latex_results $in $out
 
 rule rebuild_ninja
   command = python -m ninja
