@@ -6,27 +6,27 @@ import numpy as np
 
 directory = os.path.dirname(os.path.abspath(__file__))
 
-def evaluate(similarity_func, standard):
-    actual, ideal = [], []
-    for w1, w2, assoc in standard:
-        ideal.append(assoc)
-        actual.append(similarity_func(w1, w2))
-
-    return spearmanr(np.array(ideal), np.array(actual))[0]
+tests = [
+    ('rw', {'filename': 'rw.csv',}),
+    ('men-3000', {'filename': 'men3000-dev.csv',
+                  'preprocess_word' : lambda w: w.split('-')[0]}),
+    ('wordsim-353', {'filename': 'ws353.csv', 'sep':','}),
+    ('wordsim-353-ar', {'filename': 'ws353.ar.csv'}, 'ar'),
+    ('wordsim-353-es', {'filename': 'ws353.es.csv'}, 'es'),
+    ('wordsim-353-ro', {'filename': 'ws353.ro.csv'}, 'ro'),
+    ('scws', {'filename': 'scws-star.csv'}),
+    ('rg-65', {'filename': 'rg-65.csv'}),
+    ('rg-65-de', {'filename': 'rg-65.de.csv'}, 'de'),
+    ('rg-65-fr', {'filename': 'rg-65.fr.csv'}, 'fr'),
+    ('mc-30', {'filename': 'mc30.csv'}),
+    ('mc-30-es', {'filename': 'mc30.es.csv'}, 'es'),
+]
 
 def test_all(similarity_func):
-    print("rw")
-    print(evaluate(similarity_func, parse_rw()))
-    print("men-3000")
-    print(evaluate(similarity_func, parse_men3000()))
-    print("wordsim-353")
-    print(evaluate(similarity_func, parse_wordsim353()))
-    print("scws")
-    print(evaluate(similarity_func, parse_scws()))
-    print("rg-65")
-    print(evaluate(similarity_func, parse_rg65()))
-    print("mc-30")
-    print(evaluate(similarity_func, parse_mc30()))
+    for test, file_info, *optional in tests:
+        lang = optional[0] if optional else None
+        print(test)
+        print(evaluate(similarity_func, parse_file(**file_info), lang))
 
 def parse_file(filename, sep=None, preprocess_word=None):
     with open(os.path.join(directory, 'data', filename)) as file:
@@ -42,24 +42,13 @@ def parse_file(filename, sep=None, preprocess_word=None):
 
             yield w1, w2, float(val)
 
+def evaluate(similarity_func, standard, lang=None):
+    actual, ideal = [], []
+    for w1, w2, assoc in standard:
+        ideal.append(assoc)
+        actual.append(similarity_func(w1, w2, lang=lang))
 
-def parse_wordsim353(filename='ws353.csv'):
-    return parse_file(filename, sep=',')
-
-def parse_men3000(filename='men3000-dev.csv'):
-    return parse_file(filename, preprocess_word=lambda w: w.split('-')[0])
-
-def parse_rw(filename='rw.csv'):
-    return parse_file(filename)
-
-def parse_rg65(filename='rg-65.csv'):
-    return parse_file(filename)
-
-def parse_mc30(filename='mc30.csv'):
-    return parse_file(filename)
-
-def parse_scws(filename='scws-star.csv'):
-    return parse_file(filename)
+    return spearmanr(np.array(ideal), np.array(actual))[0]
 
 def main(labels_in, vecs_in, verbose=True):
     from conceptnet_retrofitting import loaders
