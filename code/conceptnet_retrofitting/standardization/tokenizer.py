@@ -1,7 +1,9 @@
 import re
+import os
+
 
 def load_range(filename):
-    with open(filename) as file:
+    with open(os.path.join(os.path.dirname(__file__), filename)) as file:
         return file.read()
 
 EMOJI_RANGE = load_range('emoji.txt')
