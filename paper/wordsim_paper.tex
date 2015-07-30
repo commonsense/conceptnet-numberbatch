@@ -67,7 +67,33 @@ blah blah blah
 \section{Background}
 
 \subsection{GloVe}
-\ldots introduce GloVe \ldots % TODO
+
+GloVe \cite{pennington2014glove} is a an unsupervised learning algorithm that
+trains vector representation of words. The algorithm operates on a global
+word-word cooccurrence matrix $C$. Let $v$ denote the size of the vocabulary.
+It attempts to train $W$ and $\tilde{W}$, both $v \times n$ matrix, that
+denote the word vectors and context vectors respectively and $b$ and
+$\tilde{b}$, both $v$-length vectors representing the word and context biases
+respectively. It attempts to minimize
+
+$$
+\sum_{i=1,j=1}^v
+  f \left( C_{ij} \right)
+  \left( W_i^T \tilde{W}_j + b_i + \tilde{b}_j - \log{C_{ij}} \right)^2
+$$
+
+where $f$ acts as a weighing function of the form
+
+$$
+f \left( x \right) =
+  \begin{cases}
+    \left( x / x_{max} \right)^\alpha & \text{if $x < x_{max}$ } \\
+    1 & otherwise
+  \end{cases}
+$$
+
+\newcite{pennington2014glove} experimentally determined $x_{max}=100$ and
+$\alpha=0.75$.
 
 Learning processes such as GloVe produce results that can conveniently be
 re-used in other projects, because they output a labeled matrix of the learned
