@@ -1,8 +1,10 @@
-from sklearn.preprocessing import normalize
-from conceptnet_retrofitting.builders.sparse_matrix_builder import SparseMatrixBuilder
-from conceptnet_retrofitting.builders.label_set import LabelSet
 from collections import defaultdict
 
+from sklearn.preprocessing import normalize
+
+from conceptnet_retrofitting.builders.sparse_matrix_builder import SparseMatrixBuilder
+from conceptnet_retrofitting.builders.label_set import LabelSet
+from conceptnet_retrofitting.standardization import standardize
 
 def coarse_dataset(dataset):
     if '/' not in dataset:
@@ -34,8 +36,8 @@ def build_from_conceptnet(labels, filename, verbose=True):
     with open(filename, encoding='utf-8') as infile:
         for line in infile:
             concept1, concept2, value_str, dataset, relation = line.strip().split('\t')
-            index1 = labels.add(concept1)
-            index2 = labels.add(concept2)
+            index1 = labels.add(standardize(concept1))
+            index2 = labels.add(standardize(concept2))
 
             dataset_label = coarse_dataset(dataset)
             value = float(value_str) / (dataset_totals[dataset_label] / dataset_counts[dataset_label])
