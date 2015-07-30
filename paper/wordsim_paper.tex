@@ -249,6 +249,84 @@ Mikolov et al.'s syntactic analogy task \cite{mikolov2013word2vec}, as many of
 the analogies would become trivial analogies of the form
 ``A is to A as B is to B''.
 
+% Let's have a bit of an interlude for tables. They don't belong with this
+% section but they need to be able to appear early enough in the paper despite
+% LaTeX's constraints.
+
+\begin{table*}[t]
+\centering
+\begin{tabular}{lllllrrrrrr}
+\toprule
+Note &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    WS-353 &      SCWS &    RG-65 &    MC-30 \\
+\midrule
+     &GloVe 42B    & ---   & ---       & ---      &     .391 &     .734 &      .632 &      .440 &     .817 &     .777 \\
+     &GloVe 42B    & ---   & CN5.4     & ---      &     .373 &     .763 &      .646 &      .444 &     .810 &     .762 \\
+$[1]$&GloVe 42B    & $L_2$ & ---       & ---      &     .489 &     .813 &      .759 &      .595 &     .829 &     .836 \\
+     &GloVe 42B    & $L_2$ & CN5.4     & ---      &     .494 &     .809 &      .765 &      .587 &     .779 &     .815 \\
+     &GloVe 42B    & $L_1$ & ---       & ---      &     .497 &     .817 &      .766 &      .606 &     .826 &     .829 \\
+     &GloVe 42B    & $L_1$ & CN5.4     & ---      &     .518 &     .834 &      .794 &      .619 &     .814 &     .828 \\
+\midrule
+     &GloVe 840B   & ---   & ---       & ---      &     .106 &     .710 &      .627 &      .441 &     .648 &     .696 \\
+     &GloVe 840B   & ---   & CN5.4     & ---      &     .468 &     .806 &      .735 &      .552 &     .775 &     .787 \\
+     &GloVe 840B   & $L_2$ & ---       & ---      &     .116 &     .750 &      .664 &      .496 &     .652 &     .666 \\
+     &GloVe 840B   & $L_2$ & CN5.4     & ---      &     .519 &     .817 &      .760 &      .564 &     .717 &     .789 \\
+     &GloVe 840B   & $L_1$ & ---       & ---      &     .117 &     .754 &      .667 &      .500 &     .653 &     .682 \\
+     &GloVe 840B   & $L_1$ & CN5.4     & ---      &     .536 &     .841 &      .798 &      .615 &     .774 &     .798 \\
+\midrule
+     &GloVe 840B   & ---   & CN5.4     & PPDB     &     .468 &     .813 &      .716 &      .598 &     .815 &     .815 \\
+     &GloVe 840B   & ---   & CN5.4     & CN5.4    &     .516 &     .826 &      .734 &      .602 &     .842 &     .810 \\
+     &GloVe 840B   & ---   & CN5.4     & Both     &     .520 &     .827 &      .731 &      .604 &     .838 &     .811 \\
+     &GloVe 840B   & $L_2$ & CN5.4     & PPDB     &     .555 &     .830 &      .780 &      .633 &     .788 &     .819 \\
+     &GloVe 840B   & $L_2$ & CN5.4     & CN5.4    &     .575 &     .841 &      .794 &      .631 &     .805 &     .836 \\
+     &GloVe 840B   & $L_2$ & CN5.4     & Both     &     .580 &     .841 &      .794 &      .634 &     .801 &     .829 \\
+     &GloVe 840B   & $L_1$ & CN5.4     & PPDB     &     .565 &     .852 &      .806 & {\bf .674}&     .821 &     .824 \\
+$[2]$&GloVe 840B   & $L_1$ & CN5.4     & CN5.4    &     .587 &{\bf .858}& {\bf .818}&      .668 &{\bf .852}&{\bf .845}\\
+     &GloVe 840B   & $L_1$ & CN5.4     & Both     &{\bf .591}&{\bf .858}&      .817 &      .671 &     .846 &     .842 \\
+\bottomrule
+\end{tabular}
+
+\caption{
+    Results on the word similarity task, shown as the Spearman rank correlation
+    ($\rho$) between the learned embeddings and various human-annotated corpora.
+    ``Norm'' indicates the norm applied to the columns of GloVe.
+    ``Text std.'' indicates whether labels are left in their original form or
+    standardized according to ConceptNet 5.4. ``Retrofit'' indicates which data
+    is added using retrofitting.\\
+    {\bf Notes}: $[1]$ These results correspond to those published by \newcite{pennington2014glove}.
+    $[2]$ These results are the ones we will use for further experimentation, such as in Table~\ref{eval-variations}.
+}
+\label{eval-retro-standardize}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\begin{tabular}{lrrrrrr}
+\toprule
+Modification        &   RW &  MEN-3000 &  WS-353 &  SCWS &  RG-65 &  MC-30 \\
+\midrule
+Unmodified          & .587 &      .858 &    .818 &  .668 &   .852 &   .845 \\
+\midrule
+First row only      & .563 &      .827 &    .787 &  .649 &   .822 &   .794 \\
+Unweighted row avg. & .526 &      .844 &    .751 &  .586 &   .841 &   .836 \\
+\midrule
+Drop ConceptNet 4   & .588 &      .857 &    .816 &  .669 &   .855 &   .848 \\
+Drop JMDict         & .585 &      .858 &    .819 &  .666 &   .851 &   .840 \\
+Drop OpenCyc        & .587 &      .858 &    .819 &  .668 &   .852 &   .845 \\
+Drop Verbosity      & .587 &      .853 &    .814 &  .668 &   .852 &   .837 \\
+Drop Wiktionary     & .541 &      .865 &    .818 &  .664 &   .867 &   .852 \\
+Drop WordNet        & .586 &      .858 &    .817 &  .667 &   .852 &   .845 \\
+Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .852 &   .840 \\
+\bottomrule
+\end{tabular}
+\caption{
+    The effects of various modifications to the embeddings, including
+    changing the way that embeddings are merged after standardization, and
+    dropping various components of ConceptNet. ``ConceptNet 4''
+    represents a combination of ported data sources that are difficult to
+    separate: Open Mind Common Sense, GlobalMind, and nadya.jp.
+}
+\label{eval-variations}
+\end{table*}
 
 \subsection{Normalization}
 
@@ -363,19 +441,6 @@ the same terms with a different relation, it will add to that value.
 \section{Evaluation}
 
 \subsection{Word Similarity Datasets}
-
-\begin{table*}[t]
-\centering
-\input{../code/build-data/evaluations.latex}
-\caption{
-    Results on the word similarity task, shown as the Spearman rank correlation
-    ($\rho$) between the learned embeddings and various human-annotated corpora.
-    Here we compare the performance of GloVe in its original form, GloVe with
-    its labels standardized and merged like ConceptNet, and GloVe combined with
-    ConceptNet by retrofitting, for various normalizations of the GloVe vectors.
-}
-\label{eval-retro-standardize}
-\end{table*}
 
 We evaluate our model's performance at identifying similar words using a
 variety of word-similarity gold standards:
