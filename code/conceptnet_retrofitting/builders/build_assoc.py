@@ -4,7 +4,7 @@ from sklearn.preprocessing import normalize
 
 from conceptnet_retrofitting.builders.sparse_matrix_builder import SparseMatrixBuilder
 from conceptnet_retrofitting.builders.label_set import LabelSet
-from conceptnet_retrofitting.builders.standardize import standardize
+from conceptnet_retrofitting.standardization import standardize
 
 def coarse_dataset(dataset):
     if '/' not in dataset:

@@ -1,6 +1,6 @@
 import numpy as np
 
-from conceptnet_retrofitting.builders.standardize import standardize
+from conceptnet_retrofitting.standardization import standardize
 from conceptnet_retrofitting.builders.label_set import LabelSet
 
 
