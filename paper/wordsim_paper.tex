@@ -118,12 +118,12 @@ family of techniques as ``wide learning'' instead.
 \subsection{GloVe}
 
 GloVe \cite{pennington2014glove} is a an unsupervised learning algorithm that
-trains vector representation of words. The algorithm operates on a global
-word-word cooccurrence matrix $C$. Let $v$ denote the size of the vocabulary.
-It attempts to train $W$ and $\tilde{W}$, both $v \times n$ matrix, that
-denote the word vectors and context vectors respectively and $b$ and
+trains vector representations of words. The algorithm operates on a global
+word-word co-occurrence matrix $C$. Let $v$ denote the size of the vocabulary.
+It trains $W$ and $\tilde{W}$, both $v \times n$ matrices, that
+denote the word vectors and context vectors respectively, and $b$ and
 $\tilde{b}$, both $v$-length vectors representing the word and context biases
-respectively. It attempts to minimize
+respectively. It aims to minimize
 
 $$
 \sum_{i=1,j=1}^v
@@ -131,7 +131,7 @@ $$
   \left( W_i^T \tilde{W}_j + b_i + \tilde{b}_j - \log{C_{ij}} \right)^2
 $$
 
-where $f$ acts as a weighing function of the form
+where $f$ acts as a weighting function of the form
 
 $$
 f \left( x \right) =
@@ -141,21 +141,22 @@ f \left( x \right) =
   \end{cases}
 $$
 
-\newcite{pennington2014glove} experimentally determined $x_{max}=100$ and
-$\alpha=0.75$.
+The GloVe authors experimentally determined $x_{max}=100$ and $\alpha=0.75$.
 
 Learning processes such as GloVe produce results that can conveniently be
 re-used in other projects, because they output a labeled matrix of the learned
-embeddings of each word in the vocabulary.
+embeddings of each word in the vocabulary. The embeddings that GloVe learns
+from data sources such as the Common Crawl are distributed on the GloVe web
+page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}.
+
 \newcite{faruqui2014retrofitting}
 introduced the ``retrofitting'' procedure, which adjusts such dense matrices of
 embeddings based on external knowledge from a sparse semantic network.
-
-\newcite{faruqui2014retrofitting} used PPDB \cite{ganitkevitch2013ppdb} as
-the external source of semantic knowledge, but we found that ConceptNet
-\cite{speer2012conceptnet}, a resource which combines a variety of forms of
-crowd-sourced and expert-created knowledge, should fit well with this process
-while greatly increasing the scope of its vocabulary.
+They used PPDB \cite{ganitkevitch2013ppdb} as
+the external source of semantic knowledge. We found using ConceptNet as the
+external knowledge source to be more effective, and that slight further
+improvements could be achieved on some evaluations by adding both
+ConceptNet and PPDB, as shown in Table~\ref{eval-retro-standardize}.
 
 \subsection{ConceptNet}
 ConceptNet 5 \cite{speer2012conceptnet} is a semantic network of terms
@@ -400,29 +401,29 @@ $[2]$&GloVe 840B   & $L_1$ & CN5.4*    & CN5.4    &        .444 &       .765 &  
 
 \begin{table*}[t]
 \centering
-\begin{tabular}{lrrrrrr}
+\begin{tabular}{llrrrrrr}
 \toprule
-Modification        &   RW &  MEN-3000 &  WS-353 &  SCWS &  RG-65 &  MC-30 \\
+Mod. type       & Modification        &   RW &  MEN-3000 &  WS-353 &  SCWS &  RG-65 &  MC-30 \\
 \midrule
-Unmodified          & .587 &      .858 &    .818 &  .668 &   .852 &   .845 \\
+Unmodified      &                     & .587 &      .858 &    .818 &  .668 &   .852 &   .845 \\
 \midrule
-First row only      & .563 &      .827 &    .787 &  .649 &   .822 &   .794 \\
-Unweighted row avg. & .526 &      .844 &    .751 &  .586 &   .841 &   .836 \\
+Row-merging     & First row only      & .563 &      .827 &    .787 &  .649 &   .822 &   .794 \\
+Row-merging     & Unweighted avg.     & .526 &      .844 &    .751 &  .586 &   .841 &   .836 \\
 \midrule
-Drop ConceptNet 4   & .588 &      .857 &    .816 &  .669 &   .855 &   .848 \\
-Drop JMDict         & .585 &      .858 &    .819 &  .666 &   .851 &   .840 \\
-Drop OpenCyc        & .587 &      .858 &    .819 &  .668 &   .852 &   .845 \\
-Drop Verbosity      & .587 &      .853 &    .814 &  .668 &   .852 &   .837 \\
-Drop Wiktionary     & .541 &      .865 &    .818 &  .664 &   .867 &   .852 \\
-Drop WordNet        & .586 &      .858 &    .817 &  .667 &   .852 &   .845 \\
-Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .852 &   .840 \\
+Sources         & Drop ConceptNet 4   & .588 &      .857 &    .816 &  .669 &   .855 &   .848 \\
+Sources         & Drop JMDict         & .585 &      .858 &    .819 &  .666 &   .851 &   .840 \\
+Sources         & Drop OpenCyc        & .587 &      .858 &    .819 &  .668 &   .852 &   .845 \\
+Sources         & Drop Verbosity      & .587 &      .853 &    .814 &  .668 &   .852 &   .837 \\
+Sources         & Drop Wiktionary     & .541 &      .865 &    .818 &  .664 &   .867 &   .852 \\
+Sources         & Drop WordNet        & .586 &      .858 &    .817 &  .667 &   .852 &   .845 \\
+Sources         & Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .852 &   .840 \\
 \bottomrule
 \end{tabular}
 \caption{
     The effects of various modifications to the embeddings, including
     changing the way that embeddings are merged after standardization, and
-    dropping various components of ConceptNet. ``ConceptNet 4''
-    represents a combination of ported data sources that are difficult to
+    dropping various knowledge sources from ConceptNet. ``ConceptNet 4''
+    represents a combination of ported sources that are difficult to
     separate: Open Mind Common Sense, GlobalMind, and nadya.jp.
 }
 \label{eval-variations}
