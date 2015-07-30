@@ -1,7 +1,7 @@
 from sklearn.preprocessing import normalize
 from conceptnet_retrofitting.builders.sparse_matrix_builder import SparseMatrixBuilder
 from conceptnet_retrofitting.builders.label_set import LabelSet
-
+from conceptnet_retrofitting.builders.standardize import standardize
 
 def build_from_conceptnet(labels, filename, verbose=True):
     """
@@ -16,8 +16,8 @@ def build_from_conceptnet(labels, filename, verbose=True):
     with open(filename, encoding='utf-8') as infile:
         for line in infile:
             concept1, concept2, value_str, dataset, relation = line.strip().split('\t')
-            index1 = labels.add(concept1)
-            index2 = labels.add(concept2)
+            index1 = labels.add(standardize(concept1))
+            index2 = labels.add(standardize(concept2))
 
             value = float(value_str)
             # A tweak that seems to help:

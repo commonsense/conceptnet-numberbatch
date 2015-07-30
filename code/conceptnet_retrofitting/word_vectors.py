@@ -1,16 +1,12 @@
 import numpy as np
 
-from conceptnet5.nodes import standardized_concept_uri
+from conceptnet_retrofitting.builders.standardize import standardize
 from conceptnet_retrofitting.builders.label_set import LabelSet
 from sklearn.preprocessing import normalize
 
 
-def conceptnet_standardizer(label, lang='en'):
-    return standardized_concept_uri(lang, label)
-
-
 class WordVectors:
-    def __init__(self, labels, vectors, standardizer=conceptnet_standardizer):
+    def __init__(self, labels, vectors, standardizer=standardize):
         assert(len(labels) == len(vectors))
         self.labels = LabelSet(labels)
         if not isinstance(vectors, np.memmap):
@@ -23,14 +19,13 @@ class WordVectors:
         try:
             return self.to_vector(word1, lang).dot(self.to_vector(word2, lang))
         except KeyError:
-            print("Unknown Pair: %s %s"%(word1, word2))
             return 0
 
     def to_vector(self, word, lang=None):
         if self._standardizer is not None:
-            if self._standardizer is conceptnet_standardizer and \
+            if self._standardizer is standardize and \
                 lang is not None:
-                word = self._standardizer(word, lang)
+                word = self._standardizer(word, lang=lang)
             else:
                 word = self._standardizer(word)
         vec = self.vectors[self.labels.index(word)]
