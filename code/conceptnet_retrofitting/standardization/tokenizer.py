@@ -6,10 +6,9 @@ def load_range(filename):
     with open(os.path.join(os.path.dirname(__file__), filename)) as file:
         return file.read()
 
-EMOJI_RANGE = load_range('emoji.txt')
 NON_PUNCT_RANGE = load_range('non_punct.txt')
 
-TOKEN_RE = re.compile("{0}|{1}+(?:'{1}+)*".format(EMOJI_RANGE, NON_PUNCT_RANGE))
+TOKEN_RE = re.compile("{0}+(?:'{0}+)*".format(NON_PUNCT_RANGE))
 
 
 def simple_tokenize(text):
