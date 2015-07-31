@@ -460,9 +460,11 @@ these relations should in fact decrease relatedness -- while ``hot'' and
 are likely to consider them less related because of the obvious contrast
 between them.
 
-However, association matrices are better behaved, especially under
-normalization, when they contain no negative entries. In our method, we simply
-omit all instances of negative and antonym relations in ConceptNet.
+However, association matrices are better behaved when they contain no negative
+entries. Saying that vector $A$ should be a bit less related to vector
+$B$ is very different from saying that it should be related to $-B$.
+In our method, we simply omit all instances of negative and antonym
+relations in ConceptNet.
 
 Each remaining assertion in ConceptNet corresponds to two entries in a sparse
 association matrix $S$. ConceptNet assigns a confidence score, or weight, to
