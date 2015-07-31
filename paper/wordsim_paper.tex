@@ -128,7 +128,7 @@ to this approach as ``wide learning'' instead.
 $$
 \sum_{i=1,j=1}^v
   f \left( C_{ij} \right)
-  \left( W_i^T \tilde{W}_j + b_i + \tilde{b}_j - \log{C_{ij}} \right)^2
+  \left( w_i^T \tilde{w}_j + b_i + \tilde{b}_j - \log{C_{ij}} \right)^2
 $$
 
 where $f$ acts as a weighting function of the form
@@ -137,7 +137,7 @@ $$
 f \left( x \right) =
   \begin{cases}
     \left( x / x_{max} \right)^\alpha & \text{if $x < x_{max}$ } \\
-    1 & otherwise
+    1 & \text{otherwise}
   \end{cases}
 $$
 
@@ -387,9 +387,9 @@ matrix denoting the original word vectors. If a word does not have a
 corresponding word vector, it is assigned the zero vector. Retrofitting
 generates a $W'$ that minimizes
 $$
-\Psi \left( W' \right) = \sum_{i=0}^v \left[
+\Psi \left( W' \right) = \sum_{i=1}^v \left[
   \alpha_i \left\|  w'_i - w_i \right\| ^ 2
-  + \sum_{j=0}^v s_{ij} \left\| w'_i - w'_j \right\| ^ 2
+  + \sum_{j=1}^v s_{ij} \left\| w'_i - w'_j \right\| ^ 2
 \right]
 $$
 
@@ -398,7 +398,7 @@ where $\alpha_i$ is a column weight vector. In our tests, we let
 $$
 \alpha_i =
   \begin{cases}
-    0 & \text{if $W^0_i = \vec{0}$} \\
+    0 & \text{if $w_i = \vec{0}$} \\
     1 & \text{otherwise}
   \end{cases}
 $$
