@@ -44,18 +44,16 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-A currently successful approach to
-represent the meanings of words is to represent them as vectors (embeddings)
-in a machine-learned vector space. These embeddings are often evaluated on
-their ability to identify similar or related words like a human would. In this
-paper, we show the effectiveness of combining existing embeddings learned by
-GloVe \cite{pennington2014glove} with structured knowledge from the semantic
-network ConceptNet 5 \cite{speer2012conceptnet}, taking care to merge them into
-a common word representation. The resulting vector space has a larger vocabulary
-than either source, can represent meanings in multiple languages, and achieves
-state-of-the-art performance on word similarity evaluations. In particular, its
-score of $\rho = \scoreRW{}$ on an evaluation of rare words \cite{luong2013rw}
-is 13.6\% higher than the previous best known system.
+Generating vector representations of words with machine learning has become an
+increasing effective approach for semantic analysis. In this paper, we show the
+effectiveness of combining existing embeddings learned by GloVe
+\cite{pennington2014glove} with structured knowledge from the semantic network
+ConceptNet 5 \cite{speer2012conceptnet}, taking care to merge them into a common
+word representation. The resulting vector space has a larger vocabulary than
+either source, can represent the meaning of a word in multiple languages, and
+achieves state-of-the-art performance on word similarity evaluations. In
+particular, its score of $\rho = \scoreRW{}$ on an evaluation of rare words
+\cite{luong2013rw} is 13.6\% higher than the previous best known system.
 \end{abstract}
 
 \section{Introduction}
