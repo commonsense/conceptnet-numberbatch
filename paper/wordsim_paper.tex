@@ -2,7 +2,7 @@
 \def\thetitle{Wide Learning: Breadth of Knowledge Improves Word Vectors}
 
 % Update this when our score changes.
-\def\scoreRW{.589}
+\def\scoreRW{.584}
 \def\scoreMEN{.860}
 
 \documentclass[letterpaper]{article}
@@ -44,28 +44,30 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Embeddings of natural-language words in a vector space are useful for a variety
-of tasks in semantics, and these embeddings are often evaluated on their ability
-to rank similar words. In this paper, we show the effectiveness of combining
-existing embeddings learned by GloVe with structured knowledge from the semantic
-network ConceptNet 5, taking care to merge them into a common word
-representation. The resulting vector space has a larger vocabulary than either
-source, works on non-English words and multiple-word phrases, and achieves
-state-of-the-art performance on word similarity evaluations, including an
-unprecedented score of $\rho = \scoreRW{}$ on the Stanford rare-words
-evaluation.
+A currently successful approach to
+represent the meanings of words is to represent them as vectors (embeddings)
+in a machine-learned vector space. These embeddings are often evaluated on
+their ability to identify similar or related words like a human would. In this
+paper, we show the effectiveness of combining existing embeddings learned by
+GloVe \cite{pennington2014glove} with structured knowledge from the semantic
+network ConceptNet 5 \cite{speer2012conceptnet}, taking care to merge them into
+a common word representation. The resulting vector space has a larger vocabulary
+than either source, can represent meanings in multiple languages, and achieves
+state-of-the-art performance on word similarity evaluations. In particular, its
+score of $\rho = \scoreRW{}$ on an evaluation of rare words \cite{luong2013rw}
+is 13.6\% higher than the previously best known system.
 \end{abstract}
 
 \section{Introduction}
-Embeddings of natural-language terms in a vector space are useful for a variety
-of tasks in semantics. The goal is to represent words or phrases in a vector
-space with hundreds of dimensions, such that the cosine similarity between these
-vectors is higher when the words are more similar. This kind of vector space has
-been useful in applications such as information retrieval applications such as
-search and topic detection, dating back to the introduction of latent semantic
-analysis \cite{deerwester1990indexing}. In recent years, there has been a surge
-of interest in natural-language embeddings, as machine-learning techniques such
-as \newcite{mikolov2013word2vec}'s word2vec began to show dramatic improvements.
+Vector space models are an effective way to express the approximate meanings of
+natural-language terms in a computational system. The goal is to represent words
+or phrases in a vector space with hundreds of dimensions, such that the cosine
+similarity between these vectors is higher when the words are more similar. This
+kind of vector space has been useful in applications such as search and topic
+detection, dating back to the introduction of latent semantic analysis
+\cite{deerwester1990indexing}. In recent years, there has been a surge of
+interest in natural-language embeddings, as machine-learning techniques such as
+\newcite{mikolov2013word2vec}'s word2vec began to show dramatic improvements.
 
 A recent result from \newcite{faruqui2014retrofitting} introduced a technique
 known as ``retrofitting'', which combines embeddings learned from the
@@ -100,7 +102,7 @@ all of them at once:
 The family of techniques that includes word2vec and GloVe is sometimes
 popularly conflated with ``deep learning'', but this terminology seems to have
 a particularly vague meaning within NLP. The multi-layered neural networks that
-``deep learning'' was originally intended to refer to \cite{hinton2006deep}
+``deep learning'' is intended to refer to (such as \newcite{hinton2006deep})
 tend to be absent in these successful semantic representations.
 
 For the purpose of vector-based semantics, what seems to be more important thus
