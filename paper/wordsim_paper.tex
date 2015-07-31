@@ -73,14 +73,13 @@ interest in natural-language embeddings, as machine-learning techniques like
 A recent paper from \newcite{faruqui2014retrofitting} introduced a technique
 known as ``retrofitting'', which combines embeddings learned from the
 distributional semantics of unstructured text with a source of structured
-connections between words. The combined embedding achieving performance on
-word-similarity evaluations superior to either source individually.
+connections between words. The combined embedding achieves performance on
+word-similarity evaluations superior to either source individually. While the
+original formulation operates on the intersection of the vocabularies, we modify
+it to operate on the union. This allows retrofitting to expand the vocabulary of
+the embedding instead of shrinking it.
 
-%TODO Move to GloVe section
-%We have expanded the retrofitting technique to operate on the union of two
-%vocabularies, rather than the intersection.
-
-By combining a modified version of this technique with some subtle but important
+By combining our modified version of retrofitting with some subtle but important
 normalizations to the input data, we achieve state-of-the-art performance using
 the distributional embeddings learned by GloVe \cite{pennington2014glove} from
 the Common Crawl\footnote{\url{https://commoncrawl.org/}} with the structured word and phrase
@@ -183,9 +182,9 @@ The data sources included in ConceptNet 5.4 are:
     \cite{nakahara2011nadya} in Japanese, and the PTT pet game \cite{kuo2009petgame}
     in Taiwanese Chinese
 \item WordNet 3.0 \cite{miller1998wordnet}
-\item A parsed version of Wiktionary's entries whose target language is English
-    or German \cite{wiktionary2014en} \cite{wiktionary2014de}, whose parser is
-    developed as part of the ConceptNet 5 codebase
+\item A parsed version of Wiktionary's entries whose target language is English or
+      German \cite{wiktionary2014en} \cite{wiktionary2014de}, and generated
+      using a parser developed as part of the ConceptNet 5 codebase
 \item JMDict \cite{breen2004jmdict}, a Japanese multilingual dictionary
 \item OpenCyc \cite{matuszek2006cyc} as represented in Umbel \cite{bergman2008umbel}
 \end{itemize}
@@ -196,7 +195,7 @@ not affect the results in this paper.
 
 \section{Methods}
 
-Here, we create a matrix that assigns embeddings in a 300-dimensional vector
+We create a matrix that assigns embeddings in a 300-dimensional vector
 space to terms by combining data from ConceptNet and GloVe. The resulting word
 embeddings incorporate the strengths of both ConceptNet and GloVe, and extend
 their vocabulary to the union of ConceptNet and GloVe, allowing embeddings that
@@ -260,10 +259,10 @@ of ConceptNet 5.4:
     {\tt /c/en/give\_example}.
 \end{itemize}
 
-The resulting URIs are not entirely meant for human consumption, and are
-sometimes not grammatically accurate -- the term ``ground zero'' becomes
-{\tt /c/en/grind\_zero}, for example -- but they unify surface texts that may
-appear in slightly different forms in different resources.
+ The resulting URIs are not entirely meant for human consumption, and are
+sometimes not grammatically accurate -- the term ``ground zero'' becomes {\tt
+/c/en/grind\_zero}, for example -- but they unify surface texts that may appear
+in slightly different forms in different resources.
 
 \subsubsection{How GloVe is Standardized}
 
@@ -357,12 +356,12 @@ increase over $L_2$ normalization in almost all variations of GloVe.
 Retrofitting \cite{faruqui2014retrofitting} is a process of combining existing
 word vectors with a semantic lexicon. While the original formulation expresses
 the problem in terms of a set of edges, we have found it more convenient to
-express it in terms of matrices.  Let $v$ denote the size of the vocabulary,
-$S$ be a $v \times v$ matrix denoting the semantic lexicon, and $W$ be a $v
-\times n$ matrix denoting the original word vectors. If a word does not have a
+express it in terms of matrices. Let $v$ denote the size of the vocabulary,
+which is the union of the vocabularies of the embedding and the lexicon. Let $S$ be
+a $v \times v$ matrix denoting the semantic lexicon and $W$ be a $v \times n$
+matrix denoting the original word vectors. If a word does not have a
 corresponding word vector, it is assigned the zero vector. Retrofitting
 generates a $W'$ that minimizes
-
 $$
 \Psi \left( W' \right) = \sum_{i=0}^v \left[
   \alpha_i \left\|  w'_i - w_i \right\| ^ 2
@@ -771,16 +770,16 @@ MEN-3000 by 5.4\%.
 \subsection{Standardizing Term Texts}
 
 When applying ConceptNet's standardization procedure to the labels of GloVe's
-840B-token dataset, we achieved an unexpected benefit of cleaning up the data
-so it performs much better on the rare words evaluation, even before
-retrofitting anything onto it.
+840B-token dataset, we found an unexpected benefit from cleaning up that data in
+the form of a very large performance increase on the rare words evaluation,
+even before retrofitting anything onto it.
 
 When we run our evaluation without modifying the labels on the GloVe 42B-token
 embeddings, we reproduce the results published in \cite{pennington2014glove}.
 This same evaluation, when run on the 840B-token embeddings, produces
 surprisingly poor results, implying that some of these rare words appear in
-forms that have low-quality embeddings. When we standardize the GloVe labels
-and combine them using the Zipf estimate, however, the result outperforms the
+forms that have low-quality embeddings. When we standardize the GloVe labels and
+combine them using the Zipf estimate, however, the result outperforms the
 42B-token embeddings.
 
 We conclude from this that it is important to combine the information learned
