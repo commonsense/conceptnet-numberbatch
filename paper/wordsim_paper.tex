@@ -11,7 +11,7 @@
 \usepackage{latexsym}
 \usepackage{amsmath}
 \usepackage{multirow}
-\usepackage{graphicx}
+\usepackage{pgfplots}
 \usepackage{booktabs}
 \usepackage{CJKutf8}
 \usepackage{url}
@@ -550,6 +550,7 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    W
 \label{eval-bigtable}
 \end{table*}
 
+
 %TODO: the highlights of the above table can be a graph
 
 \begin{table*}[t]
@@ -573,6 +574,31 @@ Label     & Method   & Reference                      & RW [all] & MEN-3000 \\
 }
 \label{compare-others}
 \end{table*}
+
+\begin{figure}
+\begin{tikzpicture}
+    \begin{axis}[enlargelimits=0.2, xlabel={MEN-3000 (common words)}, ylabel={RW (rare words)}]
+        \addplot[
+          scatter,mark=*,only marks,nodes near coords,
+          point meta=explicit symbolic, every node near coord/.append style={anchor=west}
+        ]
+        table[meta=label] {
+            x      y     label
+            .777   .514  {Levy SVD}
+            .774   .470  {Levy skip-gram}
+            .816   .476  {GloVe}
+            .840   .512  {WL0}
+            .860   .585  {WL1}
+            .860   .589  {WL2}
+        };
+    \end{axis}
+\end{tikzpicture}
+\caption{
+    Systems discussed in this paper, plotted according to their MEN-3000 and
+    RW scores.
+}
+\label{compare-graph}
+\end{figure}
 
 
 \begin{table*}[t]
