@@ -404,8 +404,6 @@ Label   & Reference                         & WS-353 [es] & MC-30 [es] & RG-65 [
 \label{eval-multilingual}
 \end{table*}
 
-% These are evaluated on the development data only. Re-running them with the
-% held-out test data doesn't make temporal sense.
 \begin{table*}[t]
 \centering
 \begin{tabular}{llrrrrrr}
@@ -433,8 +431,8 @@ Sources         & Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .
     The effects of various modifications to the embeddings of system {\bf WL1},
     including changing the way that embeddings are merged after
     standardization, and dropping various knowledge sources from ConceptNet.
-    RW and MEN-3000 were evaluated on the development set here,
-    not on the held-out test data.
+    RW and MEN-3000 were evaluated using their development sets here,
+    not the held-out test data.
 }
 \label{eval-variations}
 \end{table*}
@@ -801,8 +799,8 @@ We followed up on examining the influence of Wiktionary by building a version of
 the system where it was the {\em only} data we included from ConceptNet. This
 system in fact achieves most of the performance of system {\bf WL1}, with its
 largest drop in performance being on MEN-3000. We conclude that much, but not
-all, of the value of ConceptNet 5 in this system is that it contains a high-
-quality parse of Wiktionary into relational data.
+all, of the value of ConceptNet 5 in this system is that it contains a
+high-quality parse of Wiktionary into relational data.
 
 \subsection{The Limits of Similarity Judgments}
 
