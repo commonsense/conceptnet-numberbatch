@@ -757,17 +757,17 @@ same time, the MEN-3000 score {\em increases} from .858 to .865. The system
 continues to do what it is designed to do without Wiktionary, but there seems to
 be a tradeoff in performance on rare words and common words involved.
 
-We followed up on examining the influence of Wiktionary by building a version
-of the system where it was the {\em only} data we included from ConceptNet.
-This system in fact achieves most of the performance of system {\bf WL1}, with
-its largest drop in performance being on MEN-3000. We conclude that much, but
-not all, of the value of ConceptNet 5 in this application is that it contains
-a high-quality parse of Wiktionary into relational data.
+We followed up on examining the influence of Wiktionary by building a version of
+the system where it was the {\em only} data we included from ConceptNet. This
+system in fact achieves most of the performance of system {\bf WL1}, with its
+largest drop in performance being on MEN-3000. We conclude that much, but not
+all, of the value of ConceptNet 5 in this system is that it contains a high-
+quality parse of Wiktionary into relational data.
 
 \subsection{The Limits of Similarity Judgments}
 
-\newcite{bruni2014men} describe a substitute for
-inter-annotator agreement on their MEN-3000 dataset:
+\newcite{bruni2014men} describe a substitute for inter-annotator agreement on
+their MEN-3000 dataset:
 
 \begin{quote}
 ``The Spearman correlation of the two authors is at 0.68, the correlation of their
@@ -793,6 +793,16 @@ agreed more with the average of the crowd than they did with each other.
 if more people's judgments had been averaged in with the authors, perhaps the
 correlation would have been even higher. We suspect that the true upper bound
 of the MEN evaluation is higher than claimed.
+
+\section{Reproducing These Results}
+
+We aim for these results to be reproducible and reusable by others. The code
+that we ran to produce the results in this paper is available in a GitHub
+repository at [{\em currently private pending blind review}]. We have tagged
+this revision as [{\em TBD}], as we intend to continue to revise and improve the
+code afterward. The data files are available at [{\em TBD}], and the README file
+in the Git repository explains how to use {\tt git-annex} to connect the code
+with a version-controlled snapshot of the data.
 
 \begin{CJK*}{UTF8}{min}
 \bibliography{wordsim_paper}
