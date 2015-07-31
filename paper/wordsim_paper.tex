@@ -829,8 +829,36 @@ computationally when averaged over the judgments of many people. Notice, for
 example, that the two MEN-3000 authors who provided their own ratings
 agreed more with the average of the crowd than they did with each other.
 if more people's judgments had been averaged in with the authors, perhaps the
-correlation would have been even higher. We suspect that the true upper bound
-of the MEN evaluation is higher than claimed.
+correlation would have been even higher. We suspect that, while these results
+may be approaching it, the true upper bound of the MEN evaluation is higher than
+claimed.
+
+\subsection{Future work}
+
+One aspect of our method that clearly has room for improvement is the fact that
+we disregard the labels on relations in ConceptNet, and exclude antonym
+relations altogether. There is valuable knowledge there that we might be able
+to take into account with a more sophisticated extension of retrofitting, one
+that goes beyond simply knowing that particular words should be related, to
+handling them differently based on {\em how} they are related.
+
+We believe that the variety of data sources represented in ConceptNet helped
+to improve evaluation scores by expanding the domain of the system's knowledge.
+There's no reason the improvement needs to stop here. It is quite likely that
+there are more sources of ``linked data'' that could be included, or further
+standardizations that could be applied to the text to align more data. In short,
+these results can probably be surpassed easily. As the
+second author observed while running evaluations, ``It seems like every time we
+do {\em anything} to the data, the results get better.''
+
+It was convenient, but not entirely correct, to assume that all of GloVe's data
+from the Common Crawl is in English. The Common Crawl is in a wide variety of
+languages, just as the Web itself is. In our system, non-English terms are
+represented only by links in ConceptNet, but we could have a better starting
+point if multilingual terms were represented in the GloVe vectors in the first
+place. It could be useful to re-run GloVe in a way that distinguishes languages,
+using the metadata on Web pages when available and language-detection heuristics
+otherwise. Perhaps we could resolve the encoding glitches at the same time.
 
 \section{Reproducing These Results}
 
