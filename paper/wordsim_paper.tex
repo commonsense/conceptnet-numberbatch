@@ -438,6 +438,28 @@ Sources         & Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .
 \label{eval-variations}
 \end{table*}
 
+\begin{table*}[t]
+\centering
+\begin{tabular}{lrrrrr}
+\toprule
+Label   & RW [dev] & RW [test] & RW [both] & MEN-3000 [dev] & MEN-3000 [test] \\
+\midrule
+\bf G   & .489  & .448  & .477  & .813  & .816 \\
+\bf WL1 & .587  & .581  & .585  & .858  & .860 \\
+\bf WL2 & .591  & .584  & .589  & .857  & .860 \\
+\bottomrule
+\end{tabular}
+
+\caption{
+    Evaluation results for both dev and test datasets. Row {\bf G} contains the
+    published results of the GloVe model trained on 42B tokens by
+    \newcite{pennington2014glove}. {\bf WL1} and {\bf WL2} are our system, as also seen
+    in Table~\ref{eval-bigtable}.
+}
+\label{eval-dev-test}
+\end{table*}
+
+
 \subsection{Normalization}
 
 As briefly mentioned by \newcite{pennington2014glove}, $L_2$ normalization of
