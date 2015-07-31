@@ -68,7 +68,7 @@ implicit = {
     'standardize_vecs': ['conceptnet_retrofitting/builders/standardize_vecs.py'],
     'l1_normalize': ['conceptnet_retrofitting/builders/l1norm.py'],
     'l2_normalize': ['conceptnet_retrofitting/builders/l2norm.py'],
-    'conceptnet_to_assoc': ['conceptnet_retrofitting/builders/build_assoc.py'],
+    'network_to_assoc': ['conceptnet_retrofitting/builders/build_assoc.py'],
     'add_self_loops': ['conceptnet_retrofitting/builders/self_loops.py'],
     'retrofit': ['conceptnet_retrofitting/builders/retrofit.py'],
     'test': ['conceptnet_retrofitting/evaluation/wordsim.py'],
