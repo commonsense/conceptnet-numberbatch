@@ -44,56 +44,58 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-A currently successful approach to
-represent the meanings of words is to represent them as vectors (embeddings)
-in a machine-learned vector space. These embeddings are often evaluated on
-their ability to identify similar or related words like a human would. In this
+Generating vector representations of words with machine learning has become an
+increasing successful approach for semantic analysis. In particular, they have
+become very accurate at identifying related words, like a human would. In this
 paper, we show the effectiveness of combining existing embeddings learned by
 GloVe \cite{pennington2014glove} with structured knowledge from the semantic
 network ConceptNet 5 \cite{speer2012conceptnet}, taking care to merge them into
 a common word representation. The resulting vector space has a larger vocabulary
-than either source, can represent meanings in multiple languages, and achieves
-state-of-the-art performance on word similarity evaluations. In particular, its
-score of $\rho = \scoreRW{}$ on an evaluation of rare words \cite{luong2013rw}
-is 13.6\% higher than the previous best known system.
+than either source, can represent word meanings in multiple languages, and
+achieves state-of-the-art performance on word similarity evaluations. In
+particular, its score of $\rho = \scoreRW{}$ on an evaluation of rare words
+\cite{luong2013rw} is 13.6\% higher than the previous best known system.
 \end{abstract}
 
 \section{Introduction}
-Vector space models are an effective way to express the approximate meanings of
-natural-language terms in a computational system. The goal is to represent words
-or phrases in a vector space with hundreds of dimensions, such that the cosine
-similarity between these vectors is higher when the words are more similar. This
-kind of vector space has been useful in applications such as search and topic
-detection, dating back to the introduction of latent semantic analysis
-\cite{deerwester1990indexing}. In recent years, there has been a surge of
-interest in natural-language embeddings, as machine-learning techniques such as
-\newcite{mikolov2013word2vec}'s word2vec began to show dramatic improvements.
+Vector space models are an effective way to express the meanings of
+natural-language terms in a computational system. Machine learning algorithms
+attempt to represent words or phrases as vectors in a high dimensional space,
+such that the cosine similarities of two words correspond to their semantic
+similarities. This kind of vector space has found applications in search and
+topic detection, dating back to the introduction of latent semantic analysis
+\cite{deerwester1990indexing}.
+In recent years, there has been a surge of
+interest in natural-language embeddings, as machine-learning techniques like
+\newcite{mikolov2013word2vec}'s word2vec have begun to show dramatic improvements.
+% TODO ask someone with good grammar about the above sentence.
 
-A recent result from \newcite{faruqui2014retrofitting} introduced a technique
+A recent paper from \newcite{faruqui2014retrofitting} introduced a technique
 known as ``retrofitting'', which combines embeddings learned from the
 distributional semantics of unstructured text with a source of structured
-connections between words, achieving performance on word-similarity evaluations
-that neither source would achieve on its own.
+connections between words. The combined embedding achieving performance on
+word-similarity evaluations superior to either source individually.
 
-We have expanded the retrofitting technique to operate on the union of two
-vocabularies, rather than the intersection. Combining this technique with some
-subtle but important normalizations to the input data, we achieve state-of-the-art
-performance when combining the distributional
-embeddings learned by GloVe \cite{pennington2014glove} from the Common
-Crawl\footnote{\url{http://commoncrawl.org/}}
-with the structured word and phrase associations in ConceptNet
-5 \cite{speer2012conceptnet}. These new embeddings outperform many other
-recently-published methods when compared to various human judgments of word
-similarity on both common and rare words.
+%TODO Move to GloVe section
+%We have expanded the retrofitting technique to operate on the union of two
+%vocabularies, rather than the intersection.
+
+By combining a modified version of this technique with some subtle but important
+normalizations to the input data, we achieve state-of-the-art performance using
+the distributional embeddings learned by GloVe \cite{pennington2014glove} from
+the Common Crawl \cite{TODOcrawl} with the structured word and phrase
+associations in ConceptNet 5 \cite{speer2012conceptnet}. These new embeddings
+outperform many other recently-published methods on word similarity datasets of
+both common and rare words.
 
 In all, we take a three-pronged approach to improving word similarity. We will
-show that these methods all improve performance on word-similarity evaluations,
-even when applied separately, and that the best improvement comes from applying
-all of them at once:
+show that each of these methods improve performance on word-similarity
+evaluations, even when applied separately, and that the best results comes from
+applying all of them at once:
 
 \begin{itemize}
 \item Normalizing the features of the GloVe matrix with $L_1$ instead of $L_2$
-    normalization, providing a bonus to more selective features
+    normalization, increasing the weight of more selective features
 \item Transforming the matrix labels with a text ``standardization'' function,
     unifying variations and inflections of the same word
 \item Applying a variation of retrofitting to introduce a broad variety of
@@ -116,15 +118,14 @@ to this approach as ``wide learning'' instead.
 
 \subsection{GloVe}
 
-GloVe \cite{pennington2014glove} is a an unsupervised learning algorithm that
-learns vector representations of words that predict their frequency of
-co-occurrence. The algorithm operates on a global
-word-word co-occurrence matrix $C$. Let $v$ denote the size of the vocabulary.
-It trains $W$ and $\tilde{W}$, both $v \times k$ matrices that assign
-$k$-dimensional vectors to each word and each context respectively, and $b$ and
-$\tilde{b}$, both $v$-length vectors representing the word and context biases
-respectively. It aims to minimize
-
+ GloVe \cite{pennington2014glove} is an unsupervised learning algorithm that
+ learns vector representations of words, such that the dot product of two words
+ vectors is approximately equal to the logarithm of their cooccurrence count.
+ The algorithm operates on a global word-word co-occurrence matrix $C$. Let $v$
+ denote the size of the vocabulary. It trains $W$ and $\tilde{W}$, both $v
+ \times k$ matrices that assign $k$-dimensional vectors to each word and each
+ context respectively, and $b$ and $\tilde{b}$, both $v$-length vectors
+ representing the word and context biases respectively. It aims to minimize
 $$
 \sum_{i=1,j=1}^v
   f \left( C_{ij} \right)
@@ -145,9 +146,9 @@ The GloVe authors experimentally decided on $k=300$, $x_{max}=100$ and
 $\alpha=0.75$.
 
 Learning processes such as GloVe produce results that can conveniently be
-re-used in other projects, simply by re-using the matrix of word embeddings
-$W$. The embeddings that GloVe learns
-from data sources such as the Common Crawl are distributed on the GloVe web
+re-used in other projects, simply by re-using the matrix of word embeddings $W$.
+The embeddings that GloVe learns from data sources such as the Common Crawl are
+distributed on the GloVe web
 page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}.
 
 \newcite{faruqui2014retrofitting} introduced the ``retrofitting'' procedure,
@@ -155,8 +156,8 @@ which adjusts dense matrices of embeddings (such as the GloVe output) to take
 into account external knowledge from a sparse semantic network. They used PPDB
 \cite{ganitkevitch2013ppdb} as the external source of semantic knowledge. We
 found using ConceptNet as the external knowledge source to be more effective,
-and that slight further improvements could be achieved on some evaluations by
-adding both ConceptNet and PPDB, as shown in Table~\ref{eval-bigtable}.
+and that further marginal improvements could be achieved on some evaluations by
+combining ConceptNet and PPDB, as shown in Table~\ref{eval-bigtable}.
 
 \subsection{ConceptNet}
 ConceptNet 5 \cite{speer2012conceptnet} is a semantic network of terms
