@@ -384,13 +384,13 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    W
 
 \begin{table*}[t]
 \centering
-\begin{tabular}{lllllrrrr}
+\begin{tabular}{llrrrr}
 \toprule
 Label   & Reference                         & WS-353 [es] & MC-30 [es] & RG-65 [de] & RG-65 [fr] \\
 \midrule
 \bf R   & \newcite{faruqui2014retrofitting} &         --- &       .591 &       .603 &       .606 \\
-\bf WL1 & GloVe 840B  & This paper          &    \bf .444 &   \bf .765 &       .673 &       .781 \\
-\bf WL2 & Glove 840B  & This paper          &        .441 &       .762 &   \bf .677 &   \bf .788 \\
+\bf WL1 & This paper                        &    \bf .444 &   \bf .765 &       .673 &       .781 \\
+\bf WL2 & This paper                        &        .441 &       .762 &   \bf .677 &   \bf .788 \\
 \bottomrule
 \end{tabular}
 
@@ -508,8 +508,8 @@ $$
   \end{cases}
 $$
 
-Notice that $\Psi$ is convex and can be solved by a simple iterative updating
-method:
+Similarly to the original formulation of retrofitting, $\Psi$ is convex and can
+be solved by a simple iterative updating method:
 
 $$
 W^{k+1} = \left( S W^k + \alpha \odot W^0 \right)
