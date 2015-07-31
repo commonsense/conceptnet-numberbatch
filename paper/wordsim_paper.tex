@@ -79,8 +79,9 @@ We have expanded the retrofitting technique to operate on the union of two
 vocabularies, rather than the intersection. Combining this technique with some
 subtle but important normalizations to the input data, we achieve state-of-the-art
 performance when combining the distributional
-embeddings learned by GloVe \cite{pennington2014glove} from the Common Crawl
-\cite{TODOcrawl} with the structured word and phrase associations in ConceptNet
+embeddings learned by GloVe \cite{pennington2014glove} from the Common
+Crawl\footnote{\url{http://commoncrawl.org/}}
+with the structured word and phrase associations in ConceptNet
 5 \cite{speer2012conceptnet}. These new embeddings outperform many other
 recently-published methods when compared to various human judgments of word
 similarity on both common and rare words.
@@ -323,13 +324,12 @@ the analogies would become trivial analogies of the form
 ``A is to A as B is to B''.
 
 Due to a quirk in some of the evaluation data, we must apply one more
-standardization to all labels, even though it is not necessary in ConceptNet
-or in GloVe. The Spanish translations of word-similarity evaluations
-\cite{TODOspanish} turn out to be written without any accents on the letters,
-such as ``telefono'' instead of ``tel\'{e}fono''.
-In order to recognize these as the correct words instead of out-of-vocabulary
-words, we need to re-standardize all Spanish terms in ConceptNet to omit all
-of the accents.
+standardization to all labels, even though it is not necessary in ConceptNet or
+in GloVe. The Spanish translations of word-similarity evaluations
+\cite{hassan2009crosslingual} turn out to be written without any accents on the
+letters, such as ``telefono'' instead of ``tel\'{e}fono''. In order to recognize
+these as the correct words instead of out-of-vocabulary words, we need to re-
+standardize all Spanish terms in ConceptNet to omit all of the accents.
 
 % Let's have a bit of an interlude for tables. They don't belong with this
 % section but they need to be able to appear early enough in the paper despite
@@ -386,10 +386,11 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    W
 \centering
 \begin{tabular}{lllllrrrr}
 \toprule
-Label   & Embeddings   & Norm  & Text std. & Retrofit & WS-353 [es] & MC-30 [es] & RG-65 [de] & RG-65 [fr] \\
+Label   & Reference                         & WS-353 [es] & MC-30 [es] & RG-65 [de] & RG-65 [fr] \\
 \midrule
-\bf R   & Skip-grams   & $L_2$ & ---       & UWN      &         --- &       .591 &       .603 &       .606 \\
-\bf WL1 & GloVe 840B   & $L_1$ & CN5.4     & CN5.4    &        .444 &   \bf .765 &   \bf .673 &   \bf .781 \\
+\bf R   & \newcite{faruqui2014retrofitting} &         --- &       .591 &       .603 &       .606 \\
+\bf WL1 & GloVe 840B  & This paper          &    \bf .444 &   \bf .765 &       .673 &       .781 \\
+\bf WL2 & Glove 840B  & This paper          &        .441 &       .762 &   \bf .677 &   \bf .788 \\
 \bottomrule
 \end{tabular}
 
@@ -445,16 +446,16 @@ Sources         & Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .
 Label   & RW [dev] & RW [test] & RW [both] & MEN-3000 [dev] & MEN-3000 [test] \\
 \midrule
 \bf G   & .489  & .448  & .477  & .813  & .816 \\
+\bf WL0 & .536  & .512  & .528  & .841  & .840 \\
 \bf WL1 & .587  & .581  & .585  & .858  & .860 \\
 \bf WL2 & .591  & .584  & .589  & .857  & .860 \\
 \bottomrule
 \end{tabular}
 
 \caption{
-    Evaluation results for both dev and test datasets. Row {\bf G} contains the
-    published results of the GloVe model trained on 42B tokens by
-    \newcite{pennington2014glove}. {\bf WL1} and {\bf WL2} are our system, as also seen
-    in Table~\ref{eval-bigtable}.
+    A comparison of evaluation results between the ``dev'' datasets that were
+    used in development, and the held-out ``test'' datasets, for the systems
+    labled in Table~\ref{eval-bigtable}.
 }
 \label{eval-dev-test}
 \end{table*}
@@ -652,22 +653,41 @@ variety of word-similarity gold standards:
 \item MC-30 \cite{miller1991mc}, similarity judgments for 30 word pairs.
 \end{itemize}
 
-% TODO: describe foreign language datasets
+To evaluate our ability to extend the vocabulary to other languages, we also
+used translations of some of the above gold standards:
+
+\begin{itemize}
+\item RG-65 has been translated into German by \newcite{gurevych2005german},
+    and into French by \newcite{joubarne2011french}.
+\item WordSim-353 and MC-30 have been translated into Spanish, written in
+    plain ASCII without accents, by \newcite{hassan2009crosslingual}. This
+    data also comes with translations into Romanian and Arabic.
+\end{itemize}
+
+\subsection{Setting Aside Test Data}
 
 In striving to maximize an evaluation metric, it is important to hold out some
-data, to avoid overfitting to the test data by modifying the algorithm and its
+data, to avoid overfitting to the data by modifying the algorithm and its
 parameters. The metrics we focused on improving were our rank correlation with
 MEN-3000, which emphasizes having high-quality representations of common words,
 and RW, which emphasizes having a broad vocabulary.
 
 MEN-3000 comes with a development/test split, where 1000 of the 3000 word pairs
 are held out for testing. We applied a similar split to RW, setting aside a
-sample of $1/3$ of its word pairs for testing. Neither of these held-out test
-sets were used in our evaluations until the code and parameters were finalized,
-shortly before submitting this article. While
-Table~\ref{eval-bigtable} shows our correlation with only the test data on
-these evaluations, Table~\ref{eval-heldout-test} compares our performance
-on development and test data.
+sample of $1/3$ of its word pairs for testing.\footnote{
+    We set aside every third row, starting from row 3, using the Unix command
+    {\tt split -un r/3/3 rw.txt}. Similarly, we split on {\tt r/1/3} and
+    {\tt r/2/3} and concatenated the results to get the remaining evaluation
+    data.
+}
+
+Neither of these held-out test sets were used in our evaluations until the code
+and parameters were finalized, shortly before submitting this article. While
+Table~\ref{eval-bigtable} shows our correlation with only the test data on these
+evaluations, Table~\ref{eval-dev-test} compares our performance on development
+and test data.
+
+\subsection{Results}
 
 We have labeled some of the rows of~\ref{eval-bigtable} as particular systems
 that we would like to compare. System {\bf G} represents a configuration of
@@ -677,7 +697,7 @@ using their provided data, and successfully reproduced their results.
 % TODO: move/rewrite this paragraph when we have a separate table of
 % external comparisons
 System {\bf L} represents the previous state of the
-art in word-similarity evaluations \cite{levy2015improving}. We did not run this
+art in word-similarity evaluations \cite{levy2015embeddings}. We did not run this
 system; we are simply including its previously-published results for comparison.
 The score of .514 on RW is not directly comparable to the other RW scores in
 this table, then, because Levy was of course not using the development/test
@@ -697,8 +717,6 @@ the best system that we created without retrofitting anything. This system
 simply involves transforming the rows and columns of the existing GloVe 840B
 matrix, showing that some of the improvements from this paper can be realized
 without introducing any additional data.
-
-% TODO: make the eval-heldout-test table
 
 \section{Discussion}
 
@@ -823,7 +841,7 @@ that we ran to produce the results in this paper is available in a GitHub
 repository at [{\em currently private pending blind review}]. We have tagged
 this revision as [{\em TBD}], as we intend to continue to revise and improve the
 code afterward. The data files are available at [{\em TBD}], and the README file
-in the Git repository explains how to use {\tt git-annex} to connect the code
+in the repository explains how to use {\tt git-annex} to connect the code
 with a version-controlled snapshot of the data.
 
 \begin{CJK*}{UTF8}{min}
