@@ -59,16 +59,15 @@ particular, its score of $\rho = \scoreRW{}$ on an evaluation of rare words
 
 \section{Introduction}
 Vector space models are an effective way to express the meanings of
-natural-language terms in a computational system. Machine learning algorithms
-attempt to represent words or phrases as vectors in a high dimensional space,
+natural-language terms in a computational system. These models are created
+using machine-learning algorithms that attempt to represent words or phrases as vectors in a high dimensional space,
 such that the cosine similarities of two words correspond to their semantic
 similarities. This kind of vector space has found applications in search and
 topic detection, dating back to the introduction of latent semantic analysis
 \cite{deerwester1990indexing}.
 In recent years, there has been a surge of
-interest in natural-language embeddings, as machine-learning techniques like
+interest in natural-language embeddings, as machine-learning techniques such as
 \newcite{mikolov2013word2vec}'s word2vec have begun to show dramatic improvements.
-% TODO ask someone with good grammar about the above sentence.
 
 A recent paper from \newcite{faruqui2014retrofitting} introduced a technique
 known as ``retrofitting'', which combines embeddings learned from the
@@ -715,15 +714,6 @@ We have labeled some of the rows of~\ref{eval-bigtable} as particular systems
 that we would like to compare. System {\bf G} represents a configuration of
 GloVe that was evaluated by \newcite{pennington2014glove}. We ran the evaluation
 using their provided data, and successfully reproduced their results.
-
-% TODO: move/rewrite this paragraph when we have a separate table of
-% external comparisons
-%System {\bf L} represents the previous state of the
-%art in word-similarity evaluations \cite{levy2015embeddings}. We did not run this
-%system; we are simply including its previously-published results for comparison.
-%The score of .514 on RW is not directly comparable to the other RW scores in
-%this table, then, because Levy was of course not using the development/test
-%split in RW that we introduced for this paper.
 
 {\bf WL1} and {\bf WL2} are two preferred configurations of our system. {\bf WL1}
 applies all the techniques described in this paper as it retrofits with
