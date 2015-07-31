@@ -116,15 +116,14 @@ to this approach as ``wide learning'' instead.
 
 \subsection{GloVe}
 
-GloVe \cite{pennington2014glove} is a an unsupervised learning algorithm that
-learns vector representations of words that predict their frequency of
-co-occurrence. The algorithm operates on a global
-word-word co-occurrence matrix $C$. Let $v$ denote the size of the vocabulary.
-It trains $W$ and $\tilde{W}$, both $v \times k$ matrices that assign
-$k$-dimensional vectors to each word and each context respectively, and $b$ and
-$\tilde{b}$, both $v$-length vectors representing the word and context biases
-respectively. It aims to minimize
-
+ GloVe \cite{pennington2014glove} is an unsupervised learning algorithm that
+ learns vector representations of words, such that the dot product of two words
+ vectors is approximately equal to the logarithm of their cooccurrence count.
+ The algorithm operates on a global word-word co-occurrence matrix $C$. Let $v$
+ denote the size of the vocabulary. It trains $W$ and $\tilde{W}$, both $v
+ \times k$ matrices that assign $k$-dimensional vectors to each word and each
+ context respectively, and $b$ and $\tilde{b}$, both $v$-length vectors
+ representing the word and context biases respectively. It aims to minimize
 $$
 \sum_{i=1,j=1}^v
   f \left( C_{ij} \right)
@@ -145,9 +144,9 @@ The GloVe authors experimentally decided on $k=300$, $x_{max}=100$ and
 $\alpha=0.75$.
 
 Learning processes such as GloVe produce results that can conveniently be
-re-used in other projects, simply by re-using the matrix of word embeddings
-$W$. The embeddings that GloVe learns
-from data sources such as the Common Crawl are distributed on the GloVe web
+re-used in other projects, simply by re-using the matrix of word embeddings $W$.
+The embeddings that GloVe learns from data sources such as the Common Crawl are
+distributed on the GloVe web
 page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}.
 
 \newcite{faruqui2014retrofitting} introduced the ``retrofitting'' procedure,
@@ -155,8 +154,8 @@ which adjusts dense matrices of embeddings (such as the GloVe output) to take
 into account external knowledge from a sparse semantic network. They used PPDB
 \cite{ganitkevitch2013ppdb} as the external source of semantic knowledge. We
 found using ConceptNet as the external knowledge source to be more effective,
-and that slight further improvements could be achieved on some evaluations by
-adding both ConceptNet and PPDB, as shown in Table~\ref{eval-bigtable}.
+and that further marginal improvements could be achieved on some evaluations by
+combing ConceptNet and PPDB, as shown in Table~\ref{eval-bigtable}.
 
 \subsection{ConceptNet}
 ConceptNet 5 \cite{speer2012conceptnet} is a semantic network of terms
