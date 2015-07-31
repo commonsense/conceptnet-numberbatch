@@ -51,8 +51,8 @@ paper, we show the effectiveness of combining existing embeddings learned by
 GloVe \cite{pennington2014glove} with structured knowledge from the semantic
 network ConceptNet 5 \cite{speer2012conceptnet}, taking care to merge them into
 a common word representation. The resulting vector space has a larger vocabulary
-than either source, can represent the meaning of a word in multiple languages,
-and achieves state-of-the-art performance on word similarity evaluations. In
+than either source, can represent word meanings in multiple languages, and
+achieves state-of-the-art performance on word similarity evaluations. In
 particular, its score of $\rho = \scoreRW{}$ on an evaluation of rare words
 \cite{luong2013rw} is 13.6\% higher than the previous best known system.
 \end{abstract}
@@ -73,7 +73,8 @@ interest in natural-language embeddings, as machine-learning techniques like
 A recent paper from \newcite{faruqui2014retrofitting} introduced a technique
 known as ``retrofitting'', which combines embeddings learned from the
 distributional semantics of unstructured text with a source of structured
-connections between words. The combined embedding achieving performance on word-similarity evaluations superior to either source individually.
+connections between words. The combined embedding achieving performance on
+word-similarity evaluations superior to either source individually.
 
 %TODO Move to GloVe section
 %We have expanded the retrofitting technique to operate on the union of two
@@ -156,7 +157,7 @@ into account external knowledge from a sparse semantic network. They used PPDB
 \cite{ganitkevitch2013ppdb} as the external source of semantic knowledge. We
 found using ConceptNet as the external knowledge source to be more effective,
 and that further marginal improvements could be achieved on some evaluations by
-combing ConceptNet and PPDB, as shown in Table~\ref{eval-bigtable}.
+combining ConceptNet and PPDB, as shown in Table~\ref{eval-bigtable}.
 
 \subsection{ConceptNet}
 ConceptNet 5 \cite{speer2012conceptnet} is a semantic network of terms
