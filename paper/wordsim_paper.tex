@@ -374,8 +374,8 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    W
     ``Text std.'' indicates whether labels are left in their original form or
     standardized according to ConceptNet 5.4. ``Retrofit'' indicates which data
     is added using retrofitting.\\
-    The row labeled {\bf L} shows results from \newcite{levy2015embeddings}, the previous state of the art on the RW evaluation,
-    although this is using the entire set and not our held-out test set.
+    The row labeled {\bf L} shows results from \newcite{levy2015embeddings},
+    using the entire MEN-3000 set and not our held-out test set.
     Row {\bf G} matches results from \newcite{pennington2014glove}, which we successfully reproduced using their data.
     {\bf WL1} and {\bf WL2} are the two best configurations of our system.
 }
@@ -418,8 +418,8 @@ Row-merging     & Unweighted avg.     & .526 &      .844 &    .751 &  .586 &   .
 \midrule
 Retrofitting    & No self-loops       & .570 &      .855 &    .790 &  .676 &   .873 &   .853 \\
 \midrule
-Sources         & Drop ConceptNet 4   & .588 &      .857 &    .816 &  .669 &   .855 &   .848 \\
 Sources         & Drop JMDict         & .585 &      .858 &    .819 &  .666 &   .851 &   .840 \\
+Sources         & Drop OMCS/GlobalMind& .588 &      .857 &    .816 &  .669 &   .855 &   .848 \\
 Sources         & Drop OpenCyc        & .587 &      .858 &    .819 &  .668 &   .852 &   .845 \\
 Sources         & Drop Verbosity      & .587 &      .853 &    .814 &  .668 &   .852 &   .837 \\
 Sources         & Drop Wiktionary     & .541 &      .865 &    .818 &  .664 &   .867 &   .852 \\
@@ -432,8 +432,7 @@ Sources         & Don't rebalance     & .584 &      .854 &    .816 &  .668 &   .
     The effects of various modifications to the embeddings of system {\bf WL1},
     including changing the way that embeddings are merged after
     standardization, and dropping various knowledge sources from ConceptNet.
-    ``ConceptNet 4'' represents data from Open Mind Common Sense and
-    GlobalMind. RW and MEN-3000 were evaluated on the development set here,
+    RW and MEN-3000 were evaluated on the development set here,
     not on the held-out test data.
 }
 \label{eval-variations}
@@ -571,10 +570,11 @@ normalization, when they contain no negative entries. In our method, we simply
 omit all instances of negative and antonym relations in ConceptNet.
 
 Each remaining assertion in ConceptNet corresponds to two entries in a sparse
-association matrix $S$. ConceptNet assigns a confidence score, or weight, to each
-assertion. An assertion that relates term $i$ to term $j$ with weight $w$ will
-contribute $w$ to the value of $S_{ij}$ and $S_{ji}$. If another assertion relates
-the same terms with a different relation, it will add to that value.
+association matrix $S$. ConceptNet assigns a confidence score, or weight, to
+each assertion. An assertion that relates term $i$ to term $j$ with weight $w$
+will contribute $w$ to the values of $S_{ij}$ and $S_{ji}$. If another
+assertion relates the same terms with a different relation, it will add to that
+value.
 
 Due to the structure of ConceptNet, there exists a long tail of terms that are
 poorly connected to other nodes. To make the sparse matrix and the size of the
@@ -638,16 +638,37 @@ parameters. The metrics we focused on improving were our rank correlation with
 MEN-3000, which emphasizes having high-quality representations of common words,
 and RW, which emphasizes having a broad vocabulary.
 
-MEN-3000 comes with a training/test split, where 1000 of the 3000 word pairs
+MEN-3000 comes with a development/test split, where 1000 of the 3000 word pairs
 are held out for testing. We applied a similar split to RW, setting aside a
 sample of $1/3$ of its word pairs for testing. Neither of these held-out test
 sets were used in our evaluations until the code and parameters were finalized,
 shortly before submitting this article. While
-Table~\ref{eval-bigtable} shows our correlation with the development
-and test data combined, Table~\ref{eval-heldout-test} compares our performance
+Table~\ref{eval-bigtable} shows our correlation with only the test data on
+these evaluations, Table~\ref{eval-heldout-test} compares our performance
 on development and test data.
 
-% TODO: we have to actually do the above before we submit
+We have labeled some of the rows of~\ref{eval-bigtable} as particular systems
+that we would like to compare. System {\bf L} represents the previous state of the
+art in word-similarity evaluations \cite{levy2015improving}. We did not run this
+system; we are simply including its previously-published results for comparison.
+The score of .514 on RW is not directly comparable to the other RW scores in
+this table, then, because Levy was of course not using the development/test
+split in RW that we introduced for this paper.
+
+System {\bf G} represents a configuration of GloVe that was evaluated by
+\newcite{pennington2014glove}. We ran the evaluation using their provided data,
+and successfully reproduced their results.
+
+{\bf WL1} and {\bf WL2} are two preferred configurations of our system. WL1
+applies all the techniques described in this paper as it retrofits with
+ConceptNet 5.4; WL2 is the same, but retrofits with a combination of PPDB and
+ConceptNet 5.4. Both systems perform very well across all word-similarity
+evaluations, and it is inconclusive which one is better. We will use
+system {\bf WL1} for further comparison, because it is simpler.
+
+% TODO: describe the variations
+
+% TODO: make the eval-heldout-test table
 
 \section{Discussion}
 
