@@ -70,13 +70,17 @@ interest in natural-language embeddings, as machine-learning techniques like
 \newcite{mikolov2013word2vec}'s word2vec have begun to show dramatic improvements.
 % TODO ask someone with good grammar about the above sentence.
 
-A recent paper from \newcite{faruqui2014retrofitting} introduced a technique
-known as ``retrofitting'', which combines embeddings learned from the
-distributional semantics of unstructured text with a source of structured
-connections between words. The combined embedding achieving performance on
-word-similarity evaluations superior to either source individually.
+  A recent paper from \newcite{faruqui2014retrofitting} introduced a technique
+ known as ``retrofitting'', which combines embeddings learned from the
+ distributional semantics of unstructured text with a source of structured
+ connections between words. The combined embedding achieving performance on
+ word-similarity evaluations superior to either source individually. We apply a
+ number of modification. While the original formulation operates on the
+ intersection of the vocabularies, we modifiy it to operate on the union. This
+ allows retrofitting to expand the vocabulary of the embedding instead of
+ shrinking it.
 
-By combining a modified version of this technique with some subtle but important
+By combining our modified version of retrofitting with some subtle but important
 normalizations to the input data, we achieve state-of-the-art performance using
 the distributional embeddings learned by GloVe \cite{pennington2014glove} from
 the Common Crawl \cite{TODOcrawl} with the structured word and phrase
