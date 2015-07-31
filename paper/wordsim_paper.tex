@@ -83,7 +83,7 @@ word-similarity evaluations superior to either source individually.
 By combining a modified version of this technique with some subtle but important
 normalizations to the input data, we achieve state-of-the-art performance using
 the distributional embeddings learned by GloVe \cite{pennington2014glove} from
-the Common Crawl \cite{TODOcrawl} with the structured word and phrase
+the Common Crawl\footnote{\url{https://commoncrawl.org/}} with the structured word and phrase
 associations in ConceptNet 5 \cite{speer2012conceptnet}. These new embeddings
 outperform many other recently-published methods on word similarity datasets of
 both common and rare words.
@@ -332,30 +332,6 @@ letters, such as ``telefono'' instead of ``tel\'{e}fono''. In order to recognize
 these as the correct words instead of out-of-vocabulary words, we need to re-
 standardize all Spanish terms in ConceptNet to omit all of the accents.
 
-\begin{table*}[t]
-\centering
-\begin{tabular}{lrr}
-\toprule
-Label  &       RW & MEN-3000 \\
-\bf SVD & .514  & .777 \\
-\bf SGNS  & .470 &  .774 \\
-\midrule
-\bf G &      .476 &     .816 \\
-\midrule
-\bf WL1&     .585 &{\bf .860}\\
-\bf WL2&{\bf .588}&{\bf .860}\\
-\bottomrule
-\end{tabular}
-
-\caption{
-    Comparison between various vector space word embeddings. Row {\bf G} matches
-    results from \newcite{pennington2014glove}. {\bf WL1} and {\bf WL2} are our
-    system, as also seen in Table~\ref{eval-bigtable}. All others are from
-    \newcite{levy2015improving}
-}
-\label{compare-levy}
-\end{table*}
-
 
 \subsection{Normalization}
 
@@ -575,6 +551,29 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    W
 
 \begin{table*}[t]
 \centering
+\begin{tabular}{lllrr}
+\toprule
+Label     & Method   & Reference                      & RW [all] & MEN-3000 \\
+\midrule
+          & SVD      & \newcite{levy2015embeddings}   &     .514 &     .777 \\
+          & Skip-gram& \newcite{levy2015embeddings}   &     .470 &     .774 \\
+\bf G     & GloVe    & \newcite{pennington2014glove}  &     .476 &     .816 \\
+\bf WL1   & Retrofitting+ & This paper                &     .585 &{\bf .860}\\
+\bf WL2   & Retrofitting+ & This paper                &{\bf .589}&{\bf .860}\\
+\bottomrule
+\end{tabular}
+
+\caption{
+    Comparison between our vector-space word embeddings and previously-published
+    results, on RW and MEN-3000. In order to compare with previous results, we
+    use all of the RW data, not just the 1/3 of it we set aside for testing.
+}
+\label{compare-others}
+\end{table*}
+
+
+\begin{table*}[t]
+\centering
 \begin{tabular}{llrrrr}
 \toprule
 Label   & Reference                         & WS-353 [es] & MC-30 [es] & RG-65 [de] & RG-65 [fr] \\
@@ -632,7 +631,7 @@ Sources         & Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .
 \centering
 \begin{tabular}{lrrrrr}
 \toprule
-Label   & RW [dev] & RW [test] & RW [both] & MEN-3000 [dev] & MEN-3000 [test] \\
+Label   & RW [dev] & RW [test] & RW [all] & MEN-3000 [dev] & MEN-3000 [test] \\
 \midrule
 \bf G   & .489  & .448  & .477  & .813  & .816 \\
 \bf WL0 & .536  & .512  & .528  & .841  & .840 \\
@@ -752,11 +751,18 @@ results were quite poor.
 
 \subsection{Comparisons to other published results}
 
-[TODO: This is where we compare to the best results from Levy's SVD method,
-Faruqui's retrofitting, and Mikolov's word2vec skip-grams. Levy, for example,
-has the best RW score we know of besides our own, which is .514. Anyway, there
-will be a table and a section of prose for this stuff, but it's not written
-yet.]
+In Table~\ref{compare-others}, we compare our results on the RW and MEN-3000
+datasets to the best published results that we know of.
+\newcite{levy2015embeddings} presents results including an SVD-based method
+that scores $\rho = .514$ on the RW evaluation, as well as an implementation
+of skip-grams with negative sampling (SGNS), originally introduced by
+\newcite{mikolov2013word2vec}. We also compare to the original results from
+Glove 42B \cite{pennington2014glove}.
+
+In relative terms, the performance of our system {\bf WL2} outperforms the best
+published RW score (Levy's SVD) by 14.6\%, or 13.6\% if we use our score on only
+the test set. Both {\bf WL1} and {\bf WL2} outperform GloVe's result on
+MEN-3000 by 5.4\%.
 
 \section{Discussion}
 
