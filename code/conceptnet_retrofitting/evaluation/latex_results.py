@@ -12,10 +12,6 @@ DISPLAYED_NAMES = {
 }
 
 
-def display_name(name):
-    return DISPLAYED_NAMES[name]
-
-
 def float_formatter(f):
     return ('%5.3f' % f).lstrip('0')
 
@@ -44,7 +40,7 @@ def parse_evaluation(filename):
             if name is None:
                 name = line
             else:
-                results[display_name(name)] = float(line)
+                results[name] = float(line)
                 name = None
     return results
 
