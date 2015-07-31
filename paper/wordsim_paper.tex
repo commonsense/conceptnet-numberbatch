@@ -418,6 +418,7 @@ Row-merging     & Unweighted avg.     & .526 &      .844 &    .751 &  .586 &   .
 \midrule
 Retrofitting    & No self-loops       & .570 &      .855 &    .790 &  .676 &   .873 &   .853 \\
 \midrule
+Sources         & Don't rebalance     & .584 &      .854 &    .816 &  .668 &   .846 &   .842 \\
 Sources         & Drop JMDict         & .585 &      .858 &    .819 &  .666 &   .851 &   .840 \\
 Sources         & Drop OMCS/GlobalMind& .588 &      .857 &    .816 &  .669 &   .855 &   .848 \\
 Sources         & Drop OpenCyc        & .587 &      .858 &    .819 &  .668 &   .852 &   .845 \\
@@ -425,7 +426,6 @@ Sources         & Drop Verbosity      & .587 &      .853 &    .814 &  .668 &   .
 Sources         & Drop Wiktionary     & .541 &      .865 &    .818 &  .664 &   .867 &   .852 \\
 Sources         & Drop WordNet        & .586 &      .858 &    .817 &  .667 &   .852 &   .845 \\
 Sources         & Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .852 &   .840 \\
-Sources         & Don't rebalance     & .584 &      .854 &    .816 &  .668 &   .846 &   .842 \\
 \bottomrule
 \end{tabular}
 \caption{
@@ -676,11 +676,11 @@ simply involves transforming the rows and columns of the existing GloVe 840B
 matrix, showing that some of the improvements from this paper can be realized
 without introducing any additional data.
 
-% TODO: describe the variations
-
 % TODO: make the eval-heldout-test table
 
 \section{Discussion}
+
+\subsection{Standardizing Term Texts}
 
 When applying ConceptNet's standardization procedure to the labels of GloVe's
 840B-token dataset, we achieved an unexpected benefit of cleaning up the data
@@ -702,14 +702,67 @@ vector. However, even if too many word forms were distingushed in the GloVe
 learning process, re-combining the word forms after the fact is sufficient to
 repair the data.
 
-%\subsection{Analogies Are Not Our Goal}
-%\label{analogies-meh}
-%
-%The analogy evaluation of \cite{mikolov2013word2vec} is an interesting
-%emergent property to demonstrate of a system that has no syntactic or
-%relational knowledge built into it. However, at the point where the system
-%{\em does} have more knowledge built into it, it becomes somewhat of
-%a meaningless exercise.
+\subsection{Varying the System}
+
+Some of the procedures we implemented in creating systems {\bf WL1} and
+{\bf WL2} require some justification. To show the benefits of certain decisions,
+such as adding self-loops or the way we choose to merge rows of GloVe, we have
+evaluated what happens to the system in the absence of that decision. These
+evaluations appear in Table~\ref{eval-variations}. These evaluations were
+part of how we decided on the best configuration of the system, so they were
+run on the development sets of RW and MEN-3000, not the held-out test sets.
+
+Along the same lines, we were interested in finding out which parts of
+ConceptNet were most important to the results, given that ConceptNet comes from
+a variety of data sources. We experimented with dropping various pieces of
+ConceptNet from the data, by filtering out associations that were credited to
+particular data sources. (Some associations come from multiple data sources.
+When creating the file of ConceptNet associations that we used as input to the
+system, we arbitrarily credited these to whichever source appeared first in
+ConceptNet's assertion list.)
+
+In Table~\ref{eval-variations}, we can see that the choice of how to merge
+rows of GloVe that get the same standardized label makes a large difference.
+Recall that the method we ultimately used was to assign each row a
+pseudo-frequency based on Zipf's law, and taking a weighted average based on
+those frequencies. The results drop noticeably when we try the other proposed
+methods, which are taking only the first row that appears, or taking the
+unweighted average of the rows.
+
+In the retrofitting procedure, we made the decision to add ``self-loops'' that
+connect each term to itself, hypothesizing that this would help stabilize the
+representations of terms that are outside the original vocabulary of GloVe.
+Reversing this decision causes a noticeable drop in performance on RW, the
+evaluation that is most likely to involve words that were poorly represented or
+unrepresented in GloVe. On the other hand, the lack of self-loops seems to {\em
+increase} its score on SCWS, and on the smaller evaluations RG-65 and MC-30.
+
+\subsection{Comparing Data Sources in ConceptNet}
+
+Rebalancing the weights of the data sources within ConceptNet seems to have
+been a mild improvement. The ``Don't rebalance'' row of Table~\ref{eval-variations}
+confirms what we saw when we introduced rebalancing,
+as leaving the weights unbalanced decreases the scores slightly.
+
+When we separate ConceptNet into six datasets and drop each one in turn, the
+effects on the evaluation results are mostly quite small. There is no single
+dataset that acts as the ``keystone'' without which the system falls apart,
+but one dataset --- Wiktionary --- unsurprisingly has a larger effect than the
+others, because it is responsible for most of the assertions. Of the 5,631,250
+filtered assertions that come from ConceptNet 5, 4,244,410 of them are credited
+to Wiktionary.
+
+Without Wiktionary, the score on RW drops from .587 to .541. However, at the
+same time, the MEN-3000 score {\em increases} from .858 to .865. The system
+continues to do what it is designed to do without Wiktionary, but there seems to
+be a tradeoff in performance on rare words and common words involved.
+
+We followed up on examining the influence of Wiktionary by building a version
+of the system where it was the {\em only} data we included from ConceptNet.
+This system in fact achieves most of the performance of system {\bf WL1}, with
+its largest drop in performance being on MEN-3000. We conclude that much, but
+not all, of the value of ConceptNet 5 in this application is that it contains
+a high-quality parse of Wiktionary into relational data.
 
 \subsection{The Limits of Similarity Judgments}
 
