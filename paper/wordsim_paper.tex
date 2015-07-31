@@ -55,7 +55,7 @@ a common word representation. The resulting vector space has a larger vocabulary
 than either source, can represent meanings in multiple languages, and achieves
 state-of-the-art performance on word similarity evaluations. In particular, its
 score of $\rho = \scoreRW{}$ on an evaluation of rare words \cite{luong2013rw}
-is 13.6\% higher than the previously best known system.
+is 13.6\% higher than the previous best known system.
 \end{abstract}
 
 \section{Introduction}
@@ -82,7 +82,7 @@ performance when combining the distributional
 embeddings learned by GloVe \cite{pennington2014glove} from the Common Crawl
 \cite{TODOcrawl} with the structured word and phrase associations in ConceptNet
 5 \cite{speer2012conceptnet}. These new embeddings outperform many other
-recently-published methods, when compared to various human judgments of word
+recently-published methods when compared to various human judgments of word
 similarity on both common and rare words.
 
 In all, we take a three-pronged approach to improving word similarity. We will
@@ -341,8 +341,6 @@ of the accents.
 \toprule
 Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    WS-353 &      SCWS &    RG-65 &    MC-30 \\
 \midrule
-\bf L  &Levy SVD     & ---   & ---       & ---      &    (.514)&     .778 &           &           &          &          \\
-\midrule
        &GloVe 42B    & ---   & ---       & ---      &     .348 &     .740 &      .632 &      .440 &     .817 &     .777 \\
        &GloVe 42B    & ---   & CN5.4     & ---      &     .366 &     .760 &      .646 &      .444 &     .810 &     .762 \\
 \bf G  &GloVe 42B    & $L_2$ & ---       & ---      &     .448 &     .816 &      .759 &      .595 &     .829 &     .836 \\
@@ -355,7 +353,7 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    W
        &GloVe 840B   & $L_2$ & ---       & ---      &     .089 &     .768 &      .664 &      .496 &     .652 &     .666 \\
        &GloVe 840B   & $L_2$ & CN5.4     & ---      &     .493 &     .811 &      .760 &      .564 &     .717 &     .789 \\
        &GloVe 840B   & $L_1$ & ---       & ---      &     .091 &     .772 &      .667 &      .500 &     .653 &     .682 \\
-       &GloVe 840B   & $L_1$ & CN5.4     & ---      &     .512 &     .840 &      .798 &      .615 &     .774 &     .798 \\
+\bf WL0&GloVe 840B   & $L_1$ & CN5.4     & ---      &     .512 &     .840 &      .798 &      .615 &     .774 &     .798 \\
 \midrule
        &GloVe 840B   & ---   & CN5.4     & PPDB     &     .465 &     .814 &      .716 &      .598 &     .815 &     .815 \\
        &GloVe 840B   & ---   & CN5.4     & CN5.4    &     .506 &     .830 &      .734 &      .602 &     .842 &     .810 \\
@@ -376,13 +374,13 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    W
     ``Text std.'' indicates whether labels are left in their original form or
     standardized according to ConceptNet 5.4. ``Retrofit'' indicates which data
     is added using retrofitting.\\
-    The row labeled {\bf L} shows results from \newcite{levy2015embeddings},
-    using the entire MEN-3000 set and not our held-out test set.
-    Row {\bf G} matches results from \newcite{pennington2014glove}, which we successfully reproduced using their data.
+    Row {\bf G} matches results from \newcite{pennington2014glove}.
     {\bf WL1} and {\bf WL2} are the two best configurations of our system.
 }
 \label{eval-bigtable}
 \end{table*}
+
+%TODO: the highlights of the above table can be a graph
 
 \begin{table*}[t]
 \centering
@@ -581,7 +579,7 @@ value.
 Due to the structure of ConceptNet, there exists a long tail of terms that are
 poorly connected to other nodes. To make the sparse matrix and the size of the
 overall vocabulary more manageable, we filter ConceptNet when building its
-association matrix: we exclude terms that appear fewer than 3 times, English
+association matrix: we exclude all terms that appear fewer than 3 times, English
 terms that appear fewer than 4 times, and terms with more than 3 words in them.
 
 \subsection{Scaling Data Sources Within ConceptNet}
@@ -650,23 +648,33 @@ these evaluations, Table~\ref{eval-heldout-test} compares our performance
 on development and test data.
 
 We have labeled some of the rows of~\ref{eval-bigtable} as particular systems
-that we would like to compare. System {\bf L} represents the previous state of the
+that we would like to compare. System {\bf G} represents a configuration of
+GloVe that was evaluated by \newcite{pennington2014glove}. We ran the evaluation
+using their provided data, and successfully reproduced their results.
+
+% TODO: move/rewrite this paragraph when we have a separate table of
+% external comparisons
+System {\bf L} represents the previous state of the
 art in word-similarity evaluations \cite{levy2015improving}. We did not run this
 system; we are simply including its previously-published results for comparison.
 The score of .514 on RW is not directly comparable to the other RW scores in
 this table, then, because Levy was of course not using the development/test
 split in RW that we introduced for this paper.
 
-System {\bf G} represents a configuration of GloVe that was evaluated by
-\newcite{pennington2014glove}. We ran the evaluation using their provided data,
-and successfully reproduced their results.
-
-{\bf WL1} and {\bf WL2} are two preferred configurations of our system. WL1
+{\bf WL1} and {\bf WL2} are two preferred configurations of our system. {\bf WL1}
 applies all the techniques described in this paper as it retrofits with
-ConceptNet 5.4; WL2 is the same, but retrofits with a combination of PPDB and
+ConceptNet 5.4; {\bf WL2} is the same, but retrofits with a combination of PPDB and
 ConceptNet 5.4. Both systems perform very well across all word-similarity
-evaluations, and it is inconclusive which one is better. We will use
+evaluations, and it is inconclusive which one is better. We will focus on
 system {\bf WL1} for further comparison, because it is simpler.
+
+The numerals in the names {\bf WL1} and {\bf WL2} refer to the number of
+additional data sources that were added to the original data using our expanded
+version of retrofitting. Another interesting result to compare is {\bf WL0},
+the best system that we created without retrofitting anything. This system
+simply involves transforming the rows and columns of the existing GloVe 840B
+matrix, showing that some of the improvements from this paper can be realized
+without introducing any additional data.
 
 % TODO: describe the variations
 
