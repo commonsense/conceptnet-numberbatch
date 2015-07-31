@@ -12,10 +12,6 @@ DISPLAYED_NAMES = {
 }
 
 
-def display_name(name):
-    return DISPLAYED_NAMES[name]
-
-
 def float_formatter(f):
     return ('%5.3f' % f).lstrip('0')
 
@@ -44,46 +40,18 @@ def parse_evaluation(filename):
             if name is None:
                 name = line
             else:
-                results[display_name(name)] = float(line)
+                results[name] = float(line)
                 name = None
     return results
 
 
 def to_simple_name(filename):
-    sections = filename.split('/')[-1].split('.')
-    assert sections[-1] == 'evaluation'
-
-    simple_name = []
-    if 'retrofit' in sections:
-        simple_name.append('retrofitted')
-    elif 'raw' in sections or len(sections) == 5:
-        simple_name.append('raw')
-    else:
-        simple_name.append('standardized')
-
-    if 'l1' in sections or 'L1-normalized' in sections:
-        simple_name.append('(L1)')
-    elif 'l2' in sections or 'L2-normalized' in sections:
-        simple_name.append('(L2)')
-
-    return ' '.join(simple_name)
+    parts = filename.split('.')
+    return '.'.join([parts[1]] + parts[3:-1])
 
 
 def order_names(filename):
-    out = [0, 0]
-    simple = to_simple_name(filename)
-
-    if simple.startswith('retrofitted'):
-        out[0] = 2
-    elif simple.startswith('standardized'):
-        out[0] = 1
-
-    if simple.endswith('(L1)'):
-        out[1] = 2
-    elif simple.endswith('(L2)'):
-        out[1] = 1
-
-    return out
+    return filename
 
 
 if __name__ == '__main__':
