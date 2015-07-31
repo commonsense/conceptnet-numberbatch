@@ -332,6 +332,30 @@ letters, such as ``telefono'' instead of ``tel\'{e}fono''. In order to recognize
 these as the correct words instead of out-of-vocabulary words, we need to re-
 standardize all Spanish terms in ConceptNet to omit all of the accents.
 
+\begin{table*}[t]
+\centering
+\begin{tabular}{lrr}
+\toprule
+Label  &       RW & MEN-3000 \\
+\bf SVD & .514  & .777 \\
+\bf SGNS  & .470 &  .774 \\
+\midrule
+\bf G &      .476 &     .816 \\
+\midrule
+\bf WL1&     .585 &{\bf .860}\\
+\bf WL2&{\bf .588}&{\bf .860}\\
+\bottomrule
+\end{tabular}
+
+\caption{
+    Comparison between various vector space word embeddings. Row {\bf G} matches
+    results from \newcite{pennington2014glove}. {\bf WL1} and {\bf WL2} are our
+    system, as also seen in Table~\ref{eval-bigtable}. All others are from
+    \newcite{levy2015improving}
+}
+\label{compare-levy}
+\end{table*}
+
 
 \subsection{Normalization}
 
