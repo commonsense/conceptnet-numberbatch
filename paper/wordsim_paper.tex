@@ -695,12 +695,12 @@ using their provided data, and successfully reproduced their results.
 
 % TODO: move/rewrite this paragraph when we have a separate table of
 % external comparisons
-System {\bf L} represents the previous state of the
-art in word-similarity evaluations \cite{levy2015embeddings}. We did not run this
-system; we are simply including its previously-published results for comparison.
-The score of .514 on RW is not directly comparable to the other RW scores in
-this table, then, because Levy was of course not using the development/test
-split in RW that we introduced for this paper.
+%System {\bf L} represents the previous state of the
+%art in word-similarity evaluations \cite{levy2015embeddings}. We did not run this
+%system; we are simply including its previously-published results for comparison.
+%The score of .514 on RW is not directly comparable to the other RW scores in
+%this table, then, because Levy was of course not using the development/test
+%split in RW that we introduced for this paper.
 
 {\bf WL1} and {\bf WL2} are two preferred configurations of our system. {\bf WL1}
 applies all the techniques described in this paper as it retrofits with
@@ -716,6 +716,27 @@ the best system that we created without retrofitting anything. This system
 simply involves transforming the rows and columns of the existing GloVe 840B
 matrix, showing that some of the improvements from this paper can be realized
 without introducing any additional data.
+
+Table~\ref{eval-multilingual} shows the performance of these systems on
+gold standards that have been translated to other languages, in comparison to
+the multilingual results published by \newcite{faruqui2014retrofitting}.
+These systems perform well in German, French, and Spanish, even though only
+German has a data source designed for it in ConceptNet. French and Spanish terms
+are only available because of translations in the English Wiktionary, and
+indirect translations via Japanese in JMDict.
+
+In contrast, we also briefly tried evaluating on the Arabic and Romanian
+translations from \newcite{hassan2009multilingual}. These languages are not
+currently well-represented in ConceptNet, and their preliminary evaluation
+results were quite poor.
+
+\subsection{Comparisons to other published results}
+
+[TODO: This is where we compare to the best results from Levy's SVD method,
+Faruqui's retrofitting, and Mikolov's word2vec skip-grams. Levy, for example,
+has the best RW score we know of besides our own, which is .514. Anyway, there
+will be a table and a section of prose for this stuff, but it's not written
+yet.]
 
 \section{Discussion}
 
