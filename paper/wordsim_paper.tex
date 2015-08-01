@@ -12,6 +12,7 @@
 \usepackage{amsmath}
 \usepackage{multirow}
 \usepackage{pgfplots}
+\pgfplotsset{compat=1.11}
 \usepackage{booktabs}
 \usepackage{CJKutf8}
 \usepackage{url}
@@ -76,7 +77,7 @@ embeddings, as machine-learning techniques such as
 \newcite{mikolov2013word2vec}'s word2vec and \newcite{pennington2014glove}'s
 GloVe have begun to show dramatic improvements.
 
-A recent paper from \newcite{faruqui2014retrofitting} introduced a technique
+A recent paper from \newcite{faruqui2015retrofitting} introduced a technique
 known as ``retrofitting'', which combines embeddings learned from the
 distributional semantics of unstructured text with a source of structured
 connections between words. The combined embedding achieves performance on
@@ -206,7 +207,7 @@ not affect the results in this paper.
 
 \section{Methods}
 
-\newcite{faruqui2014retrofitting} introduced the ``retrofitting'' procedure,
+\newcite{faruqui2015retrofitting} introduced the ``retrofitting'' procedure,
 which adjusts dense matrices of embeddings (such as the GloVe output) to take
 into account external knowledge from a sparse semantic network. They used PPDB
 \cite{ganitkevitch2013ppdb} as an external source of semantic knowledge. We
@@ -372,7 +373,7 @@ GloVe.
 
 \subsection{Retrofitting}
 
-Retrofitting \cite{faruqui2014retrofitting} is a process of combining existing
+Retrofitting \cite{faruqui2015retrofitting} is a process of combining existing
 word vectors with a semantic lexicon. While the original formulation expresses
 the problem in terms of a set of edges, we have found it more convenient to
 express it in terms of matrices. Let $v$ denote the size of the vocabulary,
@@ -626,7 +627,7 @@ Label     & Method   & Reference                      & RW [all] & MEN-3000 \\
 \toprule
 Label   & Reference                         & WS-353 [es] & MC-30 [es] & RG-65 [de] & RG-65 [fr] \\
 \midrule
-\bf R   & \newcite{faruqui2014retrofitting} &         --- &       .591 &       .603 &       .606 \\
+\bf R   & \newcite{faruqui2015retrofitting} &         --- &       .591 &       .603 &       .606 \\
 \bf WL1 & This paper                        &    \bf .444 &   \bf .765 &       .673 &       .781 \\
 \bf WL2 & This paper                        &        .441 &       .762 &   \bf .677 &   \bf .788 \\
 \bottomrule
@@ -636,7 +637,7 @@ Label   & Reference                         & WS-353 [es] & MC-30 [es] & RG-65 [
     Multilingual evaluation results for Spanish (es), German (de), and French
     (fr). Row {\bf R} contains the published results of retrofitting
     Universal WordNet onto skip-gram embeddings learned from Wikipedia
-    \cite{faruqui2014retrofitting}. {\bf WL1} and {\bf WL2} are our system, as
+    \cite{faruqui2015retrofitting}. {\bf WL1} and {\bf WL2} are our system, as
     also seen in Table~\ref{eval-bigtable}.
 }
 \label{eval-multilingual}
@@ -778,7 +779,7 @@ without introducing any additional data.
 
 Table~\ref{eval-multilingual} shows the performance of these systems on
 gold standards that have been translated to other languages, in comparison to
-the multilingual results published by \newcite{faruqui2014retrofitting}.
+the multilingual results published by \newcite{faruqui2015retrofitting}.
 These systems perform well in German, French, and Spanish, even though only
 German has a data source designed for it in ConceptNet. French and Spanish terms
 are only available because of translations in the English Wiktionary, and
