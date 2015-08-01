@@ -356,25 +356,25 @@ standardize all Spanish terms in ConceptNet to omit all of the accents.
 \subsection{Normalization}
 
 As briefly mentioned by \newcite{pennington2014glove}, $L_2$ normalization of
-the columns of the GloVe matrix often provides a notable increase in
-performance. We have discovered that normalization attempts to increase the
-weight of distinguishing features and reduce the impact of noisy features. A
-distinguishing feature is one with many small values and a few large ones, while
-a noisy feature has many large values.
+the columns (that is, the 300 features) of the GloVe matrix provides a notable
+increase in performance. One effect of normalization is to increase the weight
+of distinguishing features and reduce the impact of noisy features.  Features
+are more distinguishing for the purpose of cosine similarity when they contain
+a few large values and many small ones.
 
 $L_2$ normalization can be generalized to arbitrary $L_p$ normalization by
-dividing a vector by its $p$-norm. The $p$-norm of an $n$-element vector is
+dividing each vector by its $p$-norm. The $p$-norm of an $n$-element vector is
 defined by
 
 $$ \left\|\mathbf{x}\right\|_p
 = \left(\sum_{i=1}^n \left|x_i\right|^p\right)^{(1/p)}$$
 
-where $p\geq1$. Notice that as $p$ increases, the impact of a few large values
-increases. Therefore, $L_p$ normalization more heavily penalizes distinguishing
-features when $p$ is large. Thus, $L_1$ normalization should provide a more
-optimal weighting than $L_2$ normalization. Our tests confirm this, with $L_1$
-normalization providing a consisent performance increase over $L_2$
-normalization in almost all variations of GloVe.
+where $p \geq 1$. Notice that as $p$ increases, the effect of a few large values
+on the norm increases: $L_p$ normalization more heavily penalizes
+distinguishing features when $p$ is large. For this reason, we found that $L_1$
+normalization should provide a better weighting of features than $L_2$
+normalization.  Our tests confirm that $L_1$ normalization provides a
+performance increase on almost all variations of GloVe.
 
 
 \subsection{Retrofitting}
