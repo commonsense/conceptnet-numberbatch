@@ -45,6 +45,8 @@
 \maketitle
 \begin{abstract}
 
+% TODO: Avril wants to rephrase the 'taking care' phrase; what should it change to?
+
 A currently successful approach to computationally represent the meanings of
 words is to represent them as vectors (embeddings) in a machine-learned vector
 space. These embeddings are often evaluated on their ability to identify
@@ -65,8 +67,8 @@ Its score of $\rho = \scoreRW{}$ on an evaluation of rare words
 Vector space models are an effective way to express the meanings of
 natural-language terms in a computational system. These models are created
 using machine-learning algorithms that attempt to represent words or phrases as
-vectors in a high dimensional space, such that the cosine similarities of two
-words correspond to their semantic similarities. This kind of vector space has
+vectors in a high dimensional space, such that the cosine similarity of any two
+words corresponds to their semantic similarity. This kind of vector space has
 been used in applications such as search and topic detection, dating back to
 the introduction of latent semantic analysis \cite{deerwester1990indexing}.  In
 recent years, there has been a surge of interest in natural-language
@@ -90,14 +92,18 @@ By combining our modified version of retrofitting with some subtle but important
 normalizations to the input data, we achieve state-of-the-art performance using
 the distributional embeddings learned by GloVe \cite{pennington2014glove} from
 the Common Crawl\footnote{\url{https://commoncrawl.org/}} with the structured word and phrase
-associations in ConceptNet 5 \cite{speer2012conceptnet}. These new embeddings
-outperform many other recently-published methods on word similarity datasets of
-both common and rare words.
+associations in ConceptNet \cite{speer2012conceptnet}. These new embeddings
+outperform many other recently-published methods on word-similarity
+evaluations\footnote{Some methods distinguish word similarity from word
+{\em relatedness}. ``Coffee'' and ``mug'', for example, are quite related,
+but not actually similar because coffee is not {\em like} a mug. In this paper,
+however, we conflate similarity and relatedness into the same metric, as most
+evaluations do.} over both common and rare words.
 
-In all, we take a three-pronged approach to improving word similarity. We will
-show that each of these methods improve performance on word-similarity
-evaluations, and that the best results comes from
-applying all of them at once:
+In all, we take a three-pronged approach to improving word similarity
+judgments. We will show that each of these methods improves performance on
+word-similarity evaluations, and that the best results comes from applying all
+of them at once:
 
 \begin{itemize}
 \item Normalizing the features of the GloVe matrix with $L_1$ instead of $L_2$
@@ -107,6 +113,9 @@ applying all of them at once:
 \item Applying a variation of retrofitting to introduce a broad variety of
     structured semantic knowledge from ConceptNet 5.4
 \end{itemize}
+
+% NOTE: should these following paragraphs be moved? Avril thinks so but Rob
+% thinks they flow better here.
 
 The family of techniques that includes word2vec and GloVe is sometimes
 popularly conflated with ``deep learning'', but this terminology seems to have
@@ -124,14 +133,17 @@ to this approach as ``wide learning'' instead.
 
 \subsection{GloVe}
 
- GloVe \cite{pennington2014glove} is an unsupervised learning algorithm that
- learns vector representations of words, such that the dot product of two words
- vectors is approximately equal to the logarithm of their cooccurrence count.
- The algorithm operates on a global word-word co-occurrence matrix $C$. Let $v$
- denote the size of the vocabulary. It trains $W$ and $\tilde{W}$, both $v
- \times k$ matrices that assign $k$-dimensional vectors to each word and each
- context respectively, and $b$ and $\tilde{b}$, both $v$-length vectors
- representing the word and context biases respectively. It aims to minimize
+GloVe \cite{pennington2014glove} is an unsupervised learning algorithm that
+learns vector representations of words, such that the dot product of two words'
+vectors is approximately equal to the logarithm of their co-occurrence count.
+The algorithm operates on a global word-word co-occurrence matrix $C$. Let $v$
+denote the size of the vocabulary. It trains $W$ and $\tilde{W}$, both $v
+\times k$ matrices that assign $k$-dimensional vectors to each word and each
+context\footnote{The contexts are also words, but it seems they have to be
+considered mathematically separate. For the purpose of similarity, the
+context vectors can be discarded.} respectively, and $b$ and $\tilde{b}$, both
+$v$-length vectors representing the word and context biases respectively. It
+aims to minimize
 $$
 \sum_{i=1,j=1}^v
   f \left( C_{ij} \right)
@@ -157,16 +169,8 @@ The embeddings that GloVe learns from data sources such as the Common Crawl are
 distributed on the GloVe web
 page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}.
 
-\newcite{faruqui2014retrofitting} introduced the ``retrofitting'' procedure,
-which adjusts dense matrices of embeddings (such as the GloVe output) to take
-into account external knowledge from a sparse semantic network. They used PPDB
-\cite{ganitkevitch2013ppdb} as the external source of semantic knowledge. We
-found using ConceptNet as the external knowledge source to be more effective,
-and that further marginal improvements could be achieved on some evaluations by
-combining ConceptNet and PPDB, as shown in Table~\ref{eval-bigtable}.
-
 \subsection{ConceptNet}
-ConceptNet 5 \cite{speer2012conceptnet} is a semantic network of terms
+ConceptNet \cite{speer2012conceptnet} is a semantic network of terms
 connected by labeled relations. Its terms are words or multiple-word phrases
 in a variety of natural language. For continuity with previous work,
 these terms are often referred to as {\em concepts}.
@@ -191,16 +195,24 @@ The data sources included in ConceptNet 5.4 are:
 \item WordNet 3.0 \cite{miller1998wordnet}
 \item A parsed version of Wiktionary's entries whose target language is English or
       German \cite{wiktionary2014en} \cite{wiktionary2014de}, generated
-      by a parser developed as part of the ConceptNet 5 codebase
+      by a parser developed as part of the ConceptNet 5.4 codebase
 \item JMDict \cite{breen2004jmdict}, a Japanese multilingual dictionary
 \item OpenCyc \cite{matuszek2006cyc} as represented in Umbel \cite{bergman2008umbel}
 \end{itemize}
 
-ConceptNet 5.4 also includes a mapping of DBPedia \cite{auer2007dbpedia} into
+ConceptNet also includes a mapping of DBPedia \cite{auer2007dbpedia} into
 its vocabulary, but it is not used for word associations, so its presence does
 not affect the results in this paper.
 
 \section{Methods}
+
+\newcite{faruqui2014retrofitting} introduced the ``retrofitting'' procedure,
+which adjusts dense matrices of embeddings (such as the GloVe output) to take
+into account external knowledge from a sparse semantic network. They used PPDB
+\cite{ganitkevitch2013ppdb} as an external source of semantic knowledge. We
+found using ConceptNet as the external knowledge source to be more effective,
+and that further marginal improvements could be achieved on some evaluations by
+combining ConceptNet and PPDB.
 
 We create a matrix that assigns embeddings in a 300-dimensional vector
 space to terms by combining data from ConceptNet and GloVe. The resulting word
@@ -227,7 +239,7 @@ here and in the code we call it ``standardization'' instead.
 
 \subsubsection{How ConceptNet is Standardized}
 
-Here are the standardizations applied to all terms in ConceptNet 5.4, as
+Here are the standardizations applied to all terms in ConceptNet, as
 implemented in the {\tt conceptnet5.nodes.normalized\_concept\_uri} function
 of ConceptNet 5.4:
 
@@ -290,12 +302,11 @@ When evaluating GloVe, it is important to keep these standardizations in mind
 and also apply them to the word-similarity datasets, such as lowercasing the
 word ``OPEC'' in WordSim-353.
 
-The 840B-token dataset is not lowercased, as described in
-\cite{pennington2014glove}, but it is also not all in UTF-8. It is possible
-that the tokens were written to the file exactly as they were found in
-Common Crawl, as bytes of ``encoding salad'', as one might expect from
-scraping arbitrary Web pages. They are still tokenized in a way that is
-reasonable for English.
+The 840-billion-token dataset is described as not being lowercased, but it is
+also not all in UTF-8. It is possible that the tokens were written to the file
+exactly as they were found in Common Crawl, as bytes of ``encoding salad'', as
+one might expect from scraping arbitrary Web pages. They are still tokenized in
+a way that is reasonable for English.
 
 \subsubsection{Aligning ConceptNet and GloVe}
 
@@ -313,6 +324,8 @@ few options for dealing with these merged labels come to mind:
 \item Take a weighted average that favors higher-frequency rows.
 \end{enumerate}
 
+% NOTE: Avril wants us to describe how many rows change due to standardization
+
 The weighted average turns out to be the best approach, as our evaluation will
 show. The multiple rows contain valuable data that should not simply be
 discarded, but lower-frequency rows tend to have lower-quality data.
@@ -326,7 +339,7 @@ proportional to $1/n$.
 In order to evaluate the combined word vectors, it is necessary for us to apply
 the same standardizations to the evaluation data. A drawback to this
 standardization process is that we will not be able to evaluate the result on
-Mikolov et al.'s syntactic analogy task \cite{mikolov2013word2vec}, as many of
+\newcite{mikolov2013word2vec}'s syntactic analogy task, as many of
 the analogies would become trivial analogies of the form
 ``A is to A as B is to B''.
 
@@ -348,15 +361,14 @@ $L_p$ normalization by dividing a vector by its $p$-norm. The $p$-norm of an
 $n$-element vector is defined by
 
 $$ \left\|\mathbf{x}\right\|_p
-  = \sum_{i=1}^n \left|x_i\right|^p$$
+= \left(\sum_{i=1}^n \left|x_i\right|^p\right)^{(1/p)}$$
 
 Normalization attempts to promote discriminative features of word vectors.
 Features with high $p$-norms are less discriminative and therefore less useful.
-However, while $L_2$ normalization provides an improvement over the un-normalized
-vectors, it weights outliers very highly, which are the features that we want to
-preserve. $L_1$ on the other hand provides an equal weighing for all inputs.
-Our tests show that $L_1$ normalization provides a consisent performance
-increase over $L_2$ normalization in almost all variations of GloVe.
+It seems that 1-norms are the most effective at emphasizing useful features
+in this task: our tests show that $L_1$ normalization provides a consisent
+performance increase over $L_2$ normalization in almost all variations of
+GloVe.
 
 \subsection{Retrofitting}
 
@@ -365,18 +377,19 @@ word vectors with a semantic lexicon. While the original formulation expresses
 the problem in terms of a set of edges, we have found it more convenient to
 express it in terms of matrices. Let $v$ denote the size of the vocabulary,
 which is the union of the vocabularies of the embedding and the lexicon. Let $S$ be
-a $v \times v$ matrix denoting the semantic lexicon and $W$ be a $v \times n$
+a $v \times v$ matrix denoting the strength of the relationship in the semantic lexicon
+between each pair of words, and $W$ be a $v \times n$
 matrix denoting the original word vectors. If a word does not have a
 corresponding word vector, it is assigned the zero vector. Retrofitting
 generates a $W'$ that minimizes
 $$
 \Psi \left( W' \right) = \sum_{i=1}^v \left[
   \alpha_i \left\|  w'_i - w_i \right\| ^ 2
-  + \sum_{j=1}^v s_{ij} \left\| w'_i - w'_j \right\| ^ 2
+  + \sum_{j=1}^v S_{ij} \left\| w'_i - w'_j \right\| ^ 2
 \right]
 $$
 
-where $\alpha_i$ is a column weight vector. In our tests, we let
+where $\alpha_i$ is a vector of weights. In our tests, we let
 
 $$
 \alpha_i =
@@ -404,7 +417,7 @@ for 10 steps.
 \subsubsection{Row-Normalized Retrofitting}
 
 The magnitude of a vector acts as an implicit $\alpha$ in retrofitting.
-The $L_2$ norms of the GloVe vectors span several orders of magnitude.
+The $L_2$ norms of the pre-trained vectors span several orders of magnitude.
 Nonsense associations within the semantic lexicon between a vector with a large
 $L_2$ norm and a vector with small $L_2$ norm could remove much of the semantic
 information contained within the small vector.
@@ -556,8 +569,6 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    W
 \end{table*}
 
 
-%TODO: the highlights of the above table can be a graph
-
 \begin{table*}[t]
 \centering
 \begin{tabular}{lllrr}
@@ -668,6 +679,7 @@ Sources         & Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .
 \centering
 \begin{tabular}{lrrrrr}
 \toprule
+% TODO: introduce MEN-3000 [all] as a column
 Label   & RW [dev] & RW [test] & RW [all] & MEN-3000 [dev] & MEN-3000 [test] \\
 \midrule
 \bf G   &    .489  &    .448  &    .477  &    .813  &    .816 \\
@@ -715,8 +727,8 @@ used translations of some of the above gold standards:
 \item RG-65 has been translated into German by \newcite{gurevych2005german},
     and into French by \newcite{joubarne2011french}.
 \item WordSim-353 and MC-30 have been translated into Spanish, written in
-    plain ASCII without accents, by \newcite{hassan2009crosslingual}. This
-    data also comes with translations into Romanian and Arabic.
+    plain ASCII without accents, by \newcite{hassan2009crosslingual}. The
+    same dataset also includes translations into Romanian and Arabic.
 \end{itemize}
 
 \subsection{Setting Aside Test Data}
@@ -744,15 +756,15 @@ and test data.
 
 \subsection{Results}
 
-We have labeled some of the rows of~\ref{eval-bigtable} as particular systems
+We have labeled some of the rows of Table~\ref{eval-bigtable} as particular systems
 that we would like to compare. System {\bf G} represents a configuration of
 GloVe that was evaluated by \newcite{pennington2014glove}. We ran the evaluation
 using their provided data, and successfully reproduced their results.
 
 {\bf WL1} and {\bf WL2} are two preferred configurations of our system. {\bf WL1}
 applies all the techniques described in this paper as it retrofits with
-ConceptNet 5.4; {\bf WL2} is the same, but retrofits with a combination of PPDB and
-ConceptNet 5.4. Both systems perform very well across all word-similarity
+ConceptNet; {\bf WL2} is the same, but retrofits with a combination of PPDB and
+ConceptNet. Both systems perform very well across all word-similarity
 evaluations, and it is inconclusive which one is better. We will focus on
 system {\bf WL1} for further comparison, because it is simpler.
 
@@ -777,15 +789,15 @@ translations from \newcite{hassan2009crosslingual}. These languages are not
 currently well-represented in ConceptNet, and their preliminary evaluation
 results were quite poor.
 
-\subsection{Comparisons to other published results}
+\subsection{Comparisons to Other Published Results}
 
 In Table~\ref{compare-others}, we compare our results on the RW and MEN-3000
 datasets to the best published results that we know of.
-\newcite{levy2015embeddings} presents results including an SVD-based method
+\newcite{levy2015embeddings} present results including an SVD-based method
 that scores $\rho = .514$ on the RW evaluation, as well as an implementation
 of skip-grams with negative sampling (SGNS), originally introduced by
 \newcite{mikolov2013word2vec}. We also compare to the original results from
-Glove 42B \cite{pennington2014glove}.
+GloVe's 42-billion-token dataset.
 
 In relative terms, the performance of our system {\bf WL2} outperforms the best
 published RW score (Levy's SVD) by 14.6\%, or 13.6\% if we use our score on only
@@ -821,7 +833,7 @@ repair the data.
 Some of the procedures we implemented in creating systems {\bf WL1} and
 {\bf WL2} require some justification. To show the benefits of certain decisions,
 such as adding self-loops or the way we choose to merge rows of GloVe, we have
-evaluated what happens to the system in the absence of that decision. These
+evaluated what happens to the system in the absence of each decision. These
 evaluations appear in Table~\ref{eval-variations}. These evaluations were
 part of how we decided on the best configuration of the system, so they were
 run on the development sets of RW and MEN-3000, not the held-out test sets.
@@ -835,12 +847,16 @@ When creating the file of ConceptNet associations that we used as input to the
 system, we arbitrarily credited these to whichever source appeared first in
 ConceptNet's assertion list.)
 
-In Table~\ref{eval-variations}, we can see that the choice of how to merge
-rows of GloVe that get the same standardized label makes a large difference.
-Recall that the method we ultimately used was to assign each row a
-pseudo-frequency based on Zipf's law, and taking a weighted average based on
-those frequencies. The results drop noticeably when we try the other proposed
-methods, which are taking only the first row that appears, or taking the
+% NOTE: Avril rightly points out that we could go back and find out how much
+% weight came from each source. This would, unfortunately, involve some
+% time-consuming lookups.
+
+In Table~\ref{eval-variations}, we can see that the choice of how to merge rows
+of GloVe that get the same standardized label makes a large difference.  Recall
+that the method we ultimately used was to assign each row a pseudo-frequency
+based on Zipf's law, and taking a weighted average based on those frequencies.
+The results drop noticeably when we try the other proposed methods, which are
+taking only the first (most frequent) row that appears, or taking the
 unweighted average of the rows.
 
 In the retrofitting procedure, we made the decision to add ``self-loops'' that
@@ -863,7 +879,7 @@ effects on the evaluation results are mostly quite small. There is no single
 dataset that acts as the ``keystone'' without which the system falls apart,
 but one dataset --- Wiktionary --- unsurprisingly has a larger effect than the
 others, because it is responsible for most of the assertions. Of the 5,631,250
-filtered assertions that come from ConceptNet 5, 4,244,410 of them are credited
+filtered assertions that come from ConceptNet, 4,244,410 of them are credited
 to Wiktionary.
 
 Without Wiktionary, the score on RW drops from .587 to .541. However, at the
@@ -875,7 +891,7 @@ We followed up on examining the influence of Wiktionary by building a version of
 the system where it was the {\em only} data we included from ConceptNet. This
 system in fact achieves most of the performance of system {\bf WL1}, with its
 largest drop in performance being on MEN-3000. We conclude that much, but not
-all, of the value of ConceptNet 5 in this system is that it contains a
+all, of the value of ConceptNet in this system is that it contains a
 high-quality parse of Wiktionary into relational data.
 
 \subsection{The Limits of Similarity Judgments}
@@ -909,7 +925,9 @@ correlation would have been even higher. We suspect that, while these results
 may be approaching it, the true upper bound of the MEN evaluation is higher than
 claimed.
 
-\subsection{Future work}
+\subsection{Future Work}
+
+% TODO: make these paragraphs flow together?
 
 One aspect of our method that clearly has room for improvement is the fact that
 we disregard the labels on relations in ConceptNet, and exclude antonym
@@ -917,15 +935,6 @@ relations altogether. There is valuable knowledge there that we might be able
 to take into account with a more sophisticated extension of retrofitting, one
 that goes beyond simply knowing that particular words should be related, to
 handling them differently based on {\em how} they are related.
-
-We believe that the variety of data sources represented in ConceptNet helped
-to improve evaluation scores by expanding the domain of the system's knowledge.
-There's no reason the improvement needs to stop here. It is quite likely that
-there are more sources of ``linked data'' that could be included, or further
-standardizations that could be applied to the text to align more data. In short,
-these results can probably be surpassed easily. As the
-second author observed while running evaluations, ``It seems like every time we
-do {\em anything} to the data, the results get better.''
 
 It was convenient, but not entirely correct, to assume that all of GloVe's data
 from the Common Crawl is in English. The Common Crawl is in a wide variety of
@@ -935,6 +944,15 @@ point if multilingual terms were represented in the GloVe vectors in the first
 place. It could be useful to re-run GloVe in a way that distinguishes languages,
 using the metadata on Web pages when available and language-detection heuristics
 otherwise. Perhaps we could resolve the encoding glitches at the same time.
+
+We believe that the variety of data sources represented in ConceptNet helped to
+improve evaluation scores by expanding the domain of the system's knowledge.
+There's no reason the improvement needs to stop here. It is quite likely that
+there are more sources of ``linked data'' that could be included, or further
+standardizations that could be applied to the text to align more data. In
+short, these results can probably be surpassed soon. As the second author
+observed while running evaluations, ``It seems like every time we do {\em
+anything} to the data, the results get better.''
 
 \section{Reproducing These Results}
 
