@@ -524,6 +524,92 @@ Table~\ref{eval-variations} shows the effect of removing this rebalancing.
 
 \section{Evaluation}
 
+\begin{figure}
+\begin{tikzpicture}
+    \begin{axis}[enlargelimits=0.2, xlabel={MEN-3000 (common words)}, ylabel={RW (rare words)}]
+        \addplot[
+          scatter,mark=*,only marks,nodes near coords,
+          point meta=explicit symbolic,
+          visualization depends on={value \thisrow{anchor}\as\myanchor},
+          every node near coord/.append style={anchor=\myanchor}
+        ]
+        table[meta=label] {
+            x      y     label             anchor
+            .777   .514  {Levy SVD}        west
+            .774   .470  {Levy skip-gram}  west
+            .8163  .4767 {GloVe}           west
+            .8400  .5280 {WL0}             west
+            .8599  .5850 {WL1}             west
+            .8597  .5887 {WL2}             south
+        };
+    \end{axis}
+\end{tikzpicture}
+\caption{
+    Systems discussed in this paper, plotted according to their $\rho$
+    correlation with MEN-3000 and RW.
+}
+\label{compare-graph}
+\end{figure}
+
+\subsection{Word Similarity Datasets}
+
+We evaluate our model's performance at identifying similar words using a
+variety of word-similarity gold standards:
+
+\begin{itemize}
+\item MEN-3000 \cite{bruni2014men}, crowd-sourced similarity judgments for 3000
+    word pairs.
+\item The Stanford Rare Words (RW) dataset \cite{luong2013rw}, crowd-sourced
+    similarity judgments for 2034 word pairs, with a bias toward uncommon words.
+\item WordSim-353 \cite{finkelstein2001ws}, a widely-used corpus of similarity
+    judgments for 353 word pairs.
+\item SCWS*. SCWS \cite{huang2012scws} contains crowd-sourced similarity
+    judgments for 2003 word pairs in the context of sentences, while SCWS* is
+    the modification of it described by \newcite{luong2013rw}
+    to disregard the context in order to evaluate
+    systems that cannot make use of context. SCWS* discards the pairs of
+    identical words that are only distinguished by context, leaving 1759 pairs.
+\item RG-65 \cite{rubenstein1965rg}, a classic corpus of similarity judgments
+    for 65 word pairs.
+\item MC-30 \cite{miller1991mc}, similarity judgments for 30 word pairs.
+\end{itemize}
+
+To evaluate our ability to extend the vocabulary to other languages, we also
+used translations of some of the above gold standards:
+
+\begin{itemize}
+\item RG-65 has been translated into German by \newcite{gurevych2005german},
+    and into French by \newcite{joubarne2011french}.
+\item WordSim-353 and MC-30 have been translated into Spanish, written in
+    plain ASCII without accents, by \newcite{hassan2009crosslingual}. The
+    same dataset also includes translations into Romanian and Arabic.
+\end{itemize}
+
+\subsection{Setting Aside Test Data}
+
+In striving to maximize an evaluation metric, it is important to hold out some
+data, to avoid overfitting to the data by modifying the algorithm and its
+parameters. The metrics we focused on improving were our rank correlation with
+MEN-3000, which emphasizes having high-quality representations of common words,
+and RW, which emphasizes having a broad vocabulary.
+
+MEN-3000 comes with a development/test split, where 1000 of the 3000 word pairs
+are held out for testing. We applied a similar split to RW, setting aside a
+sample of $1/3$ of its word pairs for testing.\footnote{
+    We set aside every third row, starting from row 3, using the Unix command
+    {\tt split -un r/3/3 rw.txt}. Similarly, we split on {\tt r/1/3} and
+    {\tt r/2/3} and concatenated the results to get the remaining evaluation
+    data.
+}
+
+Neither of these held-out test sets were used in our evaluations until the code
+and parameters were finalized, shortly before submitting this article. While
+Table~\ref{eval-bigtable} shows our correlation with only the test data on these
+evaluations, Table~\ref{eval-dev-test} compares our performance on development
+and test data.
+
+\subsection{Results}
+
 \begin{table*}[t]
 \centering
 \begin{tabular}{lllllrrrrrr}
@@ -593,34 +679,6 @@ Label     & Method   & Reference                      & RW [all] & MEN-3000 \\
 \label{compare-others}
 \end{table*}
 
-\begin{figure}
-\begin{tikzpicture}
-    \begin{axis}[enlargelimits=0.2, xlabel={MEN-3000 (common words)}, ylabel={RW (rare words)}]
-        \addplot[
-          scatter,mark=*,only marks,nodes near coords,
-          point meta=explicit symbolic,
-          visualization depends on={value \thisrow{anchor}\as\myanchor},
-          every node near coord/.append style={anchor=\myanchor}
-        ]
-        table[meta=label] {
-            x      y     label             anchor
-            .777   .514  {Levy SVD}        west
-            .774   .470  {Levy skip-gram}  west
-            .8163  .4767 {GloVe}           west
-            .8400  .5280 {WL0}             west
-            .8599  .5850 {WL1}             west
-            .8597  .5887 {WL2}             south
-        };
-    \end{axis}
-\end{tikzpicture}
-\caption{
-    Systems discussed in this paper, plotted according to their $\rho$
-    correlation with MEN-3000 and RW.
-}
-\label{compare-graph}
-\end{figure}
-
-
 \begin{table*}[t]
 \centering
 \begin{tabular}{llrrrr}
@@ -641,6 +699,27 @@ Label   & Reference                         & WS-353 [es] & MC-30 [es] & RG-65 [
     also seen in Table~\ref{eval-bigtable}.
 }
 \label{eval-multilingual}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\begin{tabular}{lrrrrrr}
+\toprule
+Label   & RW [dev] & RW [test] & RW [all] & MEN-3000 [dev] & MEN-3000 [test] & MEN-3000 [all]\\
+\midrule
+\bf G   &    .489  &    .448  &    .477  &    .813  &    .816 &    .814 \\
+\bf WL0 &    .536  &    .512  &    .528  &    .841  &    .840 &    .841 \\
+\bf WL1 &    .587  &    .581  &    .585  &\bf .858  &\bf .860 &    .859 \\
+\bf WL2 &\bf .591  &\bf .584  &\bf .589  &    .857  &\bf .860 &    .858 \\
+\bottomrule
+\end{tabular}
+
+\caption{
+    A comparison of evaluation results between the ``dev'' datasets that were
+    used in development, and the held-out ``test'' datasets, for the systems
+    labled in Table~\ref{eval-bigtable}.
+}
+\label{eval-dev-test}
 \end{table*}
 
 \begin{table*}[t]
@@ -676,86 +755,6 @@ Sources         & Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .
 \label{eval-variations}
 \end{table*}
 
-\begin{table*}[t]
-\centering
-\begin{tabular}{lrrrrr}
-\toprule
-% TODO: introduce MEN-3000 [all] as a column
-Label   & RW [dev] & RW [test] & RW [all] & MEN-3000 [dev] & MEN-3000 [test] \\
-\midrule
-\bf G   &    .489  &    .448  &    .477  &    .813  &    .816 \\
-\bf WL0 &    .536  &    .512  &    .528  &    .841  &    .840 \\
-\bf WL1 &    .587  &    .581  &    .585  &\bf .858  &\bf .860 \\
-\bf WL2 &\bf .591  &\bf .584  &\bf .589  &    .857  &\bf .860 \\
-\bottomrule
-\end{tabular}
-
-\caption{
-    A comparison of evaluation results between the ``dev'' datasets that were
-    used in development, and the held-out ``test'' datasets, for the systems
-    labled in Table~\ref{eval-bigtable}.
-}
-\label{eval-dev-test}
-\end{table*}
-
-\subsection{Word Similarity Datasets}
-
-We evaluate our model's performance at identifying similar words using a
-variety of word-similarity gold standards:
-
-\begin{itemize}
-\item MEN-3000 \cite{bruni2014men}, crowd-sourced similarity judgments for 3000
-    word pairs.
-\item The Stanford Rare Words (RW) dataset \cite{luong2013rw}, crowd-sourced
-    similarity judgments for 2034 word pairs, with a bias toward uncommon words.
-\item WordSim-353 \cite{finkelstein2001ws}, a widely-used corpus of similarity
-    judgments for 353 word pairs.
-\item SCWS*. SCWS \cite{huang2012scws} contains crowd-sourced similarity
-    judgments for 2003 word pairs in the context of sentences, while SCWS* is
-    the modification of it described by \newcite{luong2013rw}
-    to disregard the context in order to evaluate
-    systems that cannot make use of context. SCWS* discards the pairs of
-    identical words that are only distinguished by context, leaving 1759 pairs.
-\item RG-65 \cite{rubenstein1965rg}, a classic corpus of similarity judgments
-    for 65 word pairs.
-\item MC-30 \cite{miller1991mc}, similarity judgments for 30 word pairs.
-\end{itemize}
-
-To evaluate our ability to extend the vocabulary to other languages, we also
-used translations of some of the above gold standards:
-
-\begin{itemize}
-\item RG-65 has been translated into German by \newcite{gurevych2005german},
-    and into French by \newcite{joubarne2011french}.
-\item WordSim-353 and MC-30 have been translated into Spanish, written in
-    plain ASCII without accents, by \newcite{hassan2009crosslingual}. The
-    same dataset also includes translations into Romanian and Arabic.
-\end{itemize}
-
-\subsection{Setting Aside Test Data}
-
-In striving to maximize an evaluation metric, it is important to hold out some
-data, to avoid overfitting to the data by modifying the algorithm and its
-parameters. The metrics we focused on improving were our rank correlation with
-MEN-3000, which emphasizes having high-quality representations of common words,
-and RW, which emphasizes having a broad vocabulary.
-
-MEN-3000 comes with a development/test split, where 1000 of the 3000 word pairs
-are held out for testing. We applied a similar split to RW, setting aside a
-sample of $1/3$ of its word pairs for testing.\footnote{
-    We set aside every third row, starting from row 3, using the Unix command
-    {\tt split -un r/3/3 rw.txt}. Similarly, we split on {\tt r/1/3} and
-    {\tt r/2/3} and concatenated the results to get the remaining evaluation
-    data.
-}
-
-Neither of these held-out test sets were used in our evaluations until the code
-and parameters were finalized, shortly before submitting this article. While
-Table~\ref{eval-bigtable} shows our correlation with only the test data on these
-evaluations, Table~\ref{eval-dev-test} compares our performance on development
-and test data.
-
-\subsection{Results}
 
 We have labeled some of the rows of Table~\ref{eval-bigtable} as particular systems
 that we would like to compare. System {\bf G} represents a configuration of
