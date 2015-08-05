@@ -64,7 +64,7 @@ def evaluate(similarity_func, standard, lang=None):
     return spearmanr(np.array(ideal), np.array(actual))[0]
 
 def main(labels_in, vecs_in, verbose=True):
-    from conceptnet_retrofitting import loaders
+    from wide_learning import loaders
     test_all(loaders.load_word_vectors(labels_in, vecs_in).similarity)
 
 if __name__ == '__main__':

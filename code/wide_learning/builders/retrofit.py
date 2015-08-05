@@ -21,7 +21,7 @@ def retrofit(word_vecs, sparse_assoc, iterations=10, verbose=False, orig_weight=
     return vecs
 
 def main(vecs_in, assoc_in, vecs_out, verbose=False):
-    from conceptnet_retrofitting import loaders
+    from wide_learning import loaders
 
     if verbose:
         print("Loading vectors")

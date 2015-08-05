@@ -2,9 +2,9 @@ from collections import defaultdict
 
 from sklearn.preprocessing import normalize
 
-from conceptnet_retrofitting.builders.sparse_matrix_builder import SparseMatrixBuilder
-from conceptnet_retrofitting.builders.label_set import LabelSet
-from conceptnet_retrofitting.standardization import standardize
+from wide_learning.builders.sparse_matrix_builder import SparseMatrixBuilder
+from wide_learning.builders.label_set import LabelSet
+from wide_learning.standardization import standardize
 
 def coarse_dataset(dataset):
     if '/' not in dataset:
@@ -48,7 +48,7 @@ def build_from_conceptnet(labels, filename, verbose=True):
 
 
 def main(label_in, conceptnet_in, label_out, assoc_out):
-    from conceptnet_retrofitting import loaders
+    from wide_learning import loaders
 
     labels = LabelSet(loaders.load_labels(label_in))
     assoc = build_from_conceptnet(labels, conceptnet_in)

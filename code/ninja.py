@@ -1,6 +1,6 @@
 import copy
 from collections import defaultdict
-from conceptnet_retrofitting.ninja.ninja_util import (
+from wide_learning.ninja.ninja_util import (
     Dep, DepGraph, make_ninja_file, outputs
 )
 
@@ -63,20 +63,20 @@ class GloveLabels:
 
 
 implicit = {
-    'glove_to_vecs': ['conceptnet_retrofitting/builders/build_vecs.py'],
-    'filter_vecs': ['conceptnet_retrofitting/builders/filter_vecs.py'],
-    'standardize_vecs': ['conceptnet_retrofitting/builders/standardize_vecs.py'],
-    'l1_normalize': ['conceptnet_retrofitting/builders/l1norm.py'],
-    'l2_normalize': ['conceptnet_retrofitting/builders/l2norm.py'],
-    'network_to_assoc': ['conceptnet_retrofitting/builders/build_assoc.py'],
-    'add_self_loops': ['conceptnet_retrofitting/builders/self_loops.py'],
-    'retrofit': ['conceptnet_retrofitting/builders/retrofit.py'],
-    'test': ['conceptnet_retrofitting/evaluation/wordsim.py'],
-    'tests_to_latex': ['conceptnet_retrofitting/evaluation/latex_results.py'],
+    'glove_to_vecs': ['wide_learning/builders/build_vecs.py'],
+    'filter_vecs': ['wide_learning/builders/filter_vecs.py'],
+    'standardize_vecs': ['wide_learning/builders/standardize_vecs.py'],
+    'l1_normalize': ['wide_learning/builders/l1norm.py'],
+    'l2_normalize': ['wide_learning/builders/l2norm.py'],
+    'network_to_assoc': ['wide_learning/builders/build_assoc.py'],
+    'add_self_loops': ['wide_learning/builders/self_loops.py'],
+    'retrofit': ['wide_learning/builders/retrofit.py'],
+    'test': ['wide_learning/evaluation/wordsim.py'],
+    'tests_to_latex': ['wide_learning/evaluation/latex_results.py'],
 }
 
 
-def build_conceptnet_retrofitting():
+def build_wide_learning():
     graph = DepGraph()
     build_glove(graph)
 
@@ -248,5 +248,4 @@ def latex_results(graph):
 
 
 if __name__ == '__main__':
-    build_conceptnet_retrofitting()
-
+    build_wide_learning()

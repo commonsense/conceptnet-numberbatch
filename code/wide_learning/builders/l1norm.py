@@ -4,7 +4,7 @@ def l1_normalize(vecs):
     return normalize(vecs, axis=0, norm='l1', copy=False)
 
 def main(vecs_in, vecs_out):
-    from conceptnet_retrofitting import loaders
+    from wide_learning import loaders
 
     loaders.save_vecs(l1_normalize(loaders.load_vecs(vecs_in)), vecs_out)
 

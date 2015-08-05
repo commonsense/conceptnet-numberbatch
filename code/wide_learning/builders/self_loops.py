@@ -9,7 +9,7 @@ def self_loops(assoc):
     return assoc.tocsr()
 
 def main(assoc_in, assoc_out):
-    from conceptnet_retrofitting import loaders
+    from wide_learning import loaders
 
     assoc = loaders.load_csr(assoc_in)
 

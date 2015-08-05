@@ -1,7 +1,7 @@
 from unicodedata import normalize
 
-from conceptnet_retrofitting.standardization.english import english_filter
-from conceptnet_retrofitting.standardization.tokenizer import simple_tokenize
+from wide_learning.standardization.english import english_filter
+from wide_learning.standardization.tokenizer import simple_tokenize
 
 def standardize(text, lang='en', remove_accents=True):
     if remove_accents and (lang=='es' or text.startswith('/c/es/')):

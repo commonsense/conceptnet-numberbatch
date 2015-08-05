@@ -24,7 +24,7 @@ def filter_vecs(labels, vecs,
     return filtered_labels, np.array(filtered_vecs)
 
 def main(labels_in, vecs_in, labels_out, vecs_out):
-    from conceptnet_retrofitting import loaders
+    from wide_learning import loaders
 
     labels = loaders.load_labels(labels_in)
     vecs = loaders.load_vecs(vecs_in)
