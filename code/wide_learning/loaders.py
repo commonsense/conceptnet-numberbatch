@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import sparse
 
-from conceptnet_retrofitting.word_vectors import WordVectors
+from wide_learning.word_vectors import WordVectors
 
 def load_vecs(filename):
     return np.load(filename)

@@ -19,7 +19,7 @@ rule glove_to_labels
   command = cut -d" " -f1 $in >$out
 
 rule glove_to_vecs
-  command = cut -d" " -f2- $in | python -m conceptnet_retrofitting.builders.build_vecs $out
+  command = cut -d" " -f2- $in | python -m wide_learning.builders.build_vecs $out
   pool = memory_hogs
 
 rule filter_assoc_neg
@@ -29,42 +29,42 @@ rule filter_assoc_pos
   command = egrep '$filter' $in > $out
 
 rule filter_vecs
-  command = python -m conceptnet_retrofitting.builders.filter_vecs $in $out
+  command = python -m wide_learning.builders.filter_vecs $in $out
   pool = memory_hogs
 
 rule standardize_vecs
-  command = python -m conceptnet_retrofitting.builders.standardize_vecs $in $out
+  command = python -m wide_learning.builders.standardize_vecs $in $out
   pool = memory_hogs
 
 rule standardize_assoc
-  command = python -m conceptnet_retrofitting.builders.standardize_assoc $in $out
+  command = python -m wide_learning.builders.standardize_assoc $in $out
 
 rule concatenate
   command = cat $in > $out
 
 rule l1_normalize
-  command = python -m conceptnet_retrofitting.builders.l1norm $in $out
+  command = python -m wide_learning.builders.l1norm $in $out
   pool = memory_hogs
 
 rule l2_normalize
-  command = python -m conceptnet_retrofitting.builders.l2norm $in $out
+  command = python -m wide_learning.builders.l2norm $in $out
   pool = memory_hogs
 
 rule network_to_assoc
-  command = python -m conceptnet_retrofitting.builders.build_assoc $in $out
+  command = python -m wide_learning.builders.build_assoc $in $out
 
 rule add_self_loops
-  command = python -m conceptnet_retrofitting.builders.self_loops $in $out
+  command = python -m wide_learning.builders.self_loops $in $out
 
 rule retrofit
-  command = python -m conceptnet_retrofitting.builders.retrofit $in $out
+  command = python -m wide_learning.builders.retrofit $in $out
   pool = memory_hogs
 
 rule test
-  command = python -m conceptnet_retrofitting.evaluation.wordsim $in >$out
+  command = python -m wide_learning.evaluation.wordsim $in >$out
 
 rule tests_to_latex
-  command = python -m conceptnet_retrofitting.evaluation.latex_results $in $out
+  command = python -m wide_learning.evaluation.latex_results $in $out
 
 rule rebuild_ninja
   command = python -m ninja

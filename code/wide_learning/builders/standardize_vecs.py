@@ -1,7 +1,7 @@
 import numpy as np
 
-from conceptnet_retrofitting.standardization import standardize
-from conceptnet_retrofitting.builders.label_set import LabelSet
+from wide_learning.standardization import standardize
+from wide_learning.builders.label_set import LabelSet
 
 def standardize_vecs(labels, vecs):
     standardized_labels = LabelSet()
@@ -25,7 +25,7 @@ def standardize_vecs(labels, vecs):
     return list(standardized_labels), np.array(standardized_vecs)
 
 def main(labels_in, vecs_in, labels_out, vecs_out):
-    from conceptnet_retrofitting import loaders
+    from wide_learning import loaders
 
     labels = loaders.load_labels(labels_in)
     vecs = loaders.load_vecs(vecs_in)
