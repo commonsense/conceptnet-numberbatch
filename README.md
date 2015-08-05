@@ -1,9 +1,9 @@
-# conceptnet-retrofitting-paper
+# wide-learning-paper
 
 This package contains the LaTeX source of our paper on retrofitting with
 ConceptNet in the `paper/` directory. It also contains the code that
 implements it in the `code/` directory, in a module named
-`retrofitting_paper`.
+`wide_learning`.
 
 ## Building the paper
 
@@ -40,4 +40,3 @@ track them when they change:
 
     cd code/data
     git annex get
-
