@@ -31,18 +31,19 @@ def load_labels(filename, encoding='utf-8'):
     except UnicodeDecodeError:
         return[line.strip() for line in open(filename, encoding='latin-1')]
 
+
 def save_labels(labels, filename):
     with open(filename, mode='w') as file:
          file.write('\n'.join(labels))
 
-def load_word_vectors(labels_in, vecs_in, memmap=True):
 
+def load_word_vectors(labels_in, vecs_in, memmap=True):
     labels = load_labels(labels_in)
     if memmap:
         vecs = load_vec_memmap(vecs_in)
     else:
         vecs = load_vecs(vecs_in)
-        
+
     if labels[0].startswith('/c/'):
         return WordVectors(labels, vecs)
     else:

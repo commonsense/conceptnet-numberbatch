@@ -14,7 +14,6 @@ class WordVectors:
         self.vectors = vectors
         self._standardizer = standardizer
 
-
     def similarity(self, word1, word2, lang=None):
         try:
             return self.to_vector(word1, lang).dot(self.to_vector(word2, lang))
@@ -34,7 +33,6 @@ class WordVectors:
         return vec
 
     def similar_to(self, word_or_vector, num=20, only=None):
-
         if isinstance(self.vectors, np.memmap):
             self.vectors = normalize(self.vectors)
 
