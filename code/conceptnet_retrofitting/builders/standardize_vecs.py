@@ -8,10 +8,7 @@ def standardize_vecs(labels, vecs):
     standardized_vecs = []
 
     for index, (label, vec) in enumerate(zip(labels, vecs)):
-        try:
-            label = standardize(label)
-        except ValueError:
-            continue
+        label = standardize(label)
 
         vec /= (index + 1)
 

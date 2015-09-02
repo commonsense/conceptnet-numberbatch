@@ -1,9 +1,11 @@
 from unicodedata import normalize
-
+from ftfy import fix_text
 from conceptnet_retrofitting.standardization.english import english_filter
 from conceptnet_retrofitting.standardization.tokenizer import simple_tokenize
 
+
 def standardize(text, lang='en', remove_accents=True):
+    text = fix_text(text)
     if remove_accents and (lang=='es' or text.startswith('/c/es/')):
         text = normalize('NFD', text).encode('ascii', errors='ignore').decode()
     if not text.startswith('/c/'):
@@ -31,7 +33,9 @@ LCODE_ALIASES = {
     'id': 'ms'
 }
 
+
 def standardized_concept_uri(text, lang='en'):
+    text = fix_text(text)
     tokens = simple_tokenize(text)
     if lang == 'en':
         tokens = english_filter(tokens)
