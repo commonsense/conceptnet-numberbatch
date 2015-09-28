@@ -3,6 +3,7 @@ import math
 
 from scipy.stats import spearmanr
 import numpy as np
+import argparse
 
 directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -63,10 +64,15 @@ def evaluate(similarity_func, standard, lang=None):
 
     return spearmanr(np.array(ideal), np.array(actual))[0]
 
-def main(labels_in, vecs_in, verbose=True):
+def main(labels_in, vecs_in, replacements_in, verbose=True):
     from conceptnet_retrofitting import loaders
-    test_all(loaders.load_word_vectors(labels_in, vecs_in).similarity)
+    test_all(loaders.load_word_vectors(labels_in, vecs_in, replacements_in).similarity)
 
 if __name__ == '__main__':
-    import sys
-    main(sys.argv[1], sys.argv[2])
+    parser = argparse.ArgumentParser()
+    parser.add_argument('labels')
+    parser.add_argument('vectors')
+    parser.add_argument('-r', '--replacements', default=None)
+    args = parser.parse_args()
+    main(args.labels, args.vectors, args.replacements)
+

@@ -6,12 +6,13 @@ from sklearn.preprocessing import normalize
 
 
 class WordVectors:
-    def __init__(self, labels, vectors, standardizer=standardize):
+    def __init__(self, labels, vectors, replacements=None, standardizer=standardize):
         assert(len(labels) == len(vectors))
         self.labels = LabelSet(labels)
         if not isinstance(vectors, np.memmap):
             normalize(vectors, copy=False)
         self.vectors = vectors
+        self.replacements = replacements
         self._standardizer = standardizer
 
     def similarity(self, word1, word2, lang=None):
@@ -27,10 +28,15 @@ class WordVectors:
                 word = self._standardizer(word, lang=lang)
             else:
                 word = self._standardizer(word)
-        vec = self.vectors[self.labels.index(word)]
-        if isinstance(vec, np.memmap):
-            return normalize(vec)[0]
-        return vec
+
+        max_sim = 1.
+        if self.replacements and word in self.replacements:
+            while word not in self.labels:
+                word, sim = self.replacements[word]
+                max_sim *= sim
+
+        vec = normalize(self.vectors[self.labels.index(word)])[0]
+        return vec * max_sim
 
     def similar_to(self, word_or_vector, num=20, only=None):
         if isinstance(self.vectors, np.memmap):

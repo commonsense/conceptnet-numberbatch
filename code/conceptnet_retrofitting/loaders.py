@@ -1,4 +1,5 @@
 import numpy as np
+import msgpack
 from scipy import sparse
 
 from conceptnet_retrofitting.word_vectors import WordVectors
@@ -32,12 +33,21 @@ def load_labels(filename, encoding='utf-8'):
         return[line.strip() for line in open(filename, encoding='latin-1')]
 
 
+def load_replacements(filename):
+    return msgpack.load(open(filename, 'rb'), encoding='utf-8')
+
+
+def save_replacements(replacements, filename):
+    with open(filename, 'wb') as out:
+        msgpack.dump(replacements, out)
+
+
 def save_labels(labels, filename):
     with open(filename, mode='w') as file:
          file.write('\n'.join(labels))
 
 
-def load_word_vectors(labels_in, vecs_in, memmap=True):
+def load_word_vectors(labels_in, vecs_in, replacements_in=None, memmap=True):
     labels = load_labels(labels_in)
     if memmap:
         vecs = load_vec_memmap(vecs_in)
@@ -45,6 +55,12 @@ def load_word_vectors(labels_in, vecs_in, memmap=True):
         vecs = load_vecs(vecs_in)
 
     if labels[0].startswith('/c/'):
-        return WordVectors(labels, vecs)
+        wv = WordVectors(labels, vecs)
     else:
-        return WordVectors(labels, vecs, str.lower)
+        wv = WordVectors(labels, vecs, str.lower)
+    
+    if replacements_in:
+        wv.replacements = load_replacements(replacements_in)
+    
+    return wv
+

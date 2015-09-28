@@ -62,6 +62,24 @@ class GloveLabels:
         return CONFIG['build-data-path'] + '.'.join(str(x) for x in out)
 
 
+class GloveReplacements:
+    """
+    A reference to a file containing the labels corresponding to a
+    GloveVectors file.
+    """
+    def __init__(self, version, *, standardization='raw', retrofit=None):
+        self.version = version
+        self.standardization = standardization
+        self.retrofit = retrofit
+
+    def __repr__(self):
+        out = ['glove', self.version, self.standardization]
+        if self.retrofit:
+            out.append(self.retrofit)
+        out.append('replacements.msgpack')
+        return CONFIG['build-data-path'] + '.'.join(str(x) for x in out)
+
+
 implicit = {
     'glove_to_vecs': ['conceptnet_retrofitting/builders/build_vecs.py'],
     'filter_vecs': ['conceptnet_retrofitting/builders/filter_vecs.py'],
@@ -216,6 +234,19 @@ def retrofit(graph):
                 ],
                 GloveVectors(version=version, standardization='standardized', retrofit=network, normalization=norm),
                 'retrofit'
+            )
+
+            graph['filter_vecs'][norm][network] = Dep(
+                [
+                    GloveVectors(version=version, standardization='standardized', retrofit=network, normalization=norm),
+                    GloveLabels(version=version, standardization='standardized', retrofit=network)
+                ],
+                [
+                    GloveVectors(version=version, standardization='filtered', retrofit=network, normalization=norm),
+                    GloveLabels(version=version, standardization='filtered', retrofit=network),
+                    GloveReplacements(version=version, standardization='filtered', retrofit=network)
+                ],
+                'filter_vecs'
             )
 
 
