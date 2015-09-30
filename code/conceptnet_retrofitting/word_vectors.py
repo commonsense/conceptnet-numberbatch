@@ -1,14 +1,14 @@
 import numpy as np
 
 from conceptnet_retrofitting.standardization import standardize
-from conceptnet_retrofitting.builders.label_set import LabelSet
+from ordered_set import OrderedSet
 from sklearn.preprocessing import normalize
 
 
 class WordVectors:
     def __init__(self, labels, vectors, replacements=None, standardizer=standardize):
         assert(len(labels) == len(vectors))
-        self.labels = LabelSet(labels)
+        self.labels = OrderedSet(labels)
         if not isinstance(vectors, np.memmap):
             normalize(vectors, copy=False)
         self.vectors = vectors
@@ -21,7 +21,7 @@ class WordVectors:
         except KeyError:
             return 0
 
-    def to_vector(self, word, lang=None):
+    def to_vector(self, word, lang=None) -> np.ndarray:
         if self._standardizer is not None:
             if self._standardizer is standardize and \
                 lang is not None:
@@ -33,7 +33,7 @@ class WordVectors:
         if self.replacements and word in self.replacements:
             while word not in self.labels:
                 word, sim = self.replacements[word]
-                max_sim *= sim
+                #max_sim *= np.sqrt(sim)
 
         vec = normalize(self.vectors[self.labels.index(word)])[0]
         return vec * max_sim
