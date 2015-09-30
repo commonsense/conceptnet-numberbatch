@@ -58,9 +58,9 @@ def load_word_vectors(labels_in, vecs_in, replacements_in=None, memmap=True):
         wv = WordVectors(labels, vecs)
     else:
         wv = WordVectors(labels, vecs, str.lower)
-    
+
     if replacements_in:
         wv.replacements = load_replacements(replacements_in)
-    
+
     return wv
 

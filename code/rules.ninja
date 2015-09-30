@@ -22,6 +22,9 @@ rule glove_to_vecs
   command = cut -d" " -f2- $in | python -m conceptnet_retrofitting.builders.build_vecs $out
   pool = memory_hogs
 
+rule assoc_to_labels
+  command = cut -f1 $in | sort | uniq > $out
+
 rule filter_assoc_neg
   command = egrep -v '$filter' $in > $out
 

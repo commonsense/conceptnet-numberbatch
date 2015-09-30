@@ -12,13 +12,13 @@ CONFIG = {
     'neg-filters': ['jmdict', 'opencyc', 'openmind', 'verbosity', 'wiktionary', 'wordnet'],
     'pos-filters': ['wiktionary'],
     'retrofit-items': ['conceptnet5',
-                       'conceptnet5-minus-jmdict',
-                       'conceptnet5-minus-opencyc',
-                       'conceptnet5-minus-openmind',
-                       'conceptnet5-minus-verbosity',
-                       'conceptnet5-minus-wiktionary',
-                       'conceptnet5-minus-wordnet',
-                       'conceptnet5-wiktionary-only',
+                       #'conceptnet5-minus-jmdict',
+                       #'conceptnet5-minus-opencyc',
+                       #'conceptnet5-minus-openmind',
+                       #'conceptnet5-minus-verbosity',
+                       #'conceptnet5-minus-wiktionary',
+                       #'conceptnet5-minus-wordnet',
+                       #'conceptnet5-wiktionary-only',
                        'ppdb-xl-lexical-standardized', 'cnet-ppdb-combined']
 }
 
@@ -223,7 +223,7 @@ def add_self_loops(graph):
 def retrofit(graph):
     version = '840B.300d'
     for network in CONFIG['retrofit-items']:
-        for norm in ['l1', 'l2', 'none']:
+        for norm in ['l1', 'l2']:
             if 'conceptnet5-' in network and norm != 'l1':
                 # use only the l1 norm when trying dropping out datasets
                 continue
@@ -236,18 +236,26 @@ def retrofit(graph):
                 'retrofit'
             )
 
-            graph['filter_vecs'][norm][network] = Dep(
-                [
-                    GloveVectors(version=version, standardization='standardized', retrofit=network, normalization=norm),
-                    GloveLabels(version=version, standardization='standardized', retrofit=network)
-                ],
-                [
-                    GloveVectors(version=version, standardization='filtered', retrofit=network, normalization=norm),
-                    GloveLabels(version=version, standardization='filtered', retrofit=network),
-                    GloveReplacements(version=version, standardization='filtered', retrofit=network)
-                ],
-                'filter_vecs'
-            )
+    for network in ['conceptnet5']:
+        graph['assoc_to_labels'][network] = Dep(
+            CONFIG['source-data-path'] + 'conceptnet5.csv',
+            GloveLabels(version=network),
+            'assoc_to_labels'
+        )
+
+        graph['filter_vecs'][network] = Dep(
+            [
+                GloveVectors(version=version, standardization='standardized', retrofit=network, normalization='l1'),
+                GloveLabels(version=version, standardization='standardized', retrofit=network),
+                GloveLabels(version=network)
+            ],
+            [
+                GloveVectors(version=version, standardization='filtered', retrofit=network, normalization='l1'),
+                GloveLabels(version=version, standardization='filtered', retrofit=network),
+                GloveReplacements(version=version, standardization='filtered', retrofit=network)
+            ],
+            'filter_vecs'
+        )
 
 
 def test(graph):
