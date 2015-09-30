@@ -1,28 +1,27 @@
 \def\year{2015}
-\def\thetitle{Wide Learning: Breadth of Knowledge Improves Word Vectors}
+\def\thetitle{Wide Retrofitting: Breadth of Knowledge Improves Word Vectors}
 
 % Update this when our score changes.
 \def\scoreRW{.584}
 \def\scoreMEN{.860}
 
-\documentclass[letterpaper]{article}
+\documentclass[11pt]{article}
 \usepackage{acl2012}
 \usepackage{times}
 \usepackage{latexsym}
 \usepackage{amsmath}
 \usepackage{multirow}
 \usepackage{pgfplots}
-\pgfplotsset{compat=1.11}
+\pgfplotsset{compat=1.8}
 \usepackage{booktabs}
 \usepackage{CJKutf8}
 \usepackage{url}
-\frenchspacing
 \setlength{\pdfpagewidth}{8.5in}
 \setlength{\pdfpageheight}{11in}
 \pdfinfo{
 /Title \thetitle
 /Author Rob Speer, Joshua Chin, and Catherine Havasi}
-\setcounter{secnumdepth}{0}
+%\setcounter{secnumdepth}{0}
 \bibliographystyle{acl2012}
 
 \title{\thetitle}
@@ -46,16 +45,15 @@
 \maketitle
 \begin{abstract}
 
-% TODO: Avril wants to rephrase the 'taking care' phrase; what should it change to?
-
 A currently successful approach to computationally represent the meanings of
 words is to represent them as vectors (embeddings) in a machine-learned vector
 space. These embeddings are often evaluated on their ability to identify
 similar or related words like a human would. In this paper, we show the
 effectiveness of combining existing embeddings learned by GloVe
 \cite{pennington2014glove} with structured knowledge from the semantic network
-ConceptNet 5 \cite{speer2012conceptnet}, taking care to merge them into a
-common word representation. The resulting vector space has a larger vocabulary
+ConceptNet 5 \cite{speer2012conceptnet}, merging their information into a common
+representation using an extension of the ``retrofitting'' technique
+\cite{faruqui2015retrofitting}. The resulting vector space has a larger vocabulary
 than either source, can represent word meanings in multiple languages, and
 achieves state-of-the-art performance on word similarity evaluations.
 Its score of $\rho = \scoreRW{}$ on an evaluation of rare words
@@ -87,7 +85,8 @@ While the original formulation of retrofitting operates on the intersection of
 the vocabularies, we modify it to operate on the union. This allows retrofitting
 to expand the vocabulary of the embedding instead of shrinking it, and allows it
 to benefit from semantic links that must be followed for multiple steps to reach
-a term in the original vocabulary.
+a term in the original vocabulary. We refer to this modified procedure as
+``wide retrofitting''.
 
 By combining our modified version of retrofitting with some subtle but important
 normalizations to the input data, we achieve state-of-the-art performance using
@@ -111,24 +110,9 @@ of them at once:
     normalization, increasing the weight of more selective features
 \item Transforming the matrix labels with a text ``standardization'' function,
     unifying variations and inflections of the same word
-\item Applying a variation of retrofitting to introduce a broad variety of
+\item Applying wide retrofitting to introduce a broad variety of
     structured semantic knowledge from ConceptNet 5.4
 \end{itemize}
-
-% NOTE: should these following paragraphs be moved? Avril thinks so but Rob
-% thinks they flow better here.
-
-The family of techniques that includes word2vec and GloVe is sometimes
-popularly conflated with ``deep learning'', but this terminology seems to have
-a particularly vague meaning within NLP. The multi-layered neural networks that
-``deep learning'' is intended to refer to (such as \newcite{hinton2006deep})
-tend to be absent in these successful semantic representations.
-
-For the purpose of vector-based semantics, what seems to be more important thus
-far than multiple levels of learning is the ability to efficiently take in lots
-of input from a variety of sources. Combining multiple forms of knowledge to
-create the embeddings furthers this goal. Perhaps it would be more apt to refer
-to this approach as ``wide learning'' instead.
 
 \section{Background}
 
@@ -245,18 +229,6 @@ implemented in the {\tt conceptnet5.nodes.normalized\_concept\_uri} function
 of ConceptNet 5.4:
 
 \begin{itemize}
-\item The words and phrases that the data sources provide are first run
-    through the {\tt ftfy.fix\_text} function, in version 4.0 of the Python
-    module {\tt ftfy}.\footnote{
-        \url{http://github.com/LuminosoInsight/python-ftfy}
-    } This corrects ``mojibake'' (a Unicode glitch that arises when reading
-    text in the wrong encoding), as well as applying NFC normalization.\footnote{
-        For example, ConceptNet considers ``ni\~{n}o'' to be a single
-        label, regardless of whether it is spelled as the four codepoints
-        {\tt n i \~{n} o}, the five codepoints {\tt n i n \textasciitilde{} o}
-        where the fourth is a combining character,
-        or the five corrupted codepoints {\tt n i \~{A} \textpm{} o}.
-    }
 \item The text is tokenized using a regular expression that splits it at
     characters whose major Unicode category is Z (whitespace), P (punctuation),
     S (symbols), or C (control characters).
@@ -544,9 +516,9 @@ Table~\ref{eval-variations} shows the effect of removing this rebalancing.
             .777   .514  {Levy SVD}        west
             .774   .470  {Levy skip-gram}  west
             .8163  .4767 {GloVe}           west
-            .8400  .5280 {WL0}             west
-            .8599  .5850 {WL1}             west
-            .8597  .5887 {WL2}             south
+            .8400  .5280 {WR0}             west
+            .8599  .5850 {WR1}             west
+            .8597  .5887 {WR2}             south
         };
     \end{axis}
 \end{tikzpicture}
@@ -634,7 +606,7 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    W
        &GloVe 840B   & $L_2$ & ---       & ---      &     .089 &     .768 &      .664 &      .496 &     .652 &     .666 \\
        &GloVe 840B   & $L_2$ & CN5.4     & ---      &     .493 &     .811 &      .760 &      .564 &     .717 &     .789 \\
        &GloVe 840B   & $L_1$ & ---       & ---      &     .091 &     .772 &      .667 &      .500 &     .653 &     .682 \\
-\bf WL0&GloVe 840B   & $L_1$ & CN5.4     & ---      &     .512 &     .840 &      .798 &      .615 &     .774 &     .798 \\
+\bf WR0&GloVe 840B   & $L_1$ & CN5.4     & ---      &     .512 &     .840 &      .798 &      .615 &     .774 &     .798 \\
 \midrule
        &GloVe 840B   & ---   & CN5.4     & PPDB     &     .465 &     .814 &      .716 &      .598 &     .815 &     .815 \\
        &GloVe 840B   & ---   & CN5.4     & CN5.4    &     .506 &     .830 &      .734 &      .602 &     .842 &     .810 \\
@@ -643,8 +615,8 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    W
        &GloVe 840B   & $L_2$ & CN5.4     & CN5.4    &     .564 &     .841 &      .794 &      .631 &     .805 &     .836 \\
        &GloVe 840B   & $L_2$ & CN5.4     & Both     &     .566 &     .841 &      .794 &      .634 &     .801 &     .829 \\
        &GloVe 840B   & $L_1$ & CN5.4     & PPDB     &     .560 &     .852 &      .806 & {\bf .674}&     .821 &     .824 \\
-\bf WL1&GloVe 840B   & $L_1$ & CN5.4     & CN5.4    &     .581 &{\bf .860}& {\bf .818}&      .668 &{\bf .852}&{\bf .845}\\
-\bf WL2&GloVe 840B   & $L_1$ & CN5.4     & Both     &{\bf .584}&{\bf .860}&      .817 &      .671 &     .846 &     .842 \\
+\bf WR1&GloVe 840B   & $L_1$ & CN5.4     & CN5.4    &     .581 &{\bf .860}& {\bf .818}&      .668 &{\bf .852}&{\bf .845}\\
+\bf WR2&GloVe 840B   & $L_1$ & CN5.4     & Both     &{\bf .584}&{\bf .860}&      .817 &      .671 &     .846 &     .842 \\
 \bottomrule
 \end{tabular}
 
@@ -656,7 +628,7 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    W
     standardized according to ConceptNet 5.4. ``Retrofit'' indicates which data
     is added using retrofitting.\\
     Row {\bf G} matches results from \newcite{pennington2014glove}.
-    {\bf WL1} and {\bf WL2} are the two best configurations of our system.
+    {\bf WR1} and {\bf WR2} are the two best configurations of our system.
 }
 \label{eval-bigtable}
 \end{table*}
@@ -671,9 +643,9 @@ Label     & Method   & Reference                      & RW [all] & MEN-3000 \\
           & SVD      & \newcite{levy2015embeddings}   &     .514 &     .777 \\
           & Skip-gram& \newcite{levy2015embeddings}   &     .470 &     .774 \\
 \bf G     & GloVe    & \newcite{pennington2014glove}  &     .477 &     .816 \\
-\bf WL0   & GloVe    & This paper                     &     .528 &     .840 \\
-\bf WL1   & Retrofitting+ & This paper                &     .585 &{\bf .860}\\
-\bf WL2   & Retrofitting+ & This paper                &{\bf .589}&{\bf .860}\\
+\bf WR0   & GloVe    & This paper                     &     .528 &     .840 \\
+\bf WR1   & Retrofitting+ & This paper                &     .585 &{\bf .860}\\
+\bf WR2   & Retrofitting+ & This paper                &{\bf .589}&{\bf .860}\\
 \bottomrule
 \end{tabular}
 
@@ -692,8 +664,8 @@ Label     & Method   & Reference                      & RW [all] & MEN-3000 \\
 Label   & Reference                         & WS-353 [es] & MC-30 [es] & RG-65 [de] & RG-65 [fr] \\
 \midrule
 \bf R   & \newcite{faruqui2015retrofitting} &         --- &       .591 &       .603 &       .606 \\
-\bf WL1 & This paper                        &    \bf .444 &   \bf .765 &       .673 &       .781 \\
-\bf WL2 & This paper                        &        .441 &       .762 &   \bf .677 &   \bf .788 \\
+\bf WR1 & This paper                        &    \bf .444 &   \bf .765 &       .673 &       .781 \\
+\bf WR2 & This paper                        &        .441 &       .762 &   \bf .677 &   \bf .788 \\
 \bottomrule
 \end{tabular}
 
@@ -701,7 +673,7 @@ Label   & Reference                         & WS-353 [es] & MC-30 [es] & RG-65 [
     Multilingual evaluation results for Spanish (es), German (de), and French
     (fr). Row {\bf R} contains the published results of retrofitting
     Universal WordNet onto skip-gram embeddings learned from Wikipedia
-    \cite{faruqui2015retrofitting}. {\bf WL1} and {\bf WL2} are our system, as
+    \cite{faruqui2015retrofitting}. {\bf WR1} and {\bf WR2} are our system, as
     also seen in Table~\ref{eval-bigtable}.
 }
 \label{eval-multilingual}
@@ -714,9 +686,9 @@ Label   & Reference                         & WS-353 [es] & MC-30 [es] & RG-65 [
 Label   & RW [dev] & RW [test] & RW [all] & MEN-3000 [dev] & MEN-3000 [test] & MEN-3000 [all]\\
 \midrule
 \bf G   &    .489  &    .448  &    .477  &    .813  &    .816 &    .814 \\
-\bf WL0 &    .536  &    .512  &    .528  &    .841  &    .840 &    .841 \\
-\bf WL1 &    .587  &    .581  &    .585  &\bf .858  &\bf .860 &    .859 \\
-\bf WL2 &\bf .591  &\bf .584  &\bf .589  &    .857  &\bf .860 &    .858 \\
+\bf WR0 &    .536  &    .512  &    .528  &    .841  &    .840 &    .841 \\
+\bf WR1 &    .587  &    .581  &    .585  &\bf .858  &\bf .860 &    .859 \\
+\bf WR2 &\bf .591  &\bf .584  &\bf .589  &    .857  &\bf .860 &    .858 \\
 \bottomrule
 \end{tabular}
 
@@ -752,7 +724,7 @@ Sources         & Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .
 \bottomrule
 \end{tabular}
 \caption{
-    The effects of various modifications to the embeddings of system {\bf WL1},
+    The effects of various modifications to the embeddings of system {\bf WR1},
     including changing the way that embeddings are merged after
     standardization, and dropping various knowledge sources from ConceptNet.
     RW and MEN-3000 were evaluated using their development sets here,
@@ -767,16 +739,16 @@ that we would like to compare. System {\bf G} represents a configuration of
 GloVe that was evaluated by \newcite{pennington2014glove}. We ran the evaluation
 using their provided data, and successfully reproduced their results.
 
-{\bf WL1} and {\bf WL2} are two preferred configurations of our system. {\bf WL1}
+{\bf WR1} and {\bf WR2} are two preferred configurations of our system. {\bf WR1}
 applies all the techniques described in this paper as it retrofits with
-ConceptNet; {\bf WL2} is the same, but retrofits with a combination of PPDB and
+ConceptNet; {\bf WR2} is the same, but retrofits with a combination of PPDB and
 ConceptNet. Both systems perform very well across all word-similarity
 evaluations, and it is inconclusive which one is better. We will focus on
-system {\bf WL1} for further comparison, because it is simpler.
+system {\bf WR1} for further comparison, because it is simpler.
 
-The numerals in the names {\bf WL1} and {\bf WL2} refer to the number of
+The numerals in the names {\bf WR1} and {\bf WR2} refer to the number of
 additional data sources that were added to the original data using our expanded
-version of retrofitting. Another interesting result to compare is {\bf WL0},
+version of retrofitting. Another interesting result to compare is {\bf WR0},
 the best system that we created without retrofitting anything. This system
 simply involves transforming the rows and columns of the existing GloVe 840B
 matrix, showing that some of the improvements from this paper can be realized
@@ -805,9 +777,9 @@ of skip-grams with negative sampling (SGNS), originally introduced by
 \newcite{mikolov2013word2vec}. We also compare to the original results from
 GloVe's 42-billion-token dataset.
 
-In relative terms, the performance of our system {\bf WL2} outperforms the best
+In relative terms, the performance of our system {\bf WR2} outperforms the best
 published RW score (Levy's SVD) by 14.6\%, or 13.6\% if we use our score on only
-the test set. Both {\bf WL1} and {\bf WL2} outperform GloVe's result on
+the test set. Both {\bf WR1} and {\bf WR2} outperform GloVe's result on
 MEN-3000 by 5.4\%.
 
 \section{Discussion}
@@ -836,8 +808,8 @@ repair the data.
 
 \subsection{Varying the System}
 
-Some of the procedures we implemented in creating systems {\bf WL1} and
-{\bf WL2} require some justification. To show the benefits of certain decisions,
+Some of the procedures we implemented in creating systems {\bf WR1} and
+{\bf WR2} require some justification. To show the benefits of certain decisions,
 such as adding self-loops or the way we choose to merge rows of GloVe, we have
 evaluated what happens to the system in the absence of each decision. These
 evaluations appear in Table~\ref{eval-variations}. These evaluations were
@@ -895,7 +867,7 @@ be a tradeoff in performance on rare words and common words involved.
 
 We followed up on examining the influence of Wiktionary by building a version of
 the system where it was the {\em only} data we included from ConceptNet. This
-system in fact achieves most of the performance of system {\bf WL1}, with its
+system in fact achieves most of the performance of system {\bf WR1}, with its
 largest drop in performance being on MEN-3000. We conclude that much, but not
 all, of the value of ConceptNet in this system is that it contains a
 high-quality parse of Wiktionary into relational data.
