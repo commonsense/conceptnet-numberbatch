@@ -245,13 +245,13 @@ def retrofit(graph):
 
         graph['filter_vecs'][network] = Dep(
             [
-                GloveVectors(version=version, standardization='standardized', retrofit=network, normalization='l1'),
                 GloveLabels(version=version, standardization='standardized', retrofit=network),
+                GloveVectors(version=version, standardization='standardized', retrofit=network, normalization='l1'),
                 GloveLabels(version=network)
             ],
             [
-                GloveVectors(version=version, standardization='filtered', retrofit=network, normalization='l1'),
                 GloveLabels(version=version, standardization='filtered', retrofit=network),
+                GloveVectors(version=version, standardization='filtered', retrofit=network, normalization='l1'),
                 GloveReplacements(version=version, standardization='filtered', retrofit=network)
             ],
             'filter_vecs'
