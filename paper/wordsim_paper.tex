@@ -12,7 +12,7 @@
 \usepackage{amsmath}
 \usepackage{multirow}
 \usepackage{pgfplots}
-\pgfplotsset{compat=1.8}
+\pgfplotsset{compat=1.9}
 \usepackage{booktabs}
 \usepackage{CJKutf8}
 \usepackage{url}
@@ -114,6 +114,12 @@ of them at once:
     structured semantic knowledge from ConceptNet 5.4
 \end{itemize}
 
+The results provide state-of-the-art performance on word similarity tasks. We
+consider this to show the usefulness of expanding a vector space representation
+by giving it multiple ways to learn a word. ``Wide retrofitting'' could be
+considered an ensemble method for learning a vector space representation
+instead of a classifier.
+
 \section{Background}
 
 \subsection{GloVe}
@@ -121,35 +127,14 @@ of them at once:
 GloVe \cite{pennington2014glove} is an unsupervised learning algorithm that
 learns vector representations of words, such that the dot product of two words'
 vectors is approximately equal to the logarithm of their co-occurrence count.
-The algorithm operates on a global word-word co-occurrence matrix $C$. Let $v$
-denote the size of the vocabulary. It trains $W$ and $\tilde{W}$, both $v
-\times k$ matrices that assign $k$-dimensional vectors to each word and each
-context\footnote{The contexts are also words, but it seems they have to be
-considered mathematically separate. For the purpose of similarity, the
-context vectors can be discarded.} respectively, and $b$ and $\tilde{b}$, both
-$v$-length vectors representing the word and context biases respectively. It
-aims to minimize
-$$
-\sum_{i=1,j=1}^v
-  f \left( C_{ij} \right)
-  \left( w_i^T \tilde{w}_j + b_i + \tilde{b}_j - \log{C_{ij}} \right)^2
-$$
-
-where $f$ acts as a weighting function of the form
-
-$$
-f \left( x \right) =
-  \begin{cases}
-    \left( x / x_{max} \right)^\alpha & \text{if $x < x_{max}$ } \\
-    1 & \text{otherwise}
-  \end{cases}
-$$
-
-The GloVe authors experimentally decided on $k=300$, $x_{max}=100$ and
-$\alpha=0.75$.
+The algorithm operates on a global word-word co-occurrence matrix, and
+solves an optimization problem to learn a vector for each word, a separate
+vector for each context (although the contexts are also words), and a bias
+value for each word and each context. Only the word vectors are used for
+computing similarity.
 
 Learning processes such as GloVe produce results that can conveniently be
-re-used in other projects, simply by re-using the matrix of word embeddings $W$.
+re-used in other projects, simply by re-using the matrix of word embeddings.
 The embeddings that GloVe learns from data sources such as the Common Crawl are
 distributed on the GloVe web
 page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}.
@@ -222,68 +207,25 @@ The operations we apply to text would usually be called ``normalization'',
 but that word also refers to what we'll be doing to our vectors, so both
 here and in the code we call it ``standardization'' instead.
 
-\subsubsection{How ConceptNet is Standardized}
+ConceptNet 5.4 uses a particular sequence of operations to standardize its
+text, and we have reproduced these operations in the code that supports this
+paper.  The operations include tokenizing the text using a Unicode-aware
+regular expression, reducing English words to their root forms using a
+modification of WordNet's Morphy algorithm, removing a very small list of
+stopwords (``a'', ``an'', and ``the''), replacing spaces and slashes with
+underscores, lowercasing the text, and tagging the result with its language.
 
-Here are the standardizations applied to all terms in ConceptNet, as
-implemented in the {\tt conceptnet5.nodes.normalized\_concept\_uri} function
-of ConceptNet 5.4:
-
-\begin{itemize}
-\item The text is tokenized using a regular expression that splits it at
-    characters whose major Unicode category is Z (whitespace), P (punctuation),
-    S (symbols), or C (control characters).
-\item If the text is English, each token is lemmatized using a modification of
-    WordNet's Morphy algorithm, which appears in the {\tt conceptnet5.language.english}
-    module of ConceptNet 5.4's Python code. This converts inflected words such
-    as ``creating'' to their root words that appear in WordNet, such as
-    ``create''.
-    % Because most data sources are not tagged with parts of speech,
-    % it uses heuristics to choose which part of speech to lemmatize the word as,
-    % plus exceptions that allow it to choose more common roots when Morphy would
-    % give multiple options.
-\item If the text is English, a very small list of stopwords (``a'', ``an'',
-    and ``the'') are removed, as well as ``to'' if it is the first word.
-\item Spaces and slashes are replaced by underscores.
-\item The text is lowercased according to the Unicode case-mapping algorithm
-    that is implemented in Python 3.4.
-\item The resulting standardized text is tagged with its language and turned
-    into a URI: the phrase ``giving an example'', for example, becomes
-    {\tt /c/en/give\_example}.
-\end{itemize}
-
- The resulting URIs are not entirely meant for human consumption, and are
-sometimes not grammatically accurate -- the term ``ground zero'' becomes {\tt
-/c/en/grind\_zero}, for example -- but they unify surface texts that may appear
-in slightly different forms in different resources.
-
-\subsubsection{How GloVe is Standardized}
+As an example, in ConceptNet, the text ``give an example'' becomes the standardized form
+{\tt /c/en/give\_example}.
 
 The 42-billion-token version of GloVe, whose results are published in
-\cite{pennington2014glove}, has applied some simple standardizations
-to the text it extracts from Common Crawl:
-
-\begin{itemize}
-\item The text is tokenized with the Stanford parser. Only single tokens are
-    used in GloVe.
-\item The words are lowercased using a Unicode case-conversion
-    algorithm.
-\item Although not all of Common Crawl is in valid UTF-8 or even in a known
-    encoding, only words in valid UTF-8 are written to the file.
-\end{itemize}
-
-When evaluating GloVe, it is important to keep these standardizations in mind
-and also apply them to the word-similarity datasets, such as lowercasing the
-word ``OPEC'' in WordSim-353.
-
-The 840-billion-token dataset is described as not being lowercased, but it is
-also not all in UTF-8. It is possible that the tokens were written to the file
-exactly as they were found in Common Crawl, as bytes of ``encoding salad'', as
-one might expect from scraping arbitrary Web pages. They are still tokenized in
-a way that is reasonable for English.
+\cite{pennington2014glove}, applies some more minimal standardizations that do
+not include stemming. The 840-billion-token version applies almost no
+standardization, and in particular it does not lowercase its words.
 
 \subsubsection{Aligning ConceptNet and GloVe}
 
-ConceptNet's standardization process is stronger than GloVe's, so we align them
+Because ConceptNet's standardization process is stronger than GloVe's, we align them
 by applying the ConceptNet standardizations to the GloVe labels as well, turning
 its tokens into ConceptNet URIs. The GloVe tokens are assumed to be in English.
 
@@ -321,8 +263,8 @@ standardization to all labels, even though it is not necessary in ConceptNet or
 in GloVe. The Spanish translations of word-similarity evaluations
 \cite{hassan2009crosslingual} turn out to be written without any accents on the
 letters, such as ``telefono'' instead of ``tel\'{e}fono''. In order to recognize
-these as the correct words instead of out-of-vocabulary words, we need to re-
-standardize all Spanish terms in ConceptNet to omit all of the accents.
+these as the correct words instead of out-of-vocabulary words, we need to
+re-standardize all Spanish terms in ConceptNet to omit all of the accents.
 
 
 \subsection{Normalization}
@@ -361,12 +303,15 @@ between each pair of words, and $W$ be a $v \times n$
 matrix denoting the original word vectors. If a word does not have a
 corresponding word vector, it is assigned the zero vector. Retrofitting
 generates a $W'$ that minimizes
+
+\begin{small}
 $$
 \Psi \left( W' \right) = \sum_{i=1}^v \left[
   \alpha_i \left\|  w'_i - w_i \right\| ^ 2
   + \sum_{j=1}^v S_{ij} \left\| w'_i - w'_j \right\| ^ 2
 \right]
 $$
+\end{small}
 
 where $\alpha_i$ is a vector of weights. In our tests, we let
 
@@ -434,7 +379,7 @@ fluctuating wildly at each step of retrofitting.
 
 \subsection{ConceptNet as an Association Matrix}
 
-In order to apply the retrofitting method, we need to consider the data in
+In order to apply the wide retrofitting method, we need to consider the data in
 ConceptNet as a sparse, symmetric matrix of associations between terms. What
 ConceptNet provides is more complex than that, as it connects terms with a
 variety of not-necessarily-symmetric, labeled relations.
@@ -502,32 +447,50 @@ Table~\ref{eval-variations} shows the effect of removing this rebalancing.
 
 \section{Evaluation}
 
-\begin{figure}
-\begin{tikzpicture}
-    \begin{axis}[enlargelimits=0.2, xlabel={MEN-3000 (common words)}, ylabel={RW (rare words)}]
-        \addplot[
-          scatter,mark=*,only marks,nodes near coords,
-          point meta=explicit symbolic,
-          visualization depends on={value \thisrow{anchor}\as\myanchor},
-          every node near coord/.append style={anchor=\myanchor}
-        ]
-        table[meta=label] {
-            x      y     label             anchor
-            .777   .514  {Levy SVD}        west
-            .774   .470  {Levy skip-gram}  west
-            .8163  .4767 {GloVe}           west
-            .8400  .5280 {WR0}             west
-            .8599  .5850 {WR1}             west
-            .8597  .5887 {WR2}             south
-        };
-    \end{axis}
-\end{tikzpicture}
+\begin{table*}[t]
+\centering
+\begin{tabular}{lllllrrrrrr}
+\toprule
+Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN      &        WS &      SCWS &    RG-65 &    MC-30 \\
+\midrule
+       &GloVe 42B    & ---   & ---       & ---      &     .348 &     .740 &      .632 &      .440 &     .817 &     .777 \\
+       &GloVe 42B    & ---   & CN5.4     & ---      &     .366 &     .760 &      .646 &      .444 &     .810 &     .762 \\
+\bf G  &GloVe 42B    & $L_2$ & ---       & ---      &     .448 &     .816 &      .759 &      .595 &     .829 &     .836 \\
+       &GloVe 42B    & $L_2$ & CN5.4     & ---      &     .490 &     .815 &      .765 &      .587 &     .779 &     .815 \\
+       &GloVe 42B    & $L_1$ & ---       & ---      &     .457 &     .820 &      .766 &      .606 &     .826 &     .829 \\
+       &GloVe 42B    & $L_1$ & CN5.4     & ---      &     .513 &     .834 &      .794 &      .619 &     .814 &     .828 \\
+\midrule
+       &GloVe 840B   & ---   & ---       & ---      &     .070 &     .728 &      .627 &      .441 &     .648 &     .696 \\
+       &GloVe 840B   & ---   & CN5.4     & ---      &     .434 &     .803 &      .735 &      .552 &     .775 &     .787 \\
+       &GloVe 840B   & $L_2$ & ---       & ---      &     .089 &     .768 &      .664 &      .496 &     .652 &     .666 \\
+       &GloVe 840B   & $L_2$ & CN5.4     & ---      &     .493 &     .811 &      .760 &      .564 &     .717 &     .789 \\
+       &GloVe 840B   & $L_1$ & ---       & ---      &     .091 &     .772 &      .667 &      .500 &     .653 &     .682 \\
+\bf WR0&GloVe 840B   & $L_1$ & CN5.4     & ---      &     .512 &     .840 &      .798 &      .615 &     .774 &     .798 \\
+\midrule
+       &GloVe 840B   & ---   & CN5.4     & PPDB     &     .465 &     .814 &      .716 &      .598 &     .815 &     .815 \\
+       &GloVe 840B   & ---   & CN5.4     & CN5.4    &     .506 &     .830 &      .734 &      .602 &     .842 &     .810 \\
+       &GloVe 840B   & ---   & CN5.4     & Both     &     .507 &     .830 &      .731 &      .604 &     .838 &     .811 \\
+       &GloVe 840B   & $L_2$ & CN5.4     & PPDB     &     .543 &     .829 &      .780 &      .633 &     .788 &     .819 \\
+       &GloVe 840B   & $L_2$ & CN5.4     & CN5.4    &     .564 &     .841 &      .794 &      .631 &     .805 &     .836 \\
+       &GloVe 840B   & $L_2$ & CN5.4     & Both     &     .566 &     .841 &      .794 &      .634 &     .801 &     .829 \\
+       &GloVe 840B   & $L_1$ & CN5.4     & PPDB     &     .560 &     .852 &      .806 & {\bf .674}&     .821 &     .824 \\
+\bf WR1&GloVe 840B   & $L_1$ & CN5.4     & CN5.4    &     .581 &{\bf .860}& {\bf .818}&      .668 &{\bf .852}&{\bf .845}\\
+\bf WR2&GloVe 840B   & $L_1$ & CN5.4     & Both     &{\bf .584}&{\bf .860}&      .817 &      .671 &     .846 &     .842 \\
+\bottomrule
+\end{tabular}
+
 \caption{
-    Systems discussed in this paper, plotted according to their $\rho$
-    correlation with MEN-3000 and RW.
+    Results on the word similarity task, shown as the Spearman rank correlation
+    ($\rho$) between the learned embeddings and various human-annotated corpora.
+    ``Norm'' indicates the norm applied to the columns of GloVe.
+    ``Text std.'' indicates whether labels are left in their original form or
+    standardized according to ConceptNet 5.4. ``Retrofit'' indicates which data
+    is added using wide retrofitting.\\
+    Row {\bf G} matches results from \newcite{pennington2014glove}.
+    {\bf WR1} and {\bf WR2} are the two best configurations of our system.
 }
-\label{compare-graph}
-\end{figure}
+\label{eval-bigtable}
+\end{table*}
 
 \subsection{Word Similarity Datasets}
 
@@ -588,64 +551,18 @@ and test data.
 
 \subsection{Results}
 
-\begin{table*}[t]
-\centering
-\begin{tabular}{lllllrrrrrr}
-\toprule
-Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN-3000 &    WS-353 &      SCWS &    RG-65 &    MC-30 \\
-\midrule
-       &GloVe 42B    & ---   & ---       & ---      &     .348 &     .740 &      .632 &      .440 &     .817 &     .777 \\
-       &GloVe 42B    & ---   & CN5.4     & ---      &     .366 &     .760 &      .646 &      .444 &     .810 &     .762 \\
-\bf G  &GloVe 42B    & $L_2$ & ---       & ---      &     .448 &     .816 &      .759 &      .595 &     .829 &     .836 \\
-       &GloVe 42B    & $L_2$ & CN5.4     & ---      &     .490 &     .815 &      .765 &      .587 &     .779 &     .815 \\
-       &GloVe 42B    & $L_1$ & ---       & ---      &     .457 &     .820 &      .766 &      .606 &     .826 &     .829 \\
-       &GloVe 42B    & $L_1$ & CN5.4     & ---      &     .513 &     .834 &      .794 &      .619 &     .814 &     .828 \\
-\midrule
-       &GloVe 840B   & ---   & ---       & ---      &     .070 &     .728 &      .627 &      .441 &     .648 &     .696 \\
-       &GloVe 840B   & ---   & CN5.4     & ---      &     .434 &     .803 &      .735 &      .552 &     .775 &     .787 \\
-       &GloVe 840B   & $L_2$ & ---       & ---      &     .089 &     .768 &      .664 &      .496 &     .652 &     .666 \\
-       &GloVe 840B   & $L_2$ & CN5.4     & ---      &     .493 &     .811 &      .760 &      .564 &     .717 &     .789 \\
-       &GloVe 840B   & $L_1$ & ---       & ---      &     .091 &     .772 &      .667 &      .500 &     .653 &     .682 \\
-\bf WR0&GloVe 840B   & $L_1$ & CN5.4     & ---      &     .512 &     .840 &      .798 &      .615 &     .774 &     .798 \\
-\midrule
-       &GloVe 840B   & ---   & CN5.4     & PPDB     &     .465 &     .814 &      .716 &      .598 &     .815 &     .815 \\
-       &GloVe 840B   & ---   & CN5.4     & CN5.4    &     .506 &     .830 &      .734 &      .602 &     .842 &     .810 \\
-       &GloVe 840B   & ---   & CN5.4     & Both     &     .507 &     .830 &      .731 &      .604 &     .838 &     .811 \\
-       &GloVe 840B   & $L_2$ & CN5.4     & PPDB     &     .543 &     .829 &      .780 &      .633 &     .788 &     .819 \\
-       &GloVe 840B   & $L_2$ & CN5.4     & CN5.4    &     .564 &     .841 &      .794 &      .631 &     .805 &     .836 \\
-       &GloVe 840B   & $L_2$ & CN5.4     & Both     &     .566 &     .841 &      .794 &      .634 &     .801 &     .829 \\
-       &GloVe 840B   & $L_1$ & CN5.4     & PPDB     &     .560 &     .852 &      .806 & {\bf .674}&     .821 &     .824 \\
-\bf WR1&GloVe 840B   & $L_1$ & CN5.4     & CN5.4    &     .581 &{\bf .860}& {\bf .818}&      .668 &{\bf .852}&{\bf .845}\\
-\bf WR2&GloVe 840B   & $L_1$ & CN5.4     & Both     &{\bf .584}&{\bf .860}&      .817 &      .671 &     .846 &     .842 \\
-\bottomrule
-\end{tabular}
-
-\caption{
-    Results on the word similarity task, shown as the Spearman rank correlation
-    ($\rho$) between the learned embeddings and various human-annotated corpora.
-    ``Norm'' indicates the norm applied to the columns of GloVe.
-    ``Text std.'' indicates whether labels are left in their original form or
-    standardized according to ConceptNet 5.4. ``Retrofit'' indicates which data
-    is added using retrofitting.\\
-    Row {\bf G} matches results from \newcite{pennington2014glove}.
-    {\bf WR1} and {\bf WR2} are the two best configurations of our system.
-}
-\label{eval-bigtable}
-\end{table*}
-
-
-\begin{table*}[t]
+\begin{table}[t]
 \centering
 \begin{tabular}{lllrr}
 \toprule
-Label     & Method   & Reference                      & RW [all] & MEN-3000 \\
+Label     & Method                 & RW [all] &      MEN \\
 \midrule
-          & SVD      & \newcite{levy2015embeddings}   &     .514 &     .777 \\
-          & Skip-gram& \newcite{levy2015embeddings}   &     .470 &     .774 \\
-\bf G     & GloVe    & \newcite{pennington2014glove}  &     .477 &     .816 \\
-\bf WR0   & GloVe    & This paper                     &     .528 &     .840 \\
-\bf WR1   & Retrofitting+ & This paper                &     .585 &{\bf .860}\\
-\bf WR2   & Retrofitting+ & This paper                &{\bf .589}&{\bf .860}\\
+          & SVD (Levy)             &     .514 &     .777 \\
+          & Skip-gram (Levy)       &     .470 &     .774 \\
+\bf G     & GloVe (Pennington)     &     .477 &     .816 \\
+\bf WR0   & GloVe (our revision)   &     .528 &     .840 \\
+\bf WR1   & Wide retrofitting      &     .585 &{\bf .860}\\
+\bf WR2   & Wide retrofitting      &{\bf .589}&{\bf .860}\\
 \bottomrule
 \end{tabular}
 
@@ -655,83 +572,56 @@ Label     & Method   & Reference                      & RW [all] & MEN-3000 \\
     use all of the RW data, not just the 1/3 of it we set aside for testing.
 }
 \label{compare-others}
-\end{table*}
+\end{table}
 
-\begin{table*}[t]
+\begin{table}[t]
 \centering
 \begin{tabular}{llrrrr}
 \toprule
-Label   & Reference                         & WS-353 [es] & MC-30 [es] & RG-65 [de] & RG-65 [fr] \\
+Label   & WS [es] & MC [es] & RG [de] & RG [fr] \\
 \midrule
-\bf R   & \newcite{faruqui2015retrofitting} &         --- &       .591 &       .603 &       .606 \\
-\bf WR1 & This paper                        &    \bf .444 &   \bf .765 &       .673 &       .781 \\
-\bf WR2 & This paper                        &        .441 &       .762 &   \bf .677 &   \bf .788 \\
+\bf R   &         --- &       .591 &       .603 &       .606 \\
+\bf WR1 &    \bf .444 &   \bf .765 &       .673 &       .781 \\
+\bf WR2 &        .441 &       .762 &   \bf .677 &   \bf .788 \\
 \bottomrule
 \end{tabular}
 
 \caption{
     Multilingual evaluation results for Spanish (es), German (de), and French
-    (fr). Row {\bf R} contains the published results of retrofitting
+    (fr), on translations of WS-353, MC-30, and RG-65. Row {\bf R} contains the
+    published results of retrofitting
     Universal WordNet onto skip-gram embeddings learned from Wikipedia
-    \cite{faruqui2015retrofitting}. {\bf WR1} and {\bf WR2} are our system, as
-    also seen in Table~\ref{eval-bigtable}.
+    \cite{faruqui2015retrofitting}. {\bf WR1} and {\bf WR2} are our system.
 }
 \label{eval-multilingual}
-\end{table*}
+\end{table}
 
-\begin{table*}[t]
-\centering
-\begin{tabular}{lrrrrrr}
-\toprule
-Label   & RW [dev] & RW [test] & RW [all] & MEN-3000 [dev] & MEN-3000 [test] & MEN-3000 [all]\\
-\midrule
-\bf G   &    .489  &    .448  &    .477  &    .813  &    .816 &    .814 \\
-\bf WR0 &    .536  &    .512  &    .528  &    .841  &    .840 &    .841 \\
-\bf WR1 &    .587  &    .581  &    .585  &\bf .858  &\bf .860 &    .859 \\
-\bf WR2 &\bf .591  &\bf .584  &\bf .589  &    .857  &\bf .860 &    .858 \\
-\bottomrule
-\end{tabular}
-
+\begin{figure}
+\begin{tikzpicture}[scale=.9]
+    \begin{axis}[enlargelimits=0.2, xlabel={MEN-3000 (common words)}, ylabel={RW (rare words)}]
+        \addplot[
+          scatter,mark=*,only marks,nodes near coords,
+          point meta=explicit symbolic,
+          visualization depends on={value \thisrow{anchor}\as\myanchor},
+          every node near coord/.append style={anchor=\myanchor}
+        ]
+        table[meta=label] {
+            x      y     label             anchor
+            .777   .514  {Levy SVD}        west
+            .774   .470  {Levy skip-gram}  west
+            .8163  .4767 {GloVe}           west
+            .8400  .5280 {WR0}             west
+            .8599  .5850 {WR1}             west
+            .8597  .5887 {WR2}             south
+        };
+    \end{axis}
+\end{tikzpicture}
 \caption{
-    A comparison of evaluation results between the ``dev'' datasets that were
-    used in development, and the held-out ``test'' datasets, for the systems
-    labeled in Table~\ref{eval-bigtable}.
+    Systems discussed in this paper, plotted according to their $\rho$
+    correlation with MEN-3000 and RW.
 }
-\label{eval-dev-test}
-\end{table*}
-
-\begin{table*}[t]
-\centering
-\begin{tabular}{llrrrrrr}
-\toprule
-Mod. type       & Modification & RW [dev] & MEN-3000 [dev] & WS-353 & SCWS &  RG-65 &  MC-30 \\
-\midrule
-{\bf Unmodified}&                     & .587 &      .858 &    .818 &  .668 &   .852 &   .845 \\
-\midrule
-Row-merging     & First row only      & .563 &      .827 &    .787 &  .649 &   .822 &   .794 \\
-Row-merging     & Unweighted avg.     & .526 &      .844 &    .751 &  .586 &   .841 &   .836 \\
-\midrule
-Retrofitting    & No self-loops       & .570 &      .855 &    .790 &  .676 &   .873 &   .853 \\
-\midrule
-Sources         & Don't rebalance     & .584 &      .854 &    .816 &  .668 &   .846 &   .842 \\
-Sources         & Drop JMDict         & .585 &      .858 &    .819 &  .666 &   .851 &   .840 \\
-Sources         & Drop OMCS/GlobalMind& .588 &      .857 &    .816 &  .669 &   .855 &   .848 \\
-Sources         & Drop OpenCyc        & .587 &      .858 &    .819 &  .668 &   .852 &   .845 \\
-Sources         & Drop Verbosity      & .587 &      .853 &    .814 &  .668 &   .852 &   .837 \\
-Sources         & Drop Wiktionary     & .541 &      .865 &    .818 &  .664 &   .867 &   .852 \\
-Sources         & Drop WordNet        & .586 &      .858 &    .817 &  .667 &   .852 &   .845 \\
-Sources         & Wiktionary only     & .585 &      .852 &    .814 &  .665 &   .852 &   .840 \\
-\bottomrule
-\end{tabular}
-\caption{
-    The effects of various modifications to the embeddings of system {\bf WR1},
-    including changing the way that embeddings are merged after
-    standardization, and dropping various knowledge sources from ConceptNet.
-    RW and MEN-3000 were evaluated using their development sets here,
-    not the held-out test data.
-}
-\label{eval-variations}
-\end{table*}
+\label{compare-graph}
+\end{figure}
 
 
 We have labeled some of the rows of Table~\ref{eval-bigtable} as particular systems
@@ -768,6 +658,50 @@ currently well-represented in ConceptNet, and their preliminary evaluation
 results were quite poor.
 
 \subsection{Comparisons to Other Published Results}
+
+\begin{table*}[t]
+\centering
+\begin{tabular}{lrrrrrr}
+\toprule
+Label   & RW [dev] & RW [test] & RW [all] & MEN [dev] & MEN [test] & MEN [all]\\
+\midrule
+\bf G   &    .489  &    .448  &    .477  &    .813  &    .816 &    .814 \\
+\bf WR0 &    .536  &    .512  &    .528  &    .841  &    .840 &    .841 \\
+\bf WR1 &    .587  &    .581  &    .585  &\bf .858  &\bf .860 &\bf .859 \\
+\bf WR2 &\bf .591  &\bf .584  &\bf .589  &    .857  &\bf .860 &    .858 \\
+\bottomrule
+\end{tabular}
+
+\caption{
+    A comparison of evaluation results between the ``dev'' datasets that were
+    used in development, and the held-out ``test'' datasets, for the systems
+    labeled in Table~\ref{eval-bigtable}.
+}
+\label{eval-dev-test}
+\end{table*}
+
+\begin{table*}[t]
+\centering
+\begin{tabular}{llrrrrrr}
+\toprule
+Mod. type       & Modification & RW [dev] & MEN [dev] & WS-353 & SCWS &  RG-65 &  MC-30 \\
+\midrule
+{\bf Unmodified}&                     & \bf .587 & \bf .858 & \bf .818 &  .668 &   .852 &   .845 \\
+Row-merging     & First row only      & .563 &      .827 &    .787 &  .649 &   .822 &   .794 \\
+Row-merging     & Unweighted avg.     & .526 &      .844 &    .751 &  .586 &   .841 &   .836 \\
+Retrofitting    & No self-loops       & .570 &      .855 &    .790 & \bf .676 & \bf .873 & \bf .853 \\
+Sources         & Don't rebalance     & .584 &      .854 &    .816 &  .668 &   .846 &   .842 \\
+\bottomrule
+\end{tabular}
+\caption{
+    The effects of various modifications to the embeddings of system {\bf WR1},
+    including changing the way that embeddings are merged after
+    standardization, and dropping various knowledge sources from ConceptNet.
+    RW and MEN-3000 were evaluated using their development sets here,
+    not the held-out test data.
+}
+\label{eval-variations}
+\end{table*}
 
 In Table~\ref{compare-others}, we compare our results on the RW and MEN-3000
 datasets to the best published results that we know of.
@@ -816,19 +750,6 @@ evaluations appear in Table~\ref{eval-variations}. These evaluations were
 part of how we decided on the best configuration of the system, so they were
 run on the development sets of RW and MEN-3000, not the held-out test sets.
 
-Along the same lines, we were interested in finding out which parts of
-ConceptNet were most important to the results, given that ConceptNet comes from
-a variety of data sources. We experimented with dropping various pieces of
-ConceptNet from the data, by filtering out associations that were credited to
-particular data sources. (Some associations come from multiple data sources.
-When creating the file of ConceptNet associations that we used as input to the
-system, we arbitrarily credited these to whichever source appeared first in
-ConceptNet's assertion list.)
-
-% NOTE: Avril rightly points out that we could go back and find out how much
-% weight came from each source. This would, unfortunately, involve some
-% time-consuming lookups.
-
 In Table~\ref{eval-variations}, we can see that the choice of how to merge rows
 of GloVe that get the same standardized label makes a large difference.  Recall
 that the method we ultimately used was to assign each row a pseudo-frequency
@@ -845,32 +766,23 @@ evaluation that is most likely to involve words that were poorly represented or
 unrepresented in GloVe. On the other hand, the lack of self-loops seems to {\em
 increase} its score on SCWS, and on the smaller evaluations RG-65 and MC-30.
 
-\subsection{Comparing Data Sources in ConceptNet}
-
 Rebalancing the weights of the data sources within ConceptNet seems to have
 been a mild improvement. The ``Don't rebalance'' row of Table~\ref{eval-variations}
 confirms what we saw when we introduced rebalancing,
 as leaving the weights unbalanced decreases the scores slightly.
 
-When we separate ConceptNet into six datasets and drop each one in turn, the
-effects on the evaluation results are mostly quite small. There is no single
-dataset that acts as the ``keystone'' without which the system falls apart,
-but one dataset --- Wiktionary --- unsurprisingly has a larger effect than the
-others, because it is responsible for most of the assertions. Of the 5,631,250
-filtered assertions that come from ConceptNet, 4,244,410 of them are credited
-to Wiktionary.
+In separate experimentation, we found that when we separate ConceptNet into its
+component datasets and drop each one in turn, the effects on the evaluation
+results are mostly quite small. There is no single dataset that acts as the
+``keystone'' without which the system falls apart, but one dataset ---
+Wiktionary --- unsurprisingly has a larger effect than the others, because it
+is responsible for most of the assertions. Of the 5,631,250 filtered assertions
+that come from ConceptNet, 4,244,410 of them are credited to Wiktionary.
 
 Without Wiktionary, the score on RW drops from .587 to .541. However, at the
 same time, the MEN-3000 score {\em increases} from .858 to .865. The system
 continues to do what it is designed to do without Wiktionary, but there seems to
 be a tradeoff in performance on rare words and common words involved.
-
-We followed up on examining the influence of Wiktionary by building a version of
-the system where it was the {\em only} data we included from ConceptNet. This
-system in fact achieves most of the performance of system {\bf WR1}, with its
-largest drop in performance being on MEN-3000. We conclude that much, but not
-all, of the value of ConceptNet in this system is that it contains a
-high-quality parse of Wiktionary into relational data.
 
 \subsection{The Limits of Similarity Judgments}
 
@@ -921,7 +833,7 @@ represented only by links in ConceptNet, but we could have a better starting
 point if multilingual terms were represented in the GloVe vectors in the first
 place. It could be useful to re-run GloVe in a way that distinguishes languages,
 using the metadata on Web pages when available and language-detection heuristics
-otherwise. Perhaps we could resolve the encoding glitches at the same time.
+otherwise.
 
 We believe that the variety of data sources represented in ConceptNet helped to
 improve evaluation scores by expanding the domain of the system's knowledge.
