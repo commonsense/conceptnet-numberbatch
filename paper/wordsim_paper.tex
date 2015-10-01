@@ -553,12 +553,13 @@ and test data.
 
 \begin{table}[t]
 \centering
-\begin{tabular}{lllrr}
+\begin{tabular}{llrr}
 \toprule
 Label     & Method                 & RW [all] &      MEN \\
 \midrule
-          & SVD (Levy)             &     .514 &     .777 \\
           & Skip-gram (Levy)       &     .470 &     .774 \\
+          & SVD (Levy)             &     .514 &     .777 \\
+          & Retrofitting (Faruqui) &      --- &     .796 \\
 \bf G     & GloVe (Pennington)     &     .477 &     .816 \\
 \bf WR0   & GloVe (our revision)   &     .528 &     .840 \\
 \bf WR1   & Wide retrofitting      &     .585 &{\bf .860}\\
@@ -576,7 +577,7 @@ Label     & Method                 & RW [all] &      MEN \\
 
 \begin{table}[t]
 \centering
-\begin{tabular}{llrrrr}
+\begin{tabular}{lrrrr}
 \toprule
 Label   & WS [es] & MC [es] & RG [de] & RG [fr] \\
 \midrule
@@ -707,7 +708,8 @@ datasets to the best published results that we know of.
 that scores $\rho = .514$ on the RW evaluation, as well as an implementation
 of skip-grams with negative sampling (SGNS), originally introduced by
 \newcite{mikolov2013word2vec}. We also compare to the original results from
-GloVe's 42-billion-token dataset.
+GloVe's 42-billion-token dataset, and the best MEN-3000 result from
+\newcite{faruqui2015retrofitting}.
 
 In relative terms, the performance of our system {\bf WR2} outperforms the best
 published RW score (Levy's SVD) by 14.6\%, or 13.6\% if we use our score on only
