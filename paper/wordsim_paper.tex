@@ -204,8 +204,8 @@ resources with a method such as retrofitting if their string representations
 are comparable to each other.
 
 The operations we apply to text would usually be called ``normalization'',
-but that word also refers to what we'll be doing to our vectors, so both
-here and in the code we call it ``standardization'' instead.
+but that word also refers to the scaling operations we will be applying to
+vectors, so both here and in the code we call it ``standardization'' instead.
 
 ConceptNet 5.4 uses a particular sequence of operations to standardize its
 text, and we have reproduced these operations in the code that supports this
@@ -230,8 +230,8 @@ by applying the ConceptNet standardizations to the GloVe labels as well, turning
 its tokens into ConceptNet URIs. The GloVe tokens are assumed to be in English.
 
 This has the effect that many separate rows of the GloVe matrix get the same
-label, such as when the same word appears with a different capitalization. A
-few options for dealing with these merged labels come to mind:
+label, such as when the same word appears with a different capitalization.
+We considered a few options for dealing with these merged labels:
 
 \begin{enumerate}
 \item Keep only the row with the highest frequency in GloVe.
@@ -261,7 +261,7 @@ the analogies would become trivial analogies of the form
 Due to a quirk in some of the evaluation data, we must apply one more
 standardization to all labels, even though it is not necessary in ConceptNet or
 in GloVe. The Spanish translations of word-similarity evaluations
-\cite{hassan2009crosslingual} turn out to be written without any accents on the
+\cite{hassan2009crosslingual} are written without any accents on the
 letters, such as ``telefono'' instead of ``tel\'{e}fono''. In order to recognize
 these as the correct words instead of out-of-vocabulary words, we need to
 re-standardize all Spanish terms in ConceptNet to omit all of the accents.
@@ -682,21 +682,19 @@ Label   & RW [dev] & RW [test] & RW [all] & MEN [dev] & MEN [test] & MEN [all]\\
 
 \begin{table*}[t]
 \centering
-\begin{tabular}{llrrrrrr}
+\begin{tabular}{lrrrrrr}
 \toprule
-Mod. type       & Modification & RW [dev] & MEN [dev] & WS-353 & SCWS &  RG-65 &  MC-30 \\
+Modification & RW [dev] & MEN [dev] & WS-353 & SCWS &  RG-65 &  MC-30 \\
 \midrule
-{\bf Unmodified}&                     & \bf .587 & \bf .858 & \bf .818 &  .668 &   .852 &   .845 \\
-Row-merging     & First row only      & .563 &      .827 &    .787 &  .649 &   .822 &   .794 \\
-Row-merging     & Unweighted avg.     & .526 &      .844 &    .751 &  .586 &   .841 &   .836 \\
-Retrofitting    & No self-loops       & .570 &      .855 &    .790 & \bf .676 & \bf .873 & \bf .853 \\
-Sources         & Don't rebalance     & .584 &      .854 &    .816 &  .668 &   .846 &   .842 \\
+{\bf Unmodified}                     & \bf .587 & \bf .858 & \bf .818 &  .668 &   .852 &   .845 \\
+Use first row instead of row-merging & .563 &      .827 &    .787 &  .649 &   .822 &   .794 \\
+Unweighted row-merging               & .526 &      .844 &    .751 &  .586 &   .841 &   .836 \\
+No self-loops in retrofitting        & .570 &      .855 &    .790 & \bf .676 & \bf .873 & \bf .853 \\
+Don't rebalance ConceptNet sources   & .584 &      .854 &    .816 &  .668 &   .846 &   .842 \\
 \bottomrule
 \end{tabular}
 \caption{
-    The effects of various modifications to the embeddings of system {\bf WR1},
-    including changing the way that embeddings are merged after
-    standardization, and dropping various knowledge sources from ConceptNet.
+    The effects of various modifications to the embeddings of system {\bf WR1}.
     RW and MEN-3000 were evaluated using their development sets here,
     not the held-out test data.
 }
