@@ -22,8 +22,32 @@ def save_csr(matrix, filename):
 
 
 def load_csr(filename):
-    matrix = np.load(filename)
-    return sparse.csr_matrix((matrix['data'], matrix['indices'], matrix['indptr']), shape=matrix['shape'])
+    with np.load(filename) as npz:
+        mat = sparse.csr_matrix((npz['data'], npz['indices'], npz['indptr']), shape=npz['shape'])
+    return mat
+
+
+def save_sparse_relations(relation_dict, filename):
+    dense_dict = {}
+    for rel, spmat in relation_dict.items():
+        dense_dict[rel + ':data'] = spmat.data
+        dense_dict[rel + ':indices'] = spmat.indices
+        dense_dict[rel + ':indptr'] = spmat.indptr
+        dense_dict[rel + ':shape'] = spmat.shape
+    np.savez(filename, **dense_dict)
+
+
+def load_sparse_relations(filename):
+    sparse_rels = {}
+    with np.load(filename) as npz:
+        rels = [key[:-5] for key in npz if key.endswith(':data')]
+        for rel in rels:
+            spmat = sparse.csr_matrix(
+                (npz[rel + ':data'], npz[rel + ':indices'], npz[rel + ':indptr']),
+                npz[rel + ':shape']
+            )
+            sparse_rels[rel] = spmat
+    return sparse_rels
 
 
 def load_labels(filename, encoding='utf-8'):
