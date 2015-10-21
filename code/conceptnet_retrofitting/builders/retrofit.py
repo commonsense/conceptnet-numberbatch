@@ -45,8 +45,10 @@ def dense_relation_from_sparse(spmat, dmat):
 def dense_relation_array(word_vecs, sparse_relations):
     dmats = []
     rels = sorted(sparse_relations)
+    k = word_vecs.shape[1]
     dmats = [
-        dense_relation_from_sparse(sparse_relations[rel], word_vecs)
+        np.eye(k) if rel == '/r/RelatedTo'
+        else dense_relation_from_sparse(sparse_relations[rel], word_vecs)
         for rel in rels
     ]
     return np.stack(dmats, axis=0)
