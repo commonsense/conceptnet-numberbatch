@@ -107,10 +107,6 @@ def build_relations_from_conceptnet(labels, filename):
 
         '/r/Antonym': ('/r/Antonym', RelType.symmetric),
 
-        '/r/DerivedFrom': ('/r/DerivedFrom', RelType.forward),
-        '/r/EtymologicallyDerivedFrom': ('/r/DerivedFrom', RelType.forward),
-        '/r/CompoundDerivedFrom': ('/r/DerivedFrom', RelType.forward),
-
         '/r/PartOf': ('/r/PartOf', RelType.forward),
         '/r/HasA': ('/r/PartOf', RelType.backward),
         '/r/MadeOf': ('/r/PartOf', RelType.backward),
