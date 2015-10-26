@@ -44,8 +44,10 @@ def load_sparse_relations(filename):
         for rel in rels:
             spmat = sparse.csr_matrix(
                 (npz[rel + ':data'], npz[rel + ':indices'], npz[rel + ':indptr']),
-                npz[rel + ':shape']
+                npz[rel + ':shape'], dtype='f'
             )
+            if not rel.startswith('/'):
+                rel = '/' + rel
             sparse_rels[rel] = spmat
     return sparse_rels
 

@@ -66,7 +66,7 @@ def build_separate_relations(labels, filename, relation_map, verbose=True):
     """
     dataset_totals = defaultdict(float)
     dataset_counts = defaultdict(int)
-    matrix_builders = {}
+    matrix_builders = defaultdict(SparseMatrixBuilder)
 
     with open(filename, encoding='utf-8') as infile:
         for line in infile:
@@ -82,8 +82,6 @@ def build_separate_relations(labels, filename, relation_map, verbose=True):
             concept1, concept2, value_str, dataset, relation = line.strip().split('\t')
             if relation in relation_map:
                 rel_target, rel_type = relation_map[relation]
-                if rel_target not in matrix_builders:
-                    matrix_builders[rel_target] = SparseMatrixBuilder()
                 index1 = labels.add(standardize(trim_negation(concept1)))
                 index2 = labels.add(standardize(trim_negation(concept2)))
                 dataset_label = coarse_dataset(dataset)
@@ -91,8 +89,12 @@ def build_separate_relations(labels, filename, relation_map, verbose=True):
 
                 if rel_type == RelType.forward or rel_type == RelType.symmetric:
                     matrix_builders[rel_target][index1, index2] = value
+                    if rel_type == RelType.forward:
+                        matrix_builders[rel_target + '/back'][index2, index1] = value
                 if rel_type == RelType.backward or rel_type == RelType.symmetric:
                     matrix_builders[rel_target][index2, index1] = value
+                    if rel_type == RelType.backward:
+                        matrix_builders[rel_target + '/back'][index1, index2] = value
 
     return {label: mat.tocsr(shape=(len(labels), len(labels)))
             for (label, mat) in matrix_builders.items()}
@@ -120,7 +122,7 @@ def build_relations_from_conceptnet(labels, filename):
         '/r/UsedFor': ('/r/UsedFor', RelType.forward),
         '/r/HasProperty': ('/r/HasProperty', RelType.forward),
         '/r/Causes': ('/r/Causes', RelType.forward),
-        '/r/CausesDesire': ('/r/CausesDesire', RelType.forward),
+        '/r/CausesDesire': ('/r/Causes', RelType.forward),
     }
     return build_separate_relations(labels, filename, relations)
 
