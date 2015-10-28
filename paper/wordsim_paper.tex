@@ -755,10 +755,10 @@ run on the development sets of RW and MEN-3000, not the held-out test sets.
 In Table~\ref{eval-variations}, we can see that the choice of how to merge rows
 of GloVe that get the same standardized label makes a large difference.  Recall
 that the method we ultimately used was to assign each row a pseudo-frequency
-based on Zipf's law, and taking a weighted average based on those frequencies.
-The results drop noticeably when we try the other proposed methods, which are
-taking only the first (most frequent) row that appears, or taking the
-unweighted average of the rows.
+based on Zipf's law, and then take a weighted average based on those
+frequencies.  The results drop noticeably when we try the other proposed
+methods, which are taking only the first (most frequent) row that appears, or
+taking the unweighted average of the rows.
 
 In the retrofitting procedure, we made the decision to add ``self-loops'' that
 connect each term to itself, hypothesizing that this would help stabilize the
@@ -812,7 +812,7 @@ We postulate instead that similarity evaluations become easier to match
 computationally when averaged over the judgments of many people. Notice, for
 example, that the two MEN-3000 authors who provided their own ratings
 agreed more with the average of the crowd than they did with each other.
-If more people's judgments had been averaged in with the authors, perhaps the
+If more people's judgments had been averaged in with the authors', perhaps the
 correlation would have been even higher. We suspect that, while these results
 may be approaching it, the true upper bound of the MEN evaluation is higher than
 claimed.
