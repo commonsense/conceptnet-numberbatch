@@ -1,5 +1,6 @@
 from conceptnet_retrofitting import loaders
 from conceptnet_retrofitting.word_vectors import WordVectors
+from conceptnet_retrofitting.builders.retrofit import dense_relation_array
 from conceptnet_retrofitting.builders.label_set import LabelSet
 from conceptnet_retrofitting.builders.build_assoc import build_relations_from_conceptnet
 import numpy as np
@@ -144,7 +145,7 @@ def eval_analogies(analogy_func, filename='/nfs/broadway/data/corpora/readtheory
 
 
 def make_dense_relation_array(wv, sparse_rels, endrow=100000):
-    rel_array = loaders.dense_relation_array(
+    rel_array = dense_relation_array(
         wv.vectors[:endrow],
         {rel: sp[:endrow, :endrow] for (rel, sp) in sparse_rels.items()}
     )
