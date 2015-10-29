@@ -79,7 +79,7 @@ def eval_analogy_modified_3cosmul(wv, c1, c2, c3, c4, power=2):
     return sim2 * (sim3 ** power) / sim1
 
 
-def analogy(wv, rel_array, c1, c2, c3, num=20, power=2, verbose=True):
+def analogy(wv, rel_array, c1, c2, c3, num=20, power=2):
     """
     Rank term by how well they fit an analogy, as in `eval_analogy`.
     The best `num` terms and their scores will be returned.
@@ -89,13 +89,6 @@ def analogy(wv, rel_array, c1, c2, c3, num=20, power=2, verbose=True):
     """
     relA = which_relation(wv, rel_array, c1, c2)
     relB = which_relation(wv, rel_array, c1, c3)
-    if verbose:
-        print("RelA")
-        for label, strength in zip(rel_labels + rel_labels, relA):
-            print('\t%-20s\t% 7.1f' % (label, strength * 1000))
-        print("RelB")
-        for label, strength in zip(rel_labels + rel_labels, relB):
-            print('\t%-20s\t% 7.1f' % (label, strength * 1000))
     relAr = rank3_inner_product(relA, rel_array)
     relBr = rank3_inner_product(relB, rel_array)
     v1, v2, v3 = [wv.to_vector(c) for c in (c1, c2, c3)]
@@ -166,7 +159,7 @@ def main(labels_in, vecs_in, replacements_in, sparse_relations_in, analogy_file,
         rel_array = make_dense_relation_array(wv, sparse_rels)
     else:
         rel_array = sparse_rels = None
-    
+
     def analogy_func(c1, c2, c3, c4):
         if sparse_rels is None:
             return eval_analogy_modified_3cosmul(wv, c1, c2, c3, c4)
