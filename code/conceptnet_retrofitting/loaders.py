@@ -83,7 +83,7 @@ def load_word_vectors(labels_in, vecs_in, replacements_in=None, memmap=True):
     if labels[0].startswith('/c/'):
         wv = WordVectors(labels, vecs)
     else:
-        wv = WordVectors(labels, vecs, str.lower)
+        wv = WordVectors(labels, vecs, standardizer=str.lower)
 
     if replacements_in:
         wv.replacements = load_replacements(replacements_in)

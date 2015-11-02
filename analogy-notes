@@ -1,0 +1,48 @@
+## General observations
+
+modified 3cosmul is better than 3cosmul
+Retrofitted CN+GloVe is better than GloVe
+Inferred relations are better than mere similarity
+Retrofitting with inferred relations doesn't seem to help yet
+
+## Errors on grade-school analogies (readtheory.com)
+
+3cosmul (GloVe):
+dirt : brown :: leaves : GRAY (should be GREEN)
+shoes : feet :: helmet : ARMS (should be HEAD)
+poor : money :: sad : FEELINGS (should be HAPPINESS)
+now : later :: easy : SIMPLE (should be DIFFICULT)
+lettuce : green :: strawberry : ORANGE (should be RED)
+fire : hot :: snow : WARM (should be FROZEN)
+spend : save :: give : ASK (should be RECEIVE)
+race : competition :: party : DANCE (should be CELEBRATION)
+octagon : eight :: triangle : FOUR (should be THREE)
+Score: 90.22% (83/92)
+
+inferred relations (CN + GloVe):
+shoes : feet :: helmet : ARMS (should be HEAD)
+lettuce : green :: strawberry : ORANGE (should be RED)
+fire : hot :: snow : WARM (should be FROZEN) [sometimes it gets this one?]
+Score: 96.74% (89/92)
+
+## Mikolov's analogy dataset
+
+These are the analogy types in questions-words.txt and questions-phrases.txt,
+and whether CN + GloVe inferred relations can handle them:
+
+[X] Countries and their capitals
+[ ] Countries and their currencies
+[ ] Countries and their airlines*
+[X] Countries and their demonyms
+[X] Swapping the gender of gendered words
+[ ] Cities and their newspapers*
+[ ] Cities and their sports teams*
+[ ] Companies and their CEOs*
+[.] Antonyms formed using prefixes
+[ ] Morphological analogies (plurals, conjugations, comparatives...)
+
+Note that the ones marked with asterisks can't be handled by GloVe or word2vec
+unless you pre-process the data to glue together multi-word named entities using
+underscores. For example, 'Baltimore Sun' is two words, so you need to learn it
+as 'Baltimore_Sun' to be able to use it in an analogy. These systems don't do
+analogies among arbitrary phrases.

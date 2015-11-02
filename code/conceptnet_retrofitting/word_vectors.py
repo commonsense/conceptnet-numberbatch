@@ -27,6 +27,14 @@ class WordVectors:
         self._standardizer = standardizer
         self._mean_vec = np.mean(self.vectors, axis=0)
 
+    def truncate(self, size):
+        return WordVectors(
+            list(self.labels)[:size],
+            self.vectors[:size],
+            self.replacements,
+            self._standardizer
+        )
+
     def similarity(self, word1, word2, lang=None):
         try:
             return self.to_vector(word1, lang).dot(self.to_vector(word2, lang))
@@ -103,7 +111,7 @@ class WordVectors:
         ratings = weighted_3cosmul(rv1, rv2, rv3, vector_choices)
         return ratings
 
-    def rank_analogies(self, rel_array, c1, c2, c3, only=None):
+    def rank_analogies(self, rel_array, c1, c2, c3, only=None, num=20):
         ratings = self.analogy_values(rel_array, c1, c2, c3, self.vectors)
         indices = np.argsort(ratings)[::-1]
 
