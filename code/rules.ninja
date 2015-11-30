@@ -16,10 +16,10 @@ pool memory_hogs
   depth = 1
 
 rule glove_to_labels
-  command = cut -d" " -f1 $in >$out
+  command = LANG=C cut -d" " -f1 $in >$out
 
 rule glove_to_vecs
-  command = cut -d" " -f2- $in | python -m conceptnet_retrofitting.builders.build_vecs $out
+  command = LANG=C cut -d" " -f2- $in | python -m conceptnet_retrofitting.builders.build_vecs $out
   pool = memory_hogs
 
 rule assoc_to_labels
