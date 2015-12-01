@@ -5,29 +5,24 @@
 \def\scoreRW{.584}
 \def\scoreMEN{.860}
 
-\documentclass[11pt]{article}
-\usepackage{acl2012}
+\documentclass[11pt,letterpaper]{article}
+% Packages required by the paper format
+\usepackage{naaclhlt2016}
 \usepackage{times}
 \usepackage{latexsym}
 \usepackage{amsmath}
-\usepackage{multirow}
+\usepackage{booktabs}
+
+%\naaclfinalcopy % Uncomment this line for the final submission
+\def\naaclpaperid{***} %  Enter the naacl Paper ID here
+
+% Packages we need
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.9}
-\usepackage{booktabs}
 \usepackage{CJKutf8}
 \usepackage{url}
-\setlength{\pdfpagewidth}{8.5in}
-\setlength{\pdfpageheight}{11in}
-\pdfinfo{
-/Title \thetitle
-/Author Rob Speer, Joshua Chin, and Catherine Havasi}
 %\setcounter{secnumdepth}{0}
-\bibliographystyle{acl2012}
-
-\usepackage{draftwatermark}
-\SetWatermarkText{\shortstack{Unpublished draft \\ Do not distribute}}
-\SetWatermarkScale{0.65}
-\SetWatermarkLightness{0.9}
+\bibliographystyle{naaclhlt2016}
 
 \title{\thetitle}
 \author{Robert Speer\\
@@ -43,7 +38,10 @@
     \texttt{joshuarchin@gmail.com}
 }
 
+\date{}
+
 \begin{document}
+
 \maketitle
 \begin{abstract}
 
@@ -487,8 +485,8 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN      &     
     ``Norm'' indicates the norm applied to the columns of GloVe.
     ``Text std.'' indicates whether labels are left in their original form or
     standardized according to ConceptNet 5.4. ``Retrofit'' indicates which data
-    is added using wide retrofitting.\\
-    Row {\bf G} matches results from \newcite{pennington2014glove}.
+    is added using wide retrofitting.
+    Row {\bf G} reproduces the published GloVe results.
     {\bf WR1} and {\bf WR2} are the two best configurations of our system.
 }
 \label{eval-bigtable}
@@ -593,8 +591,8 @@ Label   & WS [es] & MC [es] & RG [de] & RG [fr] \\
     Multilingual evaluation results for Spanish (es), German (de), and French
     (fr), on translations of WS-353, MC-30, and RG-65. Row {\bf R} contains the
     published results of retrofitting
-    Universal WordNet onto skip-gram embeddings learned from Wikipedia
-    \cite{faruqui2015retrofitting}. {\bf WR1} and {\bf WR2} are our system.
+    Universal WordNet onto skip-gram embeddings learned from Wikipedia.
+    {\bf WR1} and {\bf WR2} are our system.
 }
 \label{eval-multilingual}
 \end{table}
@@ -855,6 +853,8 @@ this revision as [{\em TBD}], as we intend to continue to revise and improve the
 code afterward. The data files are available at [{\em TBD}], and the README file
 in the repository explains how to use {\tt git-annex} to connect the code
 with a version-controlled snapshot of the data.
+
+\section*{Acknowledgements}
 
 \begin{CJK*}{UTF8}{min}
 \bibliography{wordsim_paper}
