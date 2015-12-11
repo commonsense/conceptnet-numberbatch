@@ -1,1 +1,1 @@
-7f248e76-6891-41ef-ae76-fe341eed9fe7 bucket=public-annex chunk=100MiB datacenter=US encryption=none host=s3.amazonaws.com name=public-s3 port=80 public=yes storageclass=STANDARD type=S3 timestamp=1449868421.580342s
+7f248e76-6891-41ef-ae76-fe341eed9fe7 bucket=public-annex chunk=100MiB datacenter=US encryption=none host=s3.amazonaws.com name=public-s3 port=80 public=yes storageclass=STANDARD type=S3 timestamp=1449871301.128608s
