@@ -1,2 +1,2 @@
 7f248e76-6891-41ef-ae76-fe341eed9fe7 bucket=public-annex chunk=10MiB datacenter=US encryption=none host=s3.amazonaws.com name=public-s3 port=80 public=yes storageclass=STANDARD type=S3 timestamp=1449871315.499026s
-a9c772c1-960d-4089-9b58-5d78f5d5ecd6 bucket=conceptnet-retrofitting chunk=100MiB datacenter=US encryption=none host=s3.amazonaws.com name=s3-open-data port=80 public=yes storageclass=STANDARD type=S3 timestamp=1449871448.069684s
+a9c772c1-960d-4089-9b58-5d78f5d5ecd6 bucket=conceptnet-retrofitting chunk=1MiB datacenter=US encryption=none host=s3.amazonaws.com name=s3-open-data port=80 public=yes storageclass=STANDARD type=S3 timestamp=1449874133.556643s
