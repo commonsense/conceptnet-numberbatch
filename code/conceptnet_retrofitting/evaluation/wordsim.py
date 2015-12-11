@@ -72,7 +72,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('labels')
     parser.add_argument('vectors')
-    parser.add_argument('-r', '--replacements', default=None)
+    parser.add_argument('replacements', default=None, nargs='?')
     args = parser.parse_args()
     main(args.labels, args.vectors, args.replacements)
 

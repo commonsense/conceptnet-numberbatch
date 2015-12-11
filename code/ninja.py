@@ -21,6 +21,7 @@ CONFIG = {
                        #'conceptnet5-wiktionary-only',
                        'ppdb-xl-lexical-standardized', 'cnet-ppdb-combined']
 }
+CONCEPTNET_SOURCE_FILE = 'conceptnet5.5.csv'
 
 
 class GloveVectors:
@@ -152,7 +153,7 @@ def standardize_ppdb(graph):
 
     graph['combine_cnet_ppdb'] = Dep(
         [
-            CONFIG['source-data-path'] + 'conceptnet5.csv',
+            CONFIG['source-data-path'] + CONCEPTNET_SOURCE_FILE,
             CONFIG['build-data-path'] + 'ppdb-xl-lexical-standardized.csv'
         ],
         CONFIG['build-data-path'] + 'cnet-ppdb-combined.csv',
@@ -196,7 +197,7 @@ def filter_conceptnet(graph):
     for dataset in CONFIG['pos-filters']:
         filter_expr = regex_for_dataset(dataset)
         graph['filter_assoc']['pos'][dataset] = Dep(
-            CONFIG['source-data-path'] + 'conceptnet5.csv',
+            CONFIG['source-data-path'] + CONCEPTNET_SOURCE_FILE,
             CONFIG['build-data-path'] + 'conceptnet5-%s-only.csv' % dataset,
             'filter_assoc_pos', params={'filter': filter_expr}
         )
@@ -204,7 +205,7 @@ def filter_conceptnet(graph):
     for dataset in CONFIG['neg-filters']:
         filter_expr = regex_for_dataset(dataset)
         graph['filter_assoc']['neg'][dataset] = Dep(
-            CONFIG['source-data-path'] + 'conceptnet5.csv',
+            CONFIG['source-data-path'] + CONCEPTNET_SOURCE_FILE,
             CONFIG['build-data-path'] + 'conceptnet5-minus-%s.csv' % dataset,
             'filter_assoc_neg', params={'filter': filter_expr}
         )
@@ -238,7 +239,7 @@ def retrofit(graph):
 
     for network in ['conceptnet5']:
         graph['assoc_to_labels'][network] = Dep(
-            CONFIG['source-data-path'] + 'conceptnet5.csv',
+            CONFIG['source-data-path'] + CONCEPTNET_SOURCE_FILE,
             GloveLabels(version=network),
             'assoc_to_labels'
         )
@@ -260,6 +261,7 @@ def retrofit(graph):
 
 def test(graph):
     vector_files = defaultdict(list)
+
     for file in outputs(graph):
         if not isinstance(file, GloveVectors):
             continue
@@ -271,8 +273,12 @@ def test(graph):
             out = copy.copy(file)
             out.filetype = 'evaluation'
 
+            # this is a hack
+            inputs = [label, file]
+            if str(label) == CONFIG['build-data-path'] + 'glove.840B.300d.filtered.conceptnet5.labels':
+                inputs.append(CONFIG['build-data-path'] + 'glove.840B.300d.filtered.conceptnet5.replacements.msgpack')
             graph['test']['test_%s' % file] = Dep(
-                [label, file], out, 'test'
+                inputs, out, 'test'
             )
 
 

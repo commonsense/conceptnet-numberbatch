@@ -33,14 +33,21 @@ def make_replacements(wv, labels_to_select, startrow, nrows, select_beyond_row, 
         item = wv.labels[rownum]
         if rownum <= select_beyond_row or item in labels_to_select:
             if filter is None or filter(item):
+                print(rownum, end='\t')
                 neighbor, weight = get_more_common_neighbor(item, wv, wv2)
                 replacements[item] = [neighbor, weight]
     wv2.replacements = replacements
     return wv2
 
 
-def english_filter(label):
-    return label.startswith('/c/en/') and not label.endswith('/neg')
+def picky_english_filter(label):
+    if not label.startswith('/c/en/'):
+        return False
+    if label.endswith('/neg'):
+        return False
+    content = label[6:]
+    eng_letters = [char for char in content if 'a' <= char <= 'z']
+    return len(eng_letters) * 2 > len(content)
 
 
 def main(labels_in, vecs_in, selected_labels_in, labels_out, vecs_out, replacements_out):
@@ -51,7 +58,7 @@ def main(labels_in, vecs_in, selected_labels_in, labels_out, vecs_out, replaceme
     selected_labels = loaders.load_labels(selected_labels_in)
 
     wv = WordVectors(labels, vecs)
-    wv2 = make_replacements(wv, selected_labels, 10000, 50000, 250000, filter=english_filter)
+    wv2 = make_replacements(wv, selected_labels, 50000, 50000, 100000, filter=picky_english_filter)
 
     loaders.save_labels(wv2.labels, labels_out)
     loaders.save_vecs(wv2.vectors, vecs_out)
