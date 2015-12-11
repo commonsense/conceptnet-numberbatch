@@ -64,6 +64,7 @@ coverage.xml
 # Editor stuff
 *~
 *.swp
+.idea
 
 # Sphinx documentation
 docs/_build/
