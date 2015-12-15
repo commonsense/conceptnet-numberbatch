@@ -49,10 +49,11 @@ A currently successful approach to computational semantics is to represent words
 as embeddings in a machine-learned vector space. Embeddings convert the
 representation of sentences as a sequence or bag of discrete words to a dense,
 continuous representation, providing a model of which words are similar and a
-better input to further machine learning than uncorrelated ``one-hot'' vectors.
+better input to further machine learning than ``one-hot'' representations.
 The effectiveness of embeddings can be evaluated by their ability to identify
 similar or related words like a human would. In this paper, we present an
-ensemble method that combines embeddings from GloVe \cite{pennington2014glove}
+ensemble method that combines embeddings produced by GloVe
+\cite{pennington2014glove} and word2vec \cite{mikolov2013word2vec}
 with structured knowledge from the semantic network ConceptNet 5
 \cite{speer2012conceptnet}, merging their information into a
 common representation with a large, multilingual vocabulary. The embeddings
@@ -67,84 +68,65 @@ evaluations. Its score of $\rho = \scoreRW{}$ on an evaluation of rare words
 
 Vector space models are an effective way to express the meanings of
 natural-language terms in a computational system. These models are created
-using machine-learning algorithms that attempt to represent words or phrases as
+using machine-learning techniques that represent words or phrases as
 vectors in a high dimensional space, such that the cosine similarity of any two
-words corresponds to their semantic similarity. This kind of vector space has
-been used in applications such as search and topic detection, dating back to
-the introduction of latent semantic analysis \cite{deerwester1990indexing}.  In
-recent years, there has been a surge of interest in natural-language
-embeddings, as machine-learning techniques such as
+terms corresponds to their semantic similarity.
+
+These vectors, referred to as
+the {\em embeddings} of the terms in the vector space, can be compared directly
+to measure the similarity of two terms (as the cosine similarity of their
+respective vectors), and can also be used as an input to further steps of
+machine learning. When algorithms expect dense vectors as input, embeddings
+provide a representation that is both more compact and more informative than the
+``one-hot'' representation in which every term in the vocabulary gets its own
+dimension.
+
+This kind of vector space has
+been used in applications such as search, topic detection, and text
+classification, dating back to the introduction of latent semantic analysis
+\cite{deerwester1990indexing}.  In recent years, there has been a surge of
+interest in natural-language embeddings, as machine-learning techniques such as
 \newcite{mikolov2013word2vec}'s word2vec and \newcite{pennington2014glove}'s
 GloVe have begun to show dramatic improvements.
 
-A recent paper from \newcite{faruqui2015retrofitting} introduced a technique
+\newcite{faruqui2015retrofitting} introduced a technique
 known as ``retrofitting'', which combines embeddings learned from the
 distributional semantics of unstructured text with a source of structured
 connections between words. The combined embedding achieves performance on
 word-similarity evaluations superior to either source individually.
 
-While the original formulation of retrofitting operates on the intersection of
-the vocabularies, we modify it to operate on the union. This allows retrofitting
-to expand the vocabulary of the embedding instead of shrinking it, and allows it
-to benefit from semantic links that must be followed for multiple steps to reach
-a term in the original vocabulary. We refer to this modified procedure as
-``wide retrofitting''.
+The ensemble method we present here combines these and adds a few more
+ingredients:
 
-By combining our modified version of retrofitting with some subtle but important
-normalizations to the input data, we achieve state-of-the-art performance using
-the distributional embeddings learned by GloVe \cite{pennington2014glove} from
-the Common Crawl\footnote{\url{https://commoncrawl.org/}} with the structured word and phrase
-associations in ConceptNet \cite{speer2012conceptnet}. These new embeddings
-outperform many other recently-published methods on word-similarity
+\begin{itemize}
+\item We use ConceptNet, a Linked Open Data semantic network that expresses many
+kinds of relationships between words in many languages, as the source of
+structured connections between words.
+\item We modify the retrofitting algorithm, making it not depend on the row
+order of its input matrix, and allowing it to propagate over the structured
+semantic network as well.
+\item We align English terms from different sources using a lemmatizer and a
+heuristic for merging together multiple term vectors.
+\item We fill gaps when aligning the two distributional-semantics sources
+(GloVe and word2vec) using a locally linear interpolation.
+\item We re-scale the distributional-semantics features using L1 normalization,
+which we have found leads to better simliarity measurements than the L2
+normalization that is standard for GloVe.
+\end{itemize}
+
+This process achieves state-of-the-art performance on word-similarity
 evaluations\footnote{Some methods distinguish word similarity from word
 {\em relatedness}. ``Coffee'' and ``mug'', for example, are quite related,
 but not actually similar because coffee is not {\em like} a mug. In this paper,
 however, we conflate similarity and relatedness into the same metric, as most
 evaluations do.} over both common and rare words.
 
-In all, we take a three-pronged approach to improving word similarity
-judgments. We will show that each of these methods improves performance on
-word-similarity evaluations, and that the best results comes from applying all
-of them at once:
-
-\begin{itemize}
-\item Normalizing the features of the GloVe matrix with $L_1$ instead of $L_2$
-    normalization, increasing the weight of more selective features
-\item Transforming the matrix labels with a text ``standardization'' function,
-    unifying variations and inflections of the same word
-\item Applying wide retrofitting to introduce a broad variety of
-    structured semantic knowledge from ConceptNet 5.4
-\end{itemize}
-
-The results provide state-of-the-art performance on word similarity tasks. We
-consider this to show the usefulness of expanding a vector space representation
-by giving it multiple ways to learn a word. ``Wide retrofitting'' could be
-considered an ensemble method for learning a vector space representation
-instead of a classifier.
-
 \section{Background}
-
-\subsection{GloVe}
-
-GloVe \cite{pennington2014glove} is an unsupervised learning algorithm that
-learns vector representations of words, such that the dot product of two words'
-vectors is approximately equal to the logarithm of their co-occurrence count.
-The algorithm operates on a global word-word co-occurrence matrix, and
-solves an optimization problem to learn a vector for each word, a separate
-vector for each context (although the contexts are also words), and a bias
-value for each word and each context. Only the word vectors are used for
-computing similarity.
-
-Learning processes such as GloVe produce results that can conveniently be
-re-used in other projects, simply by re-using the matrix of word embeddings.
-The embeddings that GloVe learns from data sources such as the Common Crawl are
-distributed on the GloVe web
-page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}.
 
 \subsection{ConceptNet}
 ConceptNet \cite{speer2012conceptnet} is a semantic network of terms
 connected by labeled relations. Its terms are words or multiple-word phrases
-in a variety of natural language. For continuity with previous work,
+in a variety of natural languages. For continuity with previous work,
 these terms are often referred to as {\em concepts}.
 
 ConceptNet originated as a machine-parsed version of the early crowd-sourcing
@@ -165,9 +147,9 @@ The data sources included in ConceptNet 5.4 are:
     \cite{nakahara2011nadya} in Japanese, and the PTT pet game \cite{kuo2009petgame}
     in Taiwanese Chinese
 \item WordNet 3.0 \cite{miller1998wordnet}
-\item A parsed version of Wiktionary's entries whose target language is English or
-      German \cite{wiktionary2014en} \cite{wiktionary2014de}, generated
-      by a parser developed as part of the ConceptNet 5.4 codebase
+\item A parsed version of Wiktionary's entries whose target language is English
+      or German \cite{wiktionary2014en} \cite{wiktionary2014de}, generated
+      by a parser developed as part of the ConceptNet codebase
 \item JMDict \cite{breen2004jmdict}, a Japanese multilingual dictionary
 \item OpenCyc \cite{matuszek2006cyc} as represented in Umbel \cite{bergman2008umbel}
 \end{itemize}
@@ -175,6 +157,29 @@ The data sources included in ConceptNet 5.4 are:
 ConceptNet also includes a mapping of DBPedia \cite{auer2007dbpedia} into
 its vocabulary, but it is not used for word associations, so its presence does
 not affect the results in this paper.
+
+\subsection{GloVe}
+
+GloVe \cite{pennington2014glove} is an unsupervised learning algorithm that
+learns vector representations of words, such that the dot product of two words'
+vectors is approximately equal to the logarithm of their co-occurrence count.
+The algorithm operates on a global word-word co-occurrence matrix, and
+solves an optimization problem to learn a vector for each word, a separate
+vector for each context (although the contexts are also words), and a bias
+value for each word and each context. Only the word vectors are used for
+computing similarity.
+
+Learning processes such as GloVe produce results that can conveniently be
+re-used in other projects, simply by re-using the matrix of word embeddings.
+The embeddings that GloVe learns from data sources such as the Common
+Crawl\footnote{\url{http://commoncrawl.org/}} are
+distributed on the GloVe web
+page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}.
+
+The ``GloVe 840B''
+embeddings, calculated from 840 billion tokens of the Common Crawl, contain
+valuable data but require some cleaning of their text labels before they will
+perform well. We will do this cleaning as part of the ensemble method.
 
 \section{Methods}
 
@@ -226,6 +231,8 @@ not include stemming. The 840-billion-token version applies almost no
 standardization, and in particular it does not lowercase its words.
 
 \subsubsection{Aligning ConceptNet and GloVe}
+
+% TODO: generalize this section, describing the flow of vocabulary
 
 Because ConceptNet's standardization process is stronger than GloVe's, we align them
 by applying the ConceptNet standardizations to the GloVe labels as well, turning
