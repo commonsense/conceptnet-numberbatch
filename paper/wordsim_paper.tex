@@ -45,19 +45,21 @@
 \maketitle
 \begin{abstract}
 
-A currently successful approach to computationally represent the meanings of
-words is to represent them as vectors (embeddings) in a machine-learned vector
-space. These embeddings are often evaluated on their ability to identify
-similar or related words like a human would. In this paper, we show the
-effectiveness of combining existing embeddings learned by GloVe
-\cite{pennington2014glove} with structured knowledge from the semantic network
-ConceptNet 5 \cite{speer2012conceptnet}, merging their information into a common
-representation using an extension of the ``retrofitting'' technique
-\cite{faruqui2015retrofitting}. The resulting vector space has a larger vocabulary
-than either source, can represent word meanings in multiple languages, and
-achieves state-of-the-art performance on word similarity evaluations.
-Its score of $\rho = \scoreRW{}$ on an evaluation of rare words
+A currently successful approach to computational semantics is to represent words
+as embeddings in a machine-learned vector space. Embeddings convert the
+representation of sentences as a sequence or bag of discrete words to a dense,
+continuous representation, providing a model of which words are similar and a
+better input to further machine learning than uncorrelated ``one-hot'' vectors.
+The effectiveness of embeddings can be evaluated by their ability to identify
+similar or related words like a human would. In this paper, we present an
+ensemble method that combines embeddings from GloVe \cite{pennington2014glove}
+with structured knowledge from the semantic network ConceptNet 5
+\cite{speer2012conceptnet}, merging their information into a
+common representation with a large, multilingual vocabulary. The embeddings
+it produces achieve state-of-the-art performance on many word similarity
+evaluations. Its score of $\rho = \scoreRW{}$ on an evaluation of rare words
 \cite{luong2013rw} is 13.6\% higher than the previous best known system.
+% FIXME: update for final score and data sources
 
 \end{abstract}
 
