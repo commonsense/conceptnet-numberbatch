@@ -8,7 +8,8 @@ from conceptnet_retrofitting.ninja.ninja_util import (
 CONFIG = {
     'source-data-path': 'source-data/',
     'build-data-path': 'build-data/',
-    'glove-versions': ['840B.300d', '42B.300d'],
+    'glove-versions': ['glove.840B.300d', 'glove.42B.300d'],
+    'word2vec-versions': ['w2v-google-news'],
     'neg-filters': ['jmdict', 'opencyc', 'openmind', 'verbosity', 'wiktionary', 'wordnet'],
     'pos-filters': ['wiktionary'],
     'retrofit-items': ['conceptnet5',
@@ -38,7 +39,7 @@ class GloveVectors:
         self.filetype = filetype
 
     def __repr__(self):
-        out = ['glove', self.version, self.normalization, self.standardization]
+        out = [self.version, self.normalization, self.standardization]
         if self.retrofit:
             out.append(self.retrofit)
         out.append(self.filetype)
@@ -56,7 +57,7 @@ class GloveLabels:
         self.retrofit = retrofit
 
     def __repr__(self):
-        out = ['glove', self.version, self.standardization]
+        out = [self.version, self.standardization]
         if self.retrofit:
             out.append(self.retrofit)
         out.append('labels')
@@ -65,8 +66,8 @@ class GloveLabels:
 
 class GloveReplacements:
     """
-    A reference to a file containing the labels corresponding to a
-    GloveVectors file.
+    A reference to a file containing the mapping from labels to simplified
+    labels that corresponds to a GloveVectors file.
     """
     def __init__(self, version, *, standardization='raw', retrofit=None):
         self.version = version
@@ -74,7 +75,7 @@ class GloveReplacements:
         self.retrofit = retrofit
 
     def __repr__(self):
-        out = ['glove', self.version, self.standardization]
+        out = [self.version, self.standardization]
         if self.retrofit:
             out.append(self.retrofit)
         out.append('replacements.msgpack')
@@ -116,7 +117,7 @@ def build_conceptnet_retrofitting():
 
 def build_glove(graph):
     for version in CONFIG['glove-versions']:
-        input = CONFIG['source-data-path'] + 'glove.%s.txt' % version
+        input = CONFIG['source-data-path'] + '%s.txt' % version
         graph['build_glove']['build_glove_labels'][version] = Dep(
             input,
             GloveLabels(version=version),
@@ -130,7 +131,7 @@ def build_glove(graph):
 
 
 def standardize_glove(graph):
-    for version in CONFIG['glove-versions']:
+    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
         graph['standardize_glove'][version] = Dep(
             [
                 GloveLabels(version=version),
@@ -162,7 +163,7 @@ def standardize_ppdb(graph):
 
 
 def normalize_glove(graph):
-    for version in CONFIG['glove-versions']:
+    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
         for norm in ('l1', 'l2'):
             for s13n in ('raw', 'standardized'):
                 graph['normalize_glove'][version][norm][s13n] = Dep(
@@ -173,16 +174,16 @@ def normalize_glove(graph):
 
 
 def build_assoc(graph):
-    version = '840B.300d'
-    for network in CONFIG['retrofit-items']:
-        path = CONFIG['build-data-path']
-        if network == 'conceptnet5':
-            path = CONFIG['source-data-path']
-        graph['network_to_assoc'][network] = Dep(
-            [GloveLabels(version=version, standardization='standardized'), path + network + '.csv'],
-            [GloveLabels(version=version, standardization='standardized', retrofit=network), CONFIG['build-data-path'] + network + '.npz'],
-            'network_to_assoc'
-        )
+    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
+        for network in CONFIG['retrofit-items']:
+            path = CONFIG['build-data-path']
+            if network == 'conceptnet5':
+                path = CONFIG['source-data-path']
+            graph['network_to_assoc'][network] = Dep(
+                [GloveLabels(version=version, standardization='standardized'), path + network + '.csv'],
+                [GloveLabels(version=version, standardization='standardized', retrofit=network), CONFIG['build-data-path'] + network + '.npz'],
+                'network_to_assoc'
+            )
 
 
 def regex_for_dataset(dataset):
@@ -222,41 +223,41 @@ def add_self_loops(graph):
 
 
 def retrofit(graph):
-    version = '840B.300d'
-    for network in CONFIG['retrofit-items']:
-        for norm in ['l1', 'l2']:
-            if 'conceptnet5-' in network and norm != 'l1':
-                # use only the l1 norm when trying dropping out datasets
-                continue
-            graph['retrofit'][norm][network] = Dep(
-                [
-                    GloveVectors(version=version, standardization='standardized', normalization=norm),
-                    CONFIG['build-data-path'] + network + '.self_loops.npz'
-                ],
-                GloveVectors(version=version, standardization='standardized', retrofit=network, normalization=norm),
-                'retrofit'
+    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
+        for network in CONFIG['retrofit-items']:
+            for norm in ['l1', 'l2']:
+                if 'conceptnet5-' in network and norm != 'l1':
+                    # use only the l1 norm when trying dropping out datasets
+                    continue
+                graph['retrofit'][norm][network] = Dep(
+                    [
+                        GloveVectors(version=version, standardization='standardized', normalization=norm),
+                        CONFIG['build-data-path'] + network + '.self_loops.npz'
+                    ],
+                    GloveVectors(version=version, standardization='standardized', retrofit=network, normalization=norm),
+                    'retrofit'
+                )
+
+        for network in ['conceptnet5']:
+            graph['assoc_to_labels'][network] = Dep(
+                CONFIG['source-data-path'] + CONCEPTNET_SOURCE_FILE,
+                GloveLabels(version=network),
+                'assoc_to_labels'
             )
 
-    for network in ['conceptnet5']:
-        graph['assoc_to_labels'][network] = Dep(
-            CONFIG['source-data-path'] + CONCEPTNET_SOURCE_FILE,
-            GloveLabels(version=network),
-            'assoc_to_labels'
-        )
-
-        graph['filter_vecs'][network] = Dep(
-            [
-                GloveLabels(version=version, standardization='standardized', retrofit=network),
-                GloveVectors(version=version, standardization='standardized', retrofit=network, normalization='l1'),
-                GloveLabels(version=network)
-            ],
-            [
-                GloveLabels(version=version, standardization='filtered', retrofit=network),
-                GloveVectors(version=version, standardization='filtered', retrofit=network, normalization='l1'),
-                GloveReplacements(version=version, standardization='filtered', retrofit=network)
-            ],
-            'filter_vecs'
-        )
+            graph['filter_vecs'][network] = Dep(
+                [
+                    GloveLabels(version=version, standardization='standardized', retrofit=network),
+                    GloveVectors(version=version, standardization='standardized', retrofit=network, normalization='l1'),
+                    GloveLabels(version=network)
+                ],
+                [
+                    GloveLabels(version=version, standardization='filtered', retrofit=network),
+                    GloveVectors(version=version, standardization='filtered', retrofit=network, normalization='l1'),
+                    GloveReplacements(version=version, standardization='filtered', retrofit=network)
+                ],
+                'filter_vecs'
+            )
 
 
 def test(graph):
