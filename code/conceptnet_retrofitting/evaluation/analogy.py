@@ -1,7 +1,7 @@
 from conceptnet_retrofitting import loaders
 from conceptnet_retrofitting.word_vectors import WordVectors
 from conceptnet_retrofitting.builders.retrofit import dense_relation_array
-from conceptnet_retrofitting.builders.label_set import LabelSet
+from conceptnet_retrofitting.label_set import LabelSet
 from conceptnet_retrofitting.builders.build_assoc import build_relations_from_conceptnet
 import numpy as np
 import argparse

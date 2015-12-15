@@ -1,8 +1,11 @@
 import numpy as np
 import msgpack
+import struct
+import gzip
 from scipy import sparse
-
+from conceptnet_retrofitting.label_set import LabelSet
 from conceptnet_retrofitting.word_vectors import WordVectors
+
 
 def load_vecs(filename):
     return np.load(filename)
@@ -25,6 +28,41 @@ def load_csr(filename):
     with np.load(filename) as npz:
         mat = sparse.csr_matrix((npz['data'], npz['indices'], npz['indptr']), shape=npz['shape'])
     return mat
+
+
+def _read_until_space(file):
+    chars = []
+    while True:
+        newchar = file.read(1)
+        if newchar == b'' or newchar == b' ':
+            break
+        chars.append(newchar[0])
+    return bytes(chars).decode('utf-8')
+
+
+def _read_vec(file, ndims):
+    fmt = 'f' * ndims
+    bytes_in = file.read(4 * ndims)
+    values = list(struct.unpack(fmt, bytes_in))
+    return np.array(values)
+
+
+def load_word2vec_bin(filename):
+    label_list = []
+    vec_list = []
+    with gzip.open(filename, 'rb') as infile:
+        header = infile.readline().rstrip()
+        nrows_str, ncols_str = header.split()
+        nrows = int(nrows_str)
+        ncols = int(ncols_str)
+        for row in range(nrows):
+            label = _read_until_space(infile)
+            vec = _read_vec(infile, ncols)
+            label_list.append(label)
+            vec_list.append(vec)
+    labels = LabelSet(label_list)
+    mat = np.array(vec_list)
+    return WordVectors(labels, mat, standardizer=lambda x: x)
 
 
 def save_sparse_relations(relation_dict, filename):

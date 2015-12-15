@@ -1,7 +1,7 @@
 import numpy as np
 
 from conceptnet_retrofitting.standardization import standardize
-from conceptnet_retrofitting.builders.label_set import LabelSet
+from conceptnet_retrofitting.label_set import LabelSet
 
 def standardize_vecs(labels, vecs):
     standardized_labels = LabelSet()
