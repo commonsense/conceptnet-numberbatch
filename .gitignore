@@ -64,6 +64,7 @@ coverage.xml
 # Editor stuff
 *~
 *.swp
+.idea
 
 # Sphinx documentation
 docs/_build/
@@ -75,3 +76,4 @@ build.ninja
 
 code/data
 code/build-data
+code/prev-build-data
