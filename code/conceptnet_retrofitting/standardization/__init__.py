@@ -2,6 +2,11 @@ from unicodedata import normalize
 from ftfy import fix_text
 from conceptnet_retrofitting.standardization.english import english_filter
 from conceptnet_retrofitting.standardization.tokenizer import simple_tokenize
+import re
+
+
+DOUBLE_DIGIT_RE = re.compile(r'[0-9][0-9]')
+DIGIT_RE = re.compile(r'[0-9]')
 
 
 def standardize(text, lang='en', remove_accents=True):
@@ -34,10 +39,20 @@ LCODE_ALIASES = {
 }
 
 
+def replace_numbers(s):
+    if DOUBLE_DIGIT_RE.search(s):
+        return DIGIT_RE.sub('#', s)
+    else:
+        return s
+
+
 def standardized_concept_uri(text, lang='en'):
     text = fix_text(text)
     tokens = simple_tokenize(text)
     if lang == 'en':
         tokens = english_filter(tokens)
 
-    return '/'.join(['/c', LCODE_ALIASES.get(lang, lang), '_'.join(tokens)])
+    tokens = [replace_numbers(token) for token in tokens]
+    slug = replace_numbers('_'.join(tokens))
+
+    return '/'.join(['/c', LCODE_ALIASES.get(lang, lang), slug])
