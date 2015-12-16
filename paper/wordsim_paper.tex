@@ -1,5 +1,5 @@
 \def\year{2015}
-\def\thetitle{Wide Retrofitting: Breadth of Knowledge Improves Word Vectors}
+\def\thetitle{An Ensemble Method to Produce High-Quality Word Embeddings}
 
 % Update this when our score changes.
 \def\scoreRW{.584}
@@ -110,7 +110,7 @@ heuristic for merging together multiple term vectors.
 \item We fill gaps when aligning the two distributional-semantics sources
 (GloVe and word2vec) using a locally linear interpolation.
 \item We re-scale the distributional-semantics features using L1 normalization,
-which we have found leads to better simliarity measurements than the L2
+which we have found leads to better similarity measurements than the L2
 normalization that is standard for GloVe.
 \end{itemize}
 
@@ -132,12 +132,12 @@ these terms are often referred to as {\em concepts}.
 ConceptNet originated as a machine-parsed version of the early crowd-sourcing
 project called Open Mind Common Sense (OMCS) \cite{singh2002omcs}, and has expanded
 to include several other data sources, both crowd-sourced and expert-created,
-by unifying their vocabularies of terms into a single representation.
+by unifying their vocabularies into a single representation.
 The data sources included in ConceptNet 5.4 are:
 
 \begin{itemize}
 \item Knowledge collected as English sentences on the original OMCS website,
-    and later parsed with a pattern-matching parser
+    and later parsed with pattern-matching rules
 \item OMCS projects that collected similar sentences in Portuguese
     \cite{anacleto2006portuguese},
     Dutch \cite{eckhardt2008kid}, and some Korean and Japanese
@@ -176,10 +176,11 @@ Crawl\footnote{\url{http://commoncrawl.org/}} are
 distributed on the GloVe web
 page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}.
 
-The ``GloVe 840B''
-embeddings, calculated from 840 billion tokens of the Common Crawl, contain
-valuable data but require some cleaning of their text labels before they will
-perform well. We will do this cleaning as part of the ensemble method.
+The GloVe embeddings that are evaluated most often are the ``GloVe 42B''
+embeddings, calculated from 42 billion tokens of the Common Crawl. There are
+also ``GloVe 840B'' calculated from 840 billion tokens, which can perform
+better, but their term labels require some data cleaning first. We will do this
+cleaning as part of the ensemble method.
 
 \section{Methods}
 
@@ -230,50 +231,54 @@ The 42-billion-token version of GloVe, whose results are published in
 not include stemming. The 840-billion-token version applies almost no
 standardization, and in particular it does not lowercase its words.
 
-\subsubsection{Aligning ConceptNet and GloVe}
+\subsubsection{Transforming and Aligning Vocabularies}
 
-% TODO: generalize this section, describing the flow of vocabulary
+The different vector spaces have different sets of term labels, of course, and
+these term labels have been normalized by different processes. Some labels
+have been case-folded (including ConceptNet and GloVe 42B, but not GloVe 840B),
+and the largest difference is that ConceptNet labels have been run though
+ConceptNet's Morphy-based lemmatizer. word2vec, meanwhile, has replaced digits
+with the character {\tt #} in all labels that contain two digits in a row.
 
-Because ConceptNet's standardization process is stronger than GloVe's, we align them
-by applying the ConceptNet standardizations to the GloVe labels as well, turning
-its tokens into ConceptNet URIs. The GloVe tokens are assumed to be in English.
+Due to a quirk in some of the evaluation data, we must apply one more
+transformation. The Spanish translations of word-similarity evaluations
+\cite{hassan2009crosslingual} are written without any accents on the letters,
+such as ``telefono'' instead of ``tel\'{e}fono''. In order to recognize these as
+the correct words instead of out-of-vocabulary words when evaluating in Spanish,
+we need to re-standardize all Spanish terms in ConceptNet to omit all of the
+accents.
 
-This has the effect that many separate rows of the GloVe matrix get the same
-label, such as when the same word appears with a different capitalization.
-We considered a few options for dealing with these merged labels:
+To align the vocabularies, we first need to apply the union of all these
+transformations to all labels. Because the transformations are many-to-one, this
+has the effect that a single transformed term can become associated with
+multiple embeddings in a single vector space.
+
+We considered a few options for dealing with these merged terms:
 
 \begin{enumerate}
-\item Keep only the row with the highest frequency in GloVe.
-\item Average the rows together.
-\item Take a weighted average that favors higher-frequency rows.
+\item Keep only the vector for the term with the highest frequency in the
+    original data.
+\item Average the vectors together.
+\item Take a weighted average that favors higher-frequency terms.
 \end{enumerate}
-
-% NOTE: Avril wants us to describe how many rows change due to standardization
 
 The weighted average turns out to be the best approach, as our evaluation will
 show. The multiple rows contain valuable data that should not simply be
 discarded, but lower-frequency rows tend to have lower-quality data.
 
-The word frequency data is not distributed with the GloVe matrix, but
-the rows are clearly in descending order of frequency. We approximate the
-frequency distribution by assuming that the tokens are distributed according to
-Zipf's law \cite{zipf1949human}: the $n$th token in rank order has a frequency
-proportional to $1/n$.
+It is useful to work with pre-trained vectors from systems such as GloVe and
+word2vec, as they allow reproducing evaluations such as semantic similarity
+without having to exactly reproduce every part of the system that built them.
+However, when using pre-trained vectors, it is often the case that intermediate
+computations that produced these vectors (such as word frequencies) are not
+available.
 
-In order to evaluate the combined word vectors, it is necessary for us to apply
-the same standardizations to the evaluation data. A drawback to this
-standardization process is that we will not be able to evaluate the result on
-\newcite{mikolov2013word2vec}'s syntactic analogy task, as many of
-the analogies would become trivial analogies of the form
-``A is to A as B is to B''.
-
-Due to a quirk in some of the evaluation data, we must apply one more
-standardization to all labels, even though it is not necessary in ConceptNet or
-in GloVe. The Spanish translations of word-similarity evaluations
-\cite{hassan2009crosslingual} are written without any accents on the
-letters, such as ``telefono'' instead of ``tel\'{e}fono''. In order to recognize
-these as the correct words instead of out-of-vocabulary words, we need to
-re-standardize all Spanish terms in ConceptNet to omit all of the accents.
+What we can do instead is to infer approximate word frequencies from the fact
+that both GloVe and word2vec output their vocabularies in descending order of
+frequency. We approximate the frequency distribution by assuming that the tokens
+are distributed according to Zipf's law \cite{zipf1949human}: the $n$th token in
+rank order has a frequency proportional to $1/n$. We use these proportions in
+the weighted average when combining multiple embeddings.
 
 
 \subsection{Normalization}
@@ -729,25 +734,28 @@ MEN-3000 by 5.4\%.
 
 \subsection{Standardizing Term Texts}
 
-When applying ConceptNet's standardization procedure to the labels of GloVe's
-840B-token dataset, we found an unexpected benefit from cleaning up that data in
-the form of a very large performance increase on the rare words evaluation,
-even before retrofitting anything onto it.
+When we applied ConceptNet's lemmatizer to the labels of GloVe's 840B-token
+dataset, we found an unexpected benefit of lemmatization: it caused a very
+large performance increase on GloVe 840B even before combining it with any
+other data.
 
-When we run our evaluation without modifying the labels on the GloVe 42B-token
+When we run our evaluation without lemmatization on the GloVe 42B-token
 embeddings, we reproduce the results published in \cite{pennington2014glove}.
 This same evaluation, when run on the 840B-token embeddings, produces
 surprisingly poor results, implying that some of these rare words appear in
-forms that have low-quality embeddings. When we standardize the GloVe labels and
+forms that have low-quality embeddings. When we lemmatize the GloVe labels and
 combine them using the Zipf estimate, however, the result outperforms the
 42B-token embeddings.
 
-We conclude from this that it is important to combine the information learned
-from multiple forms of a word, including differences in inflection and
-capitalization, instead of relying on a single word form to have the correct
-vector. However, even if too many word forms were distinguished in the GloVe
-learning process, re-combining the word forms after the fact is sufficient to
-repair the data.
+It's important to note that we are not changing the evaluation data by using
+a lemmatizer; we are only changing the way we look up its embeddings in the
+vector space that we are evaluating. For example, if an evaluation requires
+similarities for the words ``dry'' and ``dried'' to be ranked differently, or
+the words ``polish'' and ``Polish'', the lemmatized system will rank them the
+same, and will be penalized in its Spearman correlation.
+However, the benefits of lemmatization when evaluating semantic similarity
+appear to far outweigh the drawbacks, especially on very large and somewhat
+messy data sets such as GloVe 840B.
 
 \subsection{Varying the System}
 
