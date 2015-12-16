@@ -8,7 +8,7 @@ from conceptnet_retrofitting.ninja.ninja_util import (
 CONFIG = {
     'source-data-path': 'source-data/',
     'build-data-path': 'build-data/',
-    'glove-versions': ['glove.840B.300d', 'glove.42B.300d'],
+    'glove-versions': ['glove.840B.300d'],
     'word2vec-versions': ['w2v-google-news'],
     'neg-filters': ['jmdict', 'opencyc', 'openmind', 'verbosity', 'wiktionary', 'wordnet'],
     'pos-filters': ['wiktionary'],
