@@ -29,11 +29,13 @@ tests = [
     #('mc-30-es', {'filename': 'mc30.es.csv'}, 'es'),
 ]
 
+
 def test_all(similarity_func):
     for test, file_info, *optional in tests:
         lang = optional[0] if optional else None
         print(test)
         print(evaluate(similarity_func, parse_file(**file_info), lang))
+
 
 def parse_file(filename, sep=None, preprocess_word=None):
     if isinstance(filename, str):
@@ -52,6 +54,7 @@ def parse_file(filename, sep=None, preprocess_word=None):
 
                 yield w1, w2, float(val)
 
+
 def evaluate(similarity_func, standard, lang=None):
     actual, ideal = [], []
     for w1, w2, assoc in standard:
@@ -64,9 +67,11 @@ def evaluate(similarity_func, standard, lang=None):
 
     return spearmanr(np.array(ideal), np.array(actual))[0]
 
+
 def main(labels_in, vecs_in, replacements_in, verbose=True):
     from conceptnet_retrofitting import loaders
     test_all(loaders.load_word_vectors(labels_in, vecs_in, replacements_in).similarity)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

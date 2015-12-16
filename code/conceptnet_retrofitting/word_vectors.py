@@ -16,6 +16,10 @@ def rank3_inner_product(vec, array3):
     return (array3 * vec[:, np.newaxis, np.newaxis]).sum(0)
 
 
+def normalize_vec(vec):
+    return normalize(vec.reshape(1, -1))[0]
+
+
 class WordVectors:
     def __init__(self, labels, vectors, replacements=None, standardizer=standardize):
         assert(len(labels) == len(vectors))
@@ -57,7 +61,7 @@ class WordVectors:
 
         if default_zero and word not in self.labels:
             return np.zeros(self.vectors.shape[1])
-        vec = normalize(self.vectors[self.labels.index(word)])[0]
+        vec = normalize_vec(self.vectors[self.labels.index(word)])
         return vec * max_sim
 
     def similar_to(self, word_or_vector, num=20, only=None):
