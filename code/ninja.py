@@ -84,6 +84,7 @@ class GloveReplacements:
 
 implicit = {
     'glove_to_vecs': ['conceptnet_retrofitting/builders/build_vecs.py'],
+    'w2v_to_vecs': ['conceptnet_retrofitting/builders/build_w2v_vecs.py'],
     'filter_vecs': ['conceptnet_retrofitting/builders/filter_vecs.py'],
     'standardize_vecs': ['conceptnet_retrofitting/builders/standardize_vecs.py'],
     'l1_normalize': ['conceptnet_retrofitting/builders/l1norm.py'],
@@ -99,6 +100,7 @@ implicit = {
 def build_conceptnet_retrofitting():
     graph = DepGraph()
     build_glove(graph)
+    build_word2vec(graph)
 
     standardize_ppdb(graph)
     standardize_glove(graph)
@@ -127,6 +129,16 @@ def build_glove(graph):
             input,
             GloveVectors(version=version),
             'glove_to_vecs'
+        )
+
+
+def build_word2vec(graph):
+    for version in CONFIG['word2vec-versions']:
+        input = CONFIG['source-data-path'] + '%s.bin.gz' % version
+        graph['build_word2vec'][version] = Dep(
+            input,
+            [GloveLabels(version=version), GloveVectors(version=version)],
+            'w2v_to_vecs'
         )
 
 
