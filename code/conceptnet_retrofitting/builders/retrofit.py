@@ -3,10 +3,7 @@ from sklearn.preprocessing import normalize
 from operator import itemgetter
 
 
-def retrofit(word_vecs, sparse_assoc, iterations=10, verbose=False, orig_weight=1):
-    orig_vecs = normalize(word_vecs, norm='l2', copy=False)
-    orig_vecs *= orig_weight
-
+def retrofit(orig_vecs, sparse_assoc, iterations=10, verbose=False):
     vecs = np.zeros(shape=(sparse_assoc.shape[0], orig_vecs.shape[1]))
     vecs[:orig_vecs.shape[0]] = orig_vecs
 
@@ -17,7 +14,7 @@ def retrofit(word_vecs, sparse_assoc, iterations=10, verbose=False, orig_weight=
         vecs = sparse_assoc.dot(vecs)
         normalize(vecs, norm='l2', copy=False)
         vecs[:len(orig_vecs)] += orig_vecs
-        vecs[:len(orig_vecs)] /= 1+orig_weight
+        vecs[:len(orig_vecs)] /= 2
 
     return vecs
 
@@ -96,6 +93,7 @@ def main(vecs_in, assoc_in, vecs_out, verbose=False):
     if verbose:
         print("Loading vectors")
     vecs = loaders.load_vecs(vecs_in)
+    normalize(vecs, norm='l2', copy=False)
 
     if verbose:
         print("Loading associations")
