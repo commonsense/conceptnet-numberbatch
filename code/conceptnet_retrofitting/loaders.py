@@ -3,7 +3,7 @@ import msgpack
 import struct
 import gzip
 from scipy import sparse
-from conceptnet_retrofitting.label_set import LabelSet
+from ordered_set import OrderedSet
 from conceptnet_retrofitting.word_vectors import WordVectors
 
 
@@ -60,7 +60,7 @@ def load_word2vec_bin(filename):
             vec = _read_vec(infile, ncols)
             label_list.append(label)
             vec_list.append(vec)
-    labels = LabelSet(label_list)
+    labels = OrderedSet(label_list)
     mat = np.array(vec_list)
     return WordVectors(labels, mat, standardizer=lambda x: x)
 

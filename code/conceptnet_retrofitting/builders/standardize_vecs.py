@@ -1,10 +1,10 @@
 import numpy as np
 
 from conceptnet_retrofitting.standardization import standardize
-from conceptnet_retrofitting.label_set import LabelSet
+from ordered_set import OrderedSet
 
 def standardize_vecs(labels, vecs):
-    standardized_labels = LabelSet()
+    standardized_labels = OrderedSet()
     standardized_vecs = []
 
     for index, (label, vec) in enumerate(zip(labels, vecs)):

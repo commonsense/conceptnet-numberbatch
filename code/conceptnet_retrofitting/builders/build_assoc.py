@@ -3,7 +3,7 @@ from collections import defaultdict
 from sklearn.preprocessing import normalize
 
 from conceptnet_retrofitting.builders.sparse_matrix_builder import SparseMatrixBuilder
-from conceptnet_retrofitting.label_set import LabelSet
+from ordered_set import OrderedSet
 from conceptnet_retrofitting.standardization import standardize
 from enum import Enum
 
@@ -130,7 +130,7 @@ def build_relations_from_conceptnet(labels, filename):
 def main(label_in, conceptnet_in, label_out, assoc_out):
     from conceptnet_retrofitting import loaders
 
-    labels = LabelSet(loaders.load_labels(label_in))
+    labels = OrderedSet(loaders.load_labels(label_in))
     assoc = build_from_conceptnet(labels, conceptnet_in)
 
     loaders.save_labels(labels, label_out)

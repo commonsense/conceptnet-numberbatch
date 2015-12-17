@@ -1,7 +1,7 @@
 from conceptnet_retrofitting import loaders
 from conceptnet_retrofitting.word_vectors import WordVectors
 from conceptnet_retrofitting.builders.retrofit import dense_relation_array
-from conceptnet_retrofitting.label_set import LabelSet
+from ordered_set import OrderedSet
 from conceptnet_retrofitting.builders.build_assoc import build_relations_from_conceptnet
 import numpy as np
 import argparse
@@ -154,7 +154,7 @@ def make_dense_relation_array(wv, sparse_rels, endrow=100000):
 
 def main(labels_in, vecs_in, replacements_in, sparse_relations_in, analogy_file, verbose=True):
     wv = loaders.load_word_vectors(labels_in, vecs_in, replacements_in)
-    labels = LabelSet(wv.labels)
+    labels = OrderedSet(wv.labels)
     if sparse_relations_in is not None:
         sparse_rels = build_relations_from_conceptnet(labels, sparse_relations_in)
         rel_array = make_dense_relation_array(wv, sparse_rels)
