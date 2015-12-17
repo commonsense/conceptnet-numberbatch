@@ -8,7 +8,7 @@ from conceptnet_retrofitting.ninja.ninja_util import (
 CONFIG = {
     'source-data-path': 'source-data/',
     'build-data-path': 'build-data/',
-    'glove-versions': ['glove.840B.300d'],
+    'glove-versions': ['glove12.840B.300d'],
     'word2vec-versions': ['w2v-google-news'],
     'neg-filters': ['jmdict', 'opencyc', 'openmind', 'verbosity', 'wiktionary', 'wordnet'],
     'pos-filters': ['wiktionary'],
@@ -192,7 +192,7 @@ def build_assoc(graph):
             path = CONFIG['build-data-path']
             if network == 'conceptnet5':
                 path = CONFIG['source-data-path']
-            graph['network_to_assoc'][network] = Dep(
+            graph['network_to_assoc'][version][network] = Dep(
                 [GloveLabels(version=version, standardization='standardized'), path + network + '.csv'],
                 [GloveLabels(version=version, standardization='standardized', retrofit=network), CONFIG['build-data-path'] + '%s.%s.npz' % (version, network)],
                 'network_to_assoc'
@@ -229,7 +229,7 @@ def filter_conceptnet(graph):
 def add_self_loops(graph):
     for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
         for network in CONFIG['retrofit-items']:
-            graph['add_self_loops'][network] = Dep(
+            graph['add_self_loops'][network][version] = Dep(
                 CONFIG['build-data-path'] + '%s.%s.npz' % (version, network),
                 CONFIG['build-data-path'] + '%s.%s.self_loops.npz' % (version, network),
                 'add_self_loops'
@@ -237,13 +237,20 @@ def add_self_loops(graph):
 
 
 def retrofit(graph):
+    for network in ['conceptnet5']:
+        graph['assoc_to_labels'][network] = Dep(
+            CONFIG['source-data-path'] + CONCEPTNET_SOURCE_FILE,
+            GloveLabels(version=network),
+            'assoc_to_labels'
+        )
+
     for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
         for network in CONFIG['retrofit-items']:
             for norm in ['l1', 'l2']:
                 if 'conceptnet5-' in network and norm != 'l1':
                     # use only the l1 norm when trying dropping out datasets
                     continue
-                graph['retrofit'][norm][network] = Dep(
+                graph['retrofit'][version][norm][network] = Dep(
                     [
                         GloveVectors(version=version, standardization='standardized', normalization=norm),
                         CONFIG['build-data-path'] + '%s.%s.self_loops.npz' % (version, network)
@@ -252,15 +259,8 @@ def retrofit(graph):
                     'retrofit'
                 )
 
-        for network in ['conceptnet5']:
-            graph['assoc_to_labels'][network] = Dep(
-                CONFIG['source-data-path'] + CONCEPTNET_SOURCE_FILE,
-                GloveLabels(version=network),
-                'assoc_to_labels'
-            )
-
             if CONFIG['run-filter']:
-                graph['filter_vecs'][network] = Dep(
+                graph['filter_vecs'][version][network] = Dep(
                     [
                         GloveLabels(version=version, standardization='standardized', retrofit=network),
                         GloveVectors(version=version, standardization='standardized', retrofit=network, normalization='l1'),
