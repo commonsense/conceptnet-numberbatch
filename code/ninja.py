@@ -113,7 +113,7 @@ def build_conceptnet_retrofitting():
     retrofit(graph)
 
     test(graph)
-    latex_results(graph)
+    # latex_results(graph)
 
     make_ninja_file('rules.ninja', graph, implicit)
 
