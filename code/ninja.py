@@ -9,9 +9,10 @@ CONFIG = {
     'source-data-path': 'source-data/',
     'build-data-path': 'build-data/',
     'glove-versions': ['glove.840B.300d'],
-    'word2vec-versions': [],   # ['w2v-google-news'],
+    'word2vec-versions': ['w2v-google-news'],
     'neg-filters': ['jmdict', 'opencyc', 'openmind', 'verbosity', 'wiktionary', 'wordnet'],
     'pos-filters': ['wiktionary'],
+    'run-filter': False,
     'retrofit-items': ['conceptnet5',
                        #'conceptnet5-minus-jmdict',
                        #'conceptnet5-minus-opencyc',
@@ -258,19 +259,20 @@ def retrofit(graph):
                 'assoc_to_labels'
             )
 
-            graph['filter_vecs'][network] = Dep(
-                [
-                    GloveLabels(version=version, standardization='standardized', retrofit=network),
-                    GloveVectors(version=version, standardization='standardized', retrofit=network, normalization='l1'),
-                    GloveLabels(version=network)
-                ],
-                [
-                    GloveLabels(version=version, standardization='filtered', retrofit=network),
-                    GloveVectors(version=version, standardization='filtered', retrofit=network, normalization='l1'),
-                    GloveReplacements(version=version, standardization='filtered', retrofit=network)
-                ],
-                'filter_vecs'
-            )
+            if CONFIG['run-filter']:
+                graph['filter_vecs'][network] = Dep(
+                    [
+                        GloveLabels(version=version, standardization='standardized', retrofit=network),
+                        GloveVectors(version=version, standardization='standardized', retrofit=network, normalization='l1'),
+                        GloveLabels(version=network)
+                    ],
+                    [
+                        GloveLabels(version=version, standardization='filtered', retrofit=network),
+                        GloveVectors(version=version, standardization='filtered', retrofit=network, normalization='l1'),
+                        GloveReplacements(version=version, standardization='filtered', retrofit=network)
+                    ],
+                    'filter_vecs'
+                )
 
 
 def test(graph):
