@@ -9,7 +9,7 @@ CONFIG = {
     'source-data-path': 'source-data/',
     'build-data-path': 'build-data/',
     'glove-versions': ['glove.840B.300d'],
-    'word2vec-versions': ['w2v-google-news'],
+    'word2vec-versions': [],   # ['w2v-google-news'],
     'neg-filters': ['jmdict', 'opencyc', 'openmind', 'verbosity', 'wiktionary', 'wordnet'],
     'pos-filters': ['wiktionary'],
     'retrofit-items': ['conceptnet5',
@@ -193,7 +193,7 @@ def build_assoc(graph):
                 path = CONFIG['source-data-path']
             graph['network_to_assoc'][network] = Dep(
                 [GloveLabels(version=version, standardization='standardized'), path + network + '.csv'],
-                [GloveLabels(version=version, standardization='standardized', retrofit=network), CONFIG['build-data-path'] + network + '.npz'],
+                [GloveLabels(version=version, standardization='standardized', retrofit=network), CONFIG['build-data-path'] + '%s.%s.npz' % (version, network)],
                 'network_to_assoc'
             )
 
@@ -226,12 +226,13 @@ def filter_conceptnet(graph):
 
 
 def add_self_loops(graph):
-    for network in CONFIG['retrofit-items']:
-        graph['add_self_loops'][network] = Dep(
-            CONFIG['build-data-path'] + network + '.npz',
-            CONFIG['build-data-path'] + network + '.self_loops.npz',
-            'add_self_loops'
-        )
+    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
+        for network in CONFIG['retrofit-items']:
+            graph['add_self_loops'][network] = Dep(
+                CONFIG['build-data-path'] + '%s.%s.npz' % (version, network),
+                CONFIG['build-data-path'] + '%s.%s.self_loops.npz' % (version, network),
+                'add_self_loops'
+            )
 
 
 def retrofit(graph):
@@ -244,7 +245,7 @@ def retrofit(graph):
                 graph['retrofit'][norm][network] = Dep(
                     [
                         GloveVectors(version=version, standardization='standardized', normalization=norm),
-                        CONFIG['build-data-path'] + network + '.self_loops.npz'
+                        CONFIG['build-data-path'] + '%s.%s.self_loops.npz' % (version, network)
                     ],
                     GloveVectors(version=version, standardization='standardized', retrofit=network, normalization=norm),
                     'retrofit'
