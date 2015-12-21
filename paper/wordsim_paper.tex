@@ -53,8 +53,8 @@ better input to further machine learning than ``one-hot'' representations.
 The effectiveness of embeddings can be evaluated by their ability to identify
 similar or related words like a human would. In this paper, we present an
 ensemble method that combines embeddings produced by GloVe
-\cite{pennington2014glove} and word2vec \cite{mikolov2013word2vec}
-with structured knowledge from the semantic network ConceptNet 5
+\cite{pennington2014glove} and word2vec \cite{mikolov2013word2vec} with
+structured knowledge from the semantic network ConceptNet 5
 \cite{speer2012conceptnet}, merging their information into a
 common representation with a large, multilingual vocabulary. The embeddings
 it produces achieve state-of-the-art performance on many word similarity
@@ -95,12 +95,12 @@ distributional semantics of unstructured text with a source of structured
 connections between words. The combined embedding achieves performance on
 word-similarity evaluations superior to either source individually.
 
-The ensemble method we present here combines these and adds a few more
-ingredients:
+The ensemble method we present here builds on retrofitting, with the following
+modifications:
 
 \begin{itemize}
-\item We use ConceptNet, a Linked Open Data semantic network that expresses many
-kinds of relationships between words in many languages, as the source of
+\item We include ConceptNet, a Linked Open Data semantic network that expresses
+many kinds of relationships between words in many languages, as a source of
 structured connections between words.
 \item We modify the retrofitting algorithm, making it not depend on the row
 order of its input matrix, and allowing it to propagate over the structured
@@ -110,16 +110,19 @@ heuristic for merging together multiple term vectors.
 \item We fill gaps when aligning the two distributional-semantics sources
 (GloVe and word2vec) using a locally linear interpolation.
 \item We re-scale the distributional-semantics features using L1 normalization,
-which we have found leads to better similarity measurements than the L2
-normalization that is standard for GloVe.
+which particularly improves the performance of GloVe over its suggested L2
+normalization.
 \end{itemize}
 
-This process achieves state-of-the-art performance on word-similarity
+When we use this process to combine word2vec, GloVe, ConceptNet, and PPDB
+\cite{ganitkevitch2013ppdb}, this process produces a space of term embeddings
+that achieves state-of-the-art performance on word-similarity
 evaluations\footnote{Some methods distinguish word similarity from word
 {\em relatedness}. ``Coffee'' and ``mug'', for example, are quite related,
 but not actually similar because coffee is not {\em like} a mug. In this paper,
 however, we conflate similarity and relatedness into the same metric, as most
-evaluations do.} over both common and rare words.
+evaluations do.}
+over both common and rare words.
 
 \section{Background}
 
@@ -158,11 +161,30 @@ ConceptNet also includes a mapping of DBPedia \cite{auer2007dbpedia} into
 its vocabulary, but it is not used for word associations, so its presence does
 not affect the results in this paper.
 
-\subsection{GloVe}
+\subsection{Distributional Representations of Word Similarity}
+
+A distributional representation of word similarity is one that compares words
+by comparing the collection of words that they appear near in a corpus.
+Systems that implement distributional representations often do so by learning
+compact representations of these sparse collections of co-occurring words.
+
+\newcite{mikolov2013word2vec} described a system for learning distributional
+word embeddings called Skip-Grams with Negative Sampling (SGNS), which is more
+popularly known by the name of its software implementation, {\em word2vec}.
+(The {\em word2vec} software also implements another representation, Continuous
+Bag-of-Words or CBOW, which is less often used because SGNS generally performs
+better.)
+
+In SGNS, a neural network with one hidden layer is trained to recognize words
+that are likely to appear near each other. Its goal is to output a high value
+when given examples of co-occurrences that appear in the data, and a low value
+for negative examples where one word is replaced by a random word. The loss
+function is weighted by the frequencies of the words involved and the distance
+between them in the data.
 
 GloVe \cite{pennington2014glove} is an unsupervised learning algorithm that
-learns vector representations of words, such that the dot product of two words'
-vectors is approximately equal to the logarithm of their co-occurrence count.
+learns a set of word embeddings such that the dot product of two words'
+embeddings is approximately equal to the logarithm of their co-occurrence count.
 The algorithm operates on a global word-word co-occurrence matrix, and
 solves an optimization problem to learn a vector for each word, a separate
 vector for each context (although the contexts are also words), and a bias
@@ -178,9 +200,24 @@ page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}.
 
 The GloVe embeddings that are evaluated most often are the ``GloVe 42B''
 embeddings, calculated from 42 billion tokens of the Common Crawl. There are
-also ``GloVe 840B'' calculated from 840 billion tokens, which can perform
-better, but their term labels require some data cleaning first. We will do this
-cleaning as part of the ensemble method.
+also ``GloVe 840B'' embeddings calculated from 840 billion tokens, which we
+find can perform better, but their term labels require some data cleaning first.
+We will do this cleaning as part of the ensemble method.
+
+There is some debate about whether GloVe or word2vec is better at representing
+word meanings in general. GloVe is presented by \newcite{pennington2014glove}
+as performing better than word2vec on word similarity tasks, but
+\newcite{levy2015embeddings} finds that word2vec performs better with an
+optimized setting of hyperparameters than GloVe does, when retrained with a
+particular corpus.
+
+In this paper, we focus only on the downloadable sets of term embeddings that
+the GloVe and word2vec projects provide, not on re-running them with tuned
+hyperparameters. Using this data makes it possible to reproduce their results
+and compare directly to them, even when their preferred input data is not
+publically available. We find that we can get very good results derived from
+the downloadable embeddings, and that GloVe's downloadable embeddings outperform
+word2vec's in this case, but a combination of them can perform even better.
 
 \section{Methods}
 

@@ -46,6 +46,12 @@ class WordVectors:
             return 0
 
     def to_vector(self, word, lang=None, default_zero=False) -> np.ndarray:
+        if isinstance(word, list):
+            vec = np.zeros(self.vectors.shape[1])
+            for actual_word, weight in word:
+                vec += self.to_vector(actual_word, lang=lang)
+            return normalize_vec(vec)
+
         if self._standardizer is not None:
             if self._standardizer is standardize and \
                 lang is not None:

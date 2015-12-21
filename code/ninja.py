@@ -10,6 +10,7 @@ CONFIG = {
     'build-data-path': 'build-data/',
     'glove-versions': ['glove.840B.300d'],
     'word2vec-versions': [],   # ['w2v-google-news'],
+    'extra-embeddings': ['combo'],
     'neg-filters': ['jmdict', 'opencyc', 'openmind', 'verbosity', 'wiktionary', 'wordnet'],
     'pos-filters': ['wiktionary'],
     'retrofit-items': ['conceptnet5',
@@ -143,7 +144,7 @@ def build_word2vec(graph):
 
 
 def standardize_glove(graph):
-    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
+    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions'] + CONFIG['extra-embeddings']:
         graph['standardize_glove'][version] = Dep(
             [
                 GloveLabels(version=version),
@@ -175,7 +176,7 @@ def standardize_ppdb(graph):
 
 
 def normalize_glove(graph):
-    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
+    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions'] + CONFIG['extra-embeddings']:
         for norm in ('l1', 'l2'):
             for s13n in ('raw', 'standardized'):
                 graph['normalize_glove'][version][norm][s13n] = Dep(
@@ -186,7 +187,7 @@ def normalize_glove(graph):
 
 
 def build_assoc(graph):
-    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
+    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions'] + CONFIG['extra-embeddings']:
         for network in CONFIG['retrofit-items']:
             path = CONFIG['build-data-path']
             if network == 'conceptnet5':
@@ -226,7 +227,7 @@ def filter_conceptnet(graph):
 
 
 def add_self_loops(graph):
-    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
+    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions'] + CONFIG['extra-embeddings']:
         for network in CONFIG['retrofit-items']:
             graph['add_self_loops'][network] = Dep(
                 CONFIG['build-data-path'] + '%s.%s.npz' % (version, network),
@@ -236,7 +237,7 @@ def add_self_loops(graph):
 
 
 def retrofit(graph):
-    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
+    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions'] + CONFIG['extra-embeddings']:
         for network in CONFIG['retrofit-items']:
             for norm in ['l1', 'l2']:
                 if 'conceptnet5-' in network and norm != 'l1':
