@@ -1,3 +1,5 @@
 7f248e76-6891-41ef-ae76-fe341eed9fe7 bucket=public-annex chunk=10MiB datacenter=US encryption=none host=s3.amazonaws.com name=public-s3 port=80 public=yes storageclass=STANDARD type=S3 timestamp=1449871315.499026s
+a4a3db85-fd6e-474d-8356-83b7286811e9 bucket=conceptnet-vector-ensemble chunksize=1GiB datacenter=US encryption=none host=s3.amazonaws.com name=pubs3 partsize=1GiB port=80 public=yes storageclass=STANDARD type=S3 timestamp=1450810642.096386s
 a4a3db85-fd6e-474d-8356-83b7286811e9 bucket=conceptnet-vector-ensemble chunksize=1GiB datacenter=US encryption=none host=s3.amazonaws.com name=pubs3 partsize=1GiB port=80 public=yes storageclass=STANDARD type=S3 timestamp=1450814878.265134s
+a9c772c1-960d-4089-9b58-5d78f5d5ecd6 bucket=conceptnet-retrofitting chunk=1GiB datacenter=US encryption=none host=s3.amazonaws.com name=s3-open-data port=80 public=yes storageclass=STANDARD type=S3 timestamp=1449874399.617484s
 a9c772c1-960d-4089-9b58-5d78f5d5ecd6 bucket=conceptnet-retrofitting chunk=1GiB datacenter=US encryption=none host=s3.amazonaws.com name=s3-open-data port=80 public=yes storageclass=STANDARD type=S3 timestamp=1450472854.15758s
