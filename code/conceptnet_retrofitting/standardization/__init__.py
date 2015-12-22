@@ -13,9 +13,10 @@ def standardize(text, lang='en', remove_accents=True):
     text = fix_text(text)
     if remove_accents and (lang=='es' or text.startswith('/c/es/')):
         text = normalize('NFD', text).encode('ascii', errors='ignore').decode()
-    if not text.startswith('/c/'):
+    if text.startswith('/c/'):
+        return replace_numbers(text)
+    else:
         return standardized_concept_uri(text, lang)
-    return text
 
 LCODE_ALIASES = {
     # Pretend that all Chinese languages and variants are equivalent. This is

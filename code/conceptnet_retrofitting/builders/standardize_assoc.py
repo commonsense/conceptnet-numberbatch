@@ -1,7 +1,6 @@
 import numpy as np
 
 from conceptnet_retrofitting.standardization import standardize
-from conceptnet_retrofitting.label_set import LabelSet
 
 
 def standardize_assoc(assoc_in, assoc_out):
