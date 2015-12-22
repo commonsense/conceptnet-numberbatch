@@ -238,9 +238,6 @@ def add_self_loops(graph):
 
 
 def retrofit(graph):
-<<<<<<< HEAD
-    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions'] + CONFIG['extra-embeddings']:
-=======
     for network in ['conceptnet5']:
         graph['assoc_to_labels'][network] = Dep(
             CONFIG['source-data-path'] + CONCEPTNET_SOURCE_FILE,
@@ -248,8 +245,7 @@ def retrofit(graph):
             'assoc_to_labels'
         )
 
-    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
->>>>>>> b1c417de66a184f27242cc5a74355834cc4c4048
+    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions'] + CONFIG['extra-embeddings']:
         for network in CONFIG['retrofit-items']:
             for norm in ['l1', 'l2']:
                 if 'conceptnet5-' in network and norm != 'l1':
