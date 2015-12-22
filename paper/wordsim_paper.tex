@@ -95,8 +95,8 @@ distributional semantics of unstructured text with a source of structured
 connections between words. The combined embedding achieves performance on
 word-similarity evaluations superior to either source individually.
 
-The ensemble method we present here builds on retrofitting, with the following
-modifications:
+Here, we build on the retrofitting process to produce a high-quality space of
+word embeddings. We extend existing techniques in the following ways:
 
 \begin{itemize}
 \item We include ConceptNet, a Linked Open Data semantic network that expresses
@@ -123,6 +123,8 @@ but not actually similar because coffee is not {\em like} a mug. In this paper,
 however, we conflate similarity and relatedness into the same metric, as most
 evaluations do.}
 over both common and rare words.
+
+% TODO: cite Turney 2010 survey
 
 \section{Background}
 
@@ -768,6 +770,8 @@ the test set. Both {\bf WR1} and {\bf WR2} outperform GloVe's result on
 MEN-3000 by 5.4\%.
 
 \section{Discussion}
+
+% TODO: talk about Zou and multilingual embeddings
 
 \subsection{Standardizing Term Texts}
 
