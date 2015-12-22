@@ -8,7 +8,7 @@ from conceptnet_retrofitting.ninja.ninja_util import (
 CONFIG = {
     'source-data-path': 'source-data/',
     'build-data-path': 'build-data/',
-    'glove-versions': ['glove.840B.300d'],
+    'glove-versions': ['glove12.840B.300d'],
     'word2vec-versions': ['w2v-google-news'],
     'extra-embeddings': ['combo'],
     'neg-filters': ['jmdict', 'opencyc', 'openmind', 'verbosity', 'wiktionary', 'wordnet'],
@@ -24,7 +24,7 @@ CONFIG = {
                        #'conceptnet5-wiktionary-only',
                        'ppdb-xl-lexical-standardized', 'cnet-ppdb-combined']
 }
-CONCEPTNET_SOURCE_FILE = 'conceptnet5.5.csv'
+CONCEPTNET_SOURCE_FILE = 'conceptnet5.csv'
 
 
 class GloveVectors:
