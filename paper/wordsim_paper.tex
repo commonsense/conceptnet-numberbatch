@@ -317,7 +317,7 @@ these term labels have been normalized by different processes. Some labels
 have been case-folded (including ConceptNet and GloVe 42B, but not GloVe 840B),
 and the largest difference is that ConceptNet labels have been run though
 ConceptNet's Morphy-based lemmatizer. word2vec, meanwhile, has replaced digits
-with the character {\tt #} in all labels that contain two digits in a row.
+with the character {\tt \#} in all labels that contain two digits in a row.
 
 Due to a quirk in some of the evaluation data, we must apply one more
 transformation. The Spanish translations of word-similarity evaluations
@@ -614,20 +614,21 @@ and test data.
 \toprule
 Label     & Method                 & RW [all] &      MEN \\
 \midrule
-          & Skip-gram (Levy)       &     .470 &     .774 \\
-          & SVD (Levy)             &     .514 &     .777 \\
-          & Retrofitting (Faruqui) &      --- &     .796 \\
-\bf G     & GloVe (Pennington)     &     .477 &     .816 \\
-\bf WR0   & GloVe (our revision)   &     .528 &     .840 \\
-\bf WR1   & Wide retrofitting      &     .585 &{\bf .860}\\
-\bf WR2   & Wide retrofitting      &{\bf .589}&{\bf .860}\\
+          & Skip-gram (Levy)       &     .470 $(.435, .503)$ &     .774 $(.759, .787)$ \\
+          & SVD (Levy)             &     .514 $(.481, .545)$ &     .777 $(.762, .791)$ \\
+          & Retrofitting (Faruqui) &      ---                &     .796 $(.783, .809)$ \\
+\bf G     & GloVe (Pennington)     &     .477 $(.443, .510)$ &     .816 $(.804, .828)$ \\
+\bf WR0   & GloVe (our revision)   &     .528 $(.496, .559)$ &     .840 $(.829, .850)$ \\
+\bf WR1   & Wide retrofitting      &     .601 $(.572, .628)$ &{\bf .860}$(.850, .869)$ \\
+\bf WR2   & Wide retrofitting      &{\bf .589}$(.576, .632)$ &{\bf .860}$(.850, .869)$ \\
 \bottomrule
 \end{tabular}
 
 \caption{
     Comparison between our vector-space word embeddings and previously-published
-    results, on RW and MEN-3000. In order to compare with previous results, we
-    use all of the RW data, not just the 1/3 of it we set aside for testing.
+    results, on RW and MEN-3000, with 95\% confidence intervals. In order to compare
+    with previous results, we use all of the RW data, not just the 1/3 of it we set
+    aside for testing.
 }
 \label{compare-others}
 \end{table}
