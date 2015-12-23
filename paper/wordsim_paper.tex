@@ -81,13 +81,14 @@ provide a representation that is both more compact and more informative than the
 ``one-hot'' representation in which every term in the vocabulary gets its own
 dimension.
 
-This kind of vector space has
-been used in applications such as search, topic detection, and text
-classification, dating back to the introduction of latent semantic analysis
-\cite{deerwester1990indexing}.  In recent years, there has been a surge of
-interest in natural-language embeddings, as machine-learning techniques such as
-\newcite{mikolov2013word2vec}'s word2vec and \newcite{pennington2014glove}'s
-GloVe have begun to show dramatic improvements.
+This kind of vector space has been used in applications such as search, topic
+detection, and text classification, dating back to the introduction of latent
+semantic analysis \cite{deerwester1990indexing}.  In recent years, there has
+been a surge of interest in natural-language embeddings, as machine-learning
+techniques such as \newcite{mikolov2013word2vec}'s word2vec and
+\newcite{pennington2014glove}'s GloVe have begun to show dramatic improvements.
+Word embeddings are often suggested as an initialization for more complex
+methods, such as the sentence encodings of \newcite{kiras2015skip}.
 
 \newcite{faruqui2015retrofitting} introduced a technique
 known as ``retrofitting'', which combines embeddings learned from the
@@ -124,9 +125,15 @@ however, we conflate similarity and relatedness into the same metric, as most
 evaluations do.}
 over both common and rare words.
 
-% TODO: cite Turney 2010 survey
 
 \section{Background}
+
+% TODO: cite Turney 2010 survey
+% TODO: talk about Zou and multilingual embeddings
+% TODO: talk about Bian and word senses
+
+
+\section{Knowledge sources}
 
 \subsection{ConceptNet}
 ConceptNet \cite{speer2012conceptnet} is a semantic network of terms
@@ -151,7 +158,8 @@ The data sources included in ConceptNet 5.4 are:
     Verbosity \cite{vonahn2006verbosity} in English, {\em nadya.jp}
     \cite{nakahara2011nadya} in Japanese, and the PTT pet game \cite{kuo2009petgame}
     in Taiwanese Chinese
-\item WordNet 3.0 \cite{miller1998wordnet}
+\item WordNet 3.0 \cite{miller1998wordnet}, represented as sense-tagged words
+    (whose sense we ignore here)
 \item A parsed version of Wiktionary's entries whose target language is English
       or German \cite{wiktionary2014en} \cite{wiktionary2014de}, generated
       by a parser developed as part of the ConceptNet codebase
@@ -159,9 +167,28 @@ The data sources included in ConceptNet 5.4 are:
 \item OpenCyc \cite{matuszek2006cyc} as represented in Umbel \cite{bergman2008umbel}
 \end{itemize}
 
-ConceptNet also includes a mapping of DBPedia \cite{auer2007dbpedia} into
-its vocabulary, but it is not used for word associations, so its presence does
-not affect the results in this paper.
+ConceptNet also comes with an alignment to DBPedia \cite{auer2007dbpedia}, but
+the forms of knowledge that ConceptNet and DBPedia represent are somewhat
+different. ConceptNet focuses on the general meaning of words, and while it
+contains occasional sense tags, it is mostly designed for undisambiguated text.
+DBPedia focuses on topics of Wikipedia articles, which are mostly specific
+named entities such as historical figures, villages, and music albums. In
+addition, the relationships between them are often not general knowledge --
+such as the rosters of sports teams from all places and decades, or the
+locations where people were born and died.
+
+Because named entities frequently overlap with common words, they often {\em
+require} disambiguation if they are to be incorporated in a non-destructive
+way. In general, we have found that incorporating DBPedia-like entities would
+require changes to our vocabulary-alignment process that works well for other
+resources, and it does not help us toward our goal of improving the
+understanding of words that appear in undisambiguated text. As such, we do not
+incorporate DBPedia here.\footnote{
+    Given different goals -- such as achieving a high score on
+    \newcite{mikolov2013word2vec}'s analogy evaluation that tests relations
+    such as ``{\em A} is the CEO of company {\em B}'' -- including an appropriate
+    representation of DBPedia would of course be helpful.
+}
 
 \subsection{Distributional Representations of Word Similarity}
 
@@ -203,8 +230,10 @@ page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}.
 The GloVe embeddings that are evaluated most often are the ``GloVe 42B''
 embeddings, calculated from 42 billion tokens of the Common Crawl. There are
 also ``GloVe 840B'' embeddings calculated from 840 billion tokens, which we
-find can perform better, but their term labels require some data cleaning first.
-We will do this cleaning as part of the ensemble method.
+find can perform better, but their term labels require some data cleaning
+first.  We will do this cleaning as part of the ensemble method. We use the
+GloVe 1.2 version of the data, as GloVe 1.0's data files had some incorrectly
+encoded text labels.
 
 There is some debate about whether GloVe or word2vec is better at representing
 word meanings in general. GloVe is presented by \newcite{pennington2014glove}
@@ -226,16 +255,18 @@ word2vec's in this case, but a combination of them can perform even better.
 \newcite{faruqui2015retrofitting} introduced the ``retrofitting'' procedure,
 which adjusts dense matrices of embeddings (such as the GloVe output) to take
 into account external knowledge from a sparse semantic network. They used PPDB
-\cite{ganitkevitch2013ppdb} as an external source of semantic knowledge. We
-found using ConceptNet as the external knowledge source to be more effective,
-and that further marginal improvements could be achieved on some evaluations by
-combining ConceptNet and PPDB.
+\cite{ganitkevitch2013ppdb} (the Paraphrase Database) as an external source of
+semantic knowledge. We found using ConceptNet as the external knowledge source
+to be more effective, and that further marginal improvements could be achieved
+on some evaluations by combining ConceptNet and PPDB.
 
-We create a matrix that assigns embeddings in a 300-dimensional vector
-space to terms by combining data from ConceptNet and GloVe. The resulting word
-embeddings incorporate the strengths of both ConceptNet and GloVe, and extend
-their vocabulary to the union of ConceptNet and GloVe, allowing embeddings that
-were originally only trained on English to be extended to other languages.
+% FIXME: does this paragraph go somewhere else?
+Our goal is to create a 300-dimensional vector space that represents terms based
+on a combination of GloVe and word2vec's downloadable embeddings, and structured
+data from ConceptNet and PPDB. The resulting vector space allows information to
+be shared among these various representations, including words that were not in
+the vocabulary of the original representations. This includes low-frequency words
+and even words that are not in English.
 
 \subsection{Standardizing Text}
 
@@ -245,10 +276,19 @@ system design choices and hyperparameter optimizations, rather than the
 embedding algorithms themselves.'' While it is presented as a negative result,
 this simply emphasizes the importance of these system design choices.
 
-Indeed, we have found that choices about how to handle text have a significant
-impact on evaluation results. Additionally, we can only properly combine two
-resources with a method such as retrofitting if their string representations
-are comparable to each other.
+Indeed, we have found that choices about how to handle terms and their
+embeddingshave a significant impact on evaluation results. One of these choices
+involves how to pre-process words and phrases before looking them up, and
+another involves the scale of the various features in the embeddings.
+
+
+\subsubsection{Transforming and Aligning Vocabularies}
+
+% TODO: shorten, this is redundant
+Different representations apply
+different pre-processing steps, placing strings in different equivalence
+classes. We can only properly combine these resources if these string
+representations are comparable to each other.
 
 The operations we apply to text would usually be called ``normalization'',
 but that word also refers to the scaling operations we will be applying to
@@ -262,16 +302,16 @@ modification of WordNet's Morphy algorithm, removing a very small list of
 stopwords (``a'', ``an'', and ``the''), replacing spaces and slashes with
 underscores, lowercasing the text, and tagging the result with its language.
 
-As an example, in ConceptNet, the text ``give an example'' becomes the standardized form
-{\tt /c/en/give\_example}.
+As an example, in ConceptNet, the text ``give an example'' becomes the
+standardized form {\tt /c/en/give\_example}.
 
 The 42-billion-token version of GloVe, whose results are published in
-\cite{pennington2014glove}, applies some more minimal standardizations that do
-not include stemming. The 840-billion-token version applies almost no
-standardization, and in particular it does not lowercase its words.
+\cite{pennington2014glove}, applies some more minimal standardizations that
+include case-folding but not lemmatization. The 840-billion-token version
+applies almost no standardization, and in particular it does not lowercase its
+words.
 
-\subsubsection{Transforming and Aligning Vocabularies}
-
+% TODO: make a table of transformations
 The different vector spaces have different sets of term labels, of course, and
 these term labels have been normalized by different processes. Some labels
 have been case-folded (including ConceptNet and GloVe 42B, but not GloVe 840B),
@@ -329,33 +369,38 @@ of distinguishing features and reduce the impact of noisy features.  Features
 are more distinguishing for the purpose of cosine similarity when they contain
 a few large values and many small ones.
 
-$L_2$ normalization can be generalized to arbitrary $L_p$ normalization by
-dividing each vector by its $p$-norm. The $p$-norm of an $n$-element vector is
-defined by
-
-$$ \left\|\mathbf{x}\right\|_p
-= \left(\sum_{i=1}^n \left|x_i\right|^p\right)^{(1/p)}$$
-
-where $p \geq 1$. Notice that as $p$ increases, the effect of a few large values
-on the norm increases: $L_p$ normalization more heavily penalizes
-distinguishing features when $p$ is large. For this reason, we found that $L_1$
-normalization should provide a better weighting of features than $L_2$
-normalization.  Our tests confirm that $L_1$ normalization provides a
-performance increase on almost all variations of GloVe.
-
+We find that $L_1$ normalization of GloVe performs even better than $L_2$
+normalization. $L_1$ causes occasional large values to have a smaller impact on the norm
+than $L_2$ normalization. When a learning method such as GloVe has provided
+highly selective features, $L_1$ normalization allows us to use them more effectively
+in measuring similarity.
 
 \subsection{Retrofitting}
 
+% TODO: restate less about how retrofitting works?
+
 Retrofitting \cite{faruqui2015retrofitting} is a process of combining existing
 word vectors with a semantic lexicon. While the original formulation expresses
-the problem in terms of a set of edges, we have found it more convenient to
-express it in terms of matrices. Let $v$ denote the size of the vocabulary,
-which is the union of the vocabularies of the embedding and the lexicon. Let $S$ be
-a $v \times v$ matrix denoting the strength of the relationship in the semantic lexicon
-between each pair of words, and $W$ be a $v \times n$
-matrix denoting the original word vectors. If a word does not have a
-corresponding word vector, it is assigned the zero vector. Retrofitting
-generates a $W'$ that minimizes
+the problem in terms of updates that propagate over a set of edges, we have
+found it more convenient to express it and implement it in terms of an update
+to a matrix.
+
+The inputs to retrofitting are an initial dense matrix of term embeddings,
+$W^0$, and a sparse matrix of known semantic relationships, $S$. Let the size
+of the complete vocabulary be $m$ and the dimensionality of the embeddings be $n$.
+$W^0$ is an $m \times n$ matrix containing the known term embeddings, with
+rows of all zeroes for terms that are outside the vocabulary of the original embeddings.
+$S$ is an $n \times n$ matrix containing positive weighted values for terms that
+are known to be semantically related, 1 on the diagonal relating each term to
+itself\footnote{
+    These diagonal entries, or ``self-loops'' in the semantic network, are not strictly
+    necessary, but we have found that they help the process converge faster.
+    In Table~\ref{eval-variations}, we examine the effect of omitting the self-loops
+    while running for the same number of steps.
+}, and 0 otherwise.
+
+Retrofitting on a matrix $W$ (whose rows are indicated by $w_i$) yields a final
+matrix $W'$ (with rows indicated by $w'_i$) that minimizes
 
 \begin{small}
 $$
@@ -366,71 +411,27 @@ $$
 $$
 \end{small}
 
-where $\alpha_i$ is a vector of weights. In our tests, we let
+where $\alpha$ is a vector that indicates the weight of a term in the original
+vector space. For our purposes, we let $\alpha_i$ be 1 when word $i$ is in the
+original embeddings' vocabulary, and 0 when it only appears in the semantic
+network. (This neutralizes the effect of the all-zero rows in $W^0$.) We can
+also represent these weights as a diagonal matrix $A$, where $A_{ii} =
+\alpha_i$, allowing us to multiply matrices by it row-wise.
+
+Similarly to the original formulation of retrofitting, $\Psi$ can be optimized
+by a simple iterative updating method. We repeatedly update $W$ with:
 
 $$
-\alpha_i =
-  \begin{cases}
-    0 & \text{if $w_i = \vec{0}$} \\
-    1 & \text{otherwise}
-  \end{cases}
+W^{k+1} = \mathrm{normalize}\left( \left( S W^k + W^0 A \right)\left( 1 + A \right)^{-1} \right)
 $$
 
-Similarly to the original formulation of retrofitting, $\Psi$ is convex and can
-be solved by a simple iterative updating method:
-
-$$
-W^{k+1} = \left( S W^k + \alpha \odot W^0 \right)
-\oslash \left( \vec{1} + \alpha \right)
-$$
-
-where $\oslash$ denotes row-wise division, $\odot$ denotes row-wise
-multiplication, $\vec{1}$ is a vector of all ones and $W^0$ are the original
-word vectors.
-
-As in the original publication of retrofitting, we apply this iterative process
-for 10 steps.
-
-\subsubsection{Row-Normalized Retrofitting}
-
-The magnitude of a vector acts as an implicit $\alpha$ in retrofitting.
-The $L_2$ norms of the pre-trained vectors span several orders of magnitude.
-Nonsense associations within the semantic lexicon between a vector with a large
-$L_2$ norm and a vector with small $L_2$ norm could remove much of the semantic
-information contained within the small vector.
-
-Therefore, we $L_2$-normalize
-the rows of the word vectors both before and during the retrofitting process.
-We $L_2$-normalize the rows of $W^0$, as well as the result of each
-multiplication $S W^k$. Preliminary experiments showed us that this yields
-an increase in performance on word similarity.
-
-\subsection{Self-Loops}
-If not for the step that averages the multiplied vectors with the original
-vectors $W^0$, retrofitting would fail to optimize anything at all, as all
-vectors in a connected component would eventually converge to the same vector.
-Averaging with $W^0$ seems to have an important ``anchoring'' effect that
-ensures that the previously-learned values for the vectors continue to have
-an effect.
-
-When we extend the domain of retrofitting so that it applies to the union of
-the vocabularies instead of the intersection, the newly-introduced terms have
-no such anchor point. We can at least stabilize the values of these vectors
-somewhat by adding some weight to the diagonal of $S$ -- that is, by
-effectively adding edges to the semantic network that connect each node to
-itself. The effect is to average each row with its {\em previous} value, as
-well as its original value when applicable. We refer to these stabilizing edges
-as ``self loops''.
-
-Assuming that $S$ is originally $L_1$-normalized so that every node's
-out-degree is 1, we find that adding 1 to the diagonal of $S$ has a mildly
-positive effect, particularly when evaluated on rare words that may depend
-heavily on these new terms. The effect of removing these self-loops is one of
-the variations shown in Table~\ref{eval-variations}.  We suspect that
-self-loops have a dampening effect that prevents the vectors of rare words from
-fluctuating wildly at each step of retrofitting.
+where $A$ is a matrix whose diagonal is the weight vector $\alpha$. The {\em normalize}
+function applies $L_2$ normalization to each non-zero row of its argument, ensuring
+that terms are always represented by unit vectors that can be used directly in
+cosine similarity.
 
 \subsection{ConceptNet as an Association Matrix}
+% TODO: can this be trimmed?
 
 In order to apply the wide retrofitting method, we need to consider the data in
 ConceptNet as a sparse, symmetric matrix of associations between terms. What
@@ -467,9 +468,10 @@ association matrix $S$. ConceptNet assigns a confidence score, or weight, to
 each assertion. An assertion that relates term $i$ to term $j$ with weight $w$
 will contribute $w$ to the values of $S_{ij}$ and $S_{ji}$. If another
 assertion relates the same terms with a different relation, it will add to that
-value.
+value. This constructs a symmetric matrix $S$, but the matrix we actually use
+in retrofitting is the asymmetric $S'$, whose rows have been $L_1$-normalized.
 
-Due to the structure of ConceptNet, there exists a long tail of terms that are
+Due to the structure of ConceptNet, there exists a large fringe of terms that are
 poorly connected to other nodes. To make the sparse matrix and the size of the
 overall vocabulary more manageable, we filter ConceptNet when building its
 association matrix: we exclude all terms that appear fewer than 3 times, English
@@ -604,6 +606,8 @@ and test data.
 
 \subsection{Results}
 
+% TODO: compare to Rothe
+
 \begin{table}[t]
 \centering
 \begin{tabular}{llrr}
@@ -698,6 +702,11 @@ simply involves transforming the rows and columns of the existing GloVe 840B
 matrix, showing that some of the improvements from this paper can be realized
 without introducing any additional data.
 
+It is difficult to compare our system to \newcite{rothe2015} because they only
+evaluated on SCWS. Their system can use the full SCWS, because it has a
+representation of word contexts, and as such it achieves a higher score than
+our system gets on SCWS* without contexts.
+
 Table~\ref{eval-multilingual} shows the performance of these systems on
 gold standards that have been translated to other languages, in comparison to
 the multilingual results published by \newcite{faruqui2015retrofitting}.
@@ -771,9 +780,8 @@ MEN-3000 by 5.4\%.
 
 \section{Discussion}
 
-% TODO: talk about Zou and multilingual embeddings
-
 \subsection{Standardizing Term Texts}
+% TODO: rewrite to "the importance of text standardization" or something
 
 When we applied ConceptNet's lemmatizer to the labels of GloVe's 840B-token
 dataset, we found an unexpected benefit of lemmatization: it caused a very
