@@ -128,7 +128,7 @@ over both common and rare words.
 
 \section{Knowledge sources}
 
-\subsection{ConceptNet}
+\subsection{ConceptNet and PPDB}
 ConceptNet \cite{speer2012conceptnet} is a semantic network of terms
 connected by labeled relations. Its terms are words or multiple-word phrases
 in a variety of natural languages. For continuity with previous work,
@@ -149,6 +149,11 @@ with general word similarity.\footnote{
     such as ``{\em A} is the CEO of company {\em B}'' -- including an appropriate
     representation of DBPedia would of course be helpful.
 }
+
+PPDB \cite{ganitkevitch2013ppdb} is another resource that is useful for
+learning about word similarity, providing different information from
+ConceptNet. It lists pairs of words that are translated to the same word in parallel
+corpora, particularly in documents of the European parliament.
 
 \subsection{word2vec and GloVe}
 
@@ -206,11 +211,11 @@ word2vec's in this case, but a combination of them can perform even better.
 
 \newcite{faruqui2015retrofitting} introduced the ``retrofitting'' procedure,
 which adjusts dense matrices of embeddings (such as the GloVe output) to take
-into account external knowledge from a sparse semantic network. They used PPDB
-\cite{ganitkevitch2013ppdb} (the Paraphrase Database) as an external source of
-semantic knowledge. We found using ConceptNet as the external knowledge source
-to be more effective, and that further marginal improvements could be achieved
-on some evaluations by combining ConceptNet and PPDB.
+into account external knowledge from a sparse semantic network. They tried
+various sources of external knowledge, and the one that was most helpful to
+GloVe was PPDB.  We found using ConceptNet to be more effective, and that
+further marginal improvements could be achieved on some evaluations by
+combining ConceptNet and PPDB.
 
 % FIXME: does this paragraph go somewhere else?
 Our goal is to create a 300-dimensional vector space that represents terms based
@@ -229,62 +234,39 @@ embedding algorithms themselves.'' While it is presented as a negative result,
 this simply emphasizes the importance of these system design choices.
 
 Indeed, we have found that choices about how to handle terms and their
-embeddingshave a significant impact on evaluation results. One of these choices
+embeddings have a significant impact on evaluation results. One of these choices
 involves how to pre-process words and phrases before looking them up, and
 another involves the scale of the various features in the embeddings.
 
 
 \subsubsection{Transforming and Aligning Vocabularies}
 
-% TODO: shorten, this is redundant
 Different representations apply
 different pre-processing steps, placing strings in different equivalence
 classes. We can only properly combine these resources if these string
 representations are comparable to each other.
 
-The operations we apply to text would usually be called ``normalization'',
-but that word also refers to the scaling operations we will be applying to
-vectors, so both here and in the code we call it ``standardization'' instead.
+% TODO: check this list
 
-ConceptNet 5.4 uses a particular sequence of operations to standardize its
-text, and we have reproduced these operations in the code that supports this
-paper.  The operations include tokenizing the text using a Unicode-aware
-regular expression, reducing English words to their root forms using a
-modification of WordNet's Morphy algorithm, removing a very small list of
-stopwords (``a'', ``an'', and ``the''), replacing spaces and slashes with
-underscores, lowercasing the text, and tagging the result with its language.
+Pre-processing steps that various resources apply include: tokenizing text to
+separate words from punctuation (which all inputs except GloVe 840B do),
+joining multi-word phrases with underscores (ConceptNet and word2vec), removing
+a small list of stopwords (ConceptNet only), folding the text to lowercase
+(ConceptNet and GloVe 42B), replacing multiple digits with the character {\tt
+\#} (word2vec only), lemmatizing English words to their root form using a
+modification of WordNet's Morphy algorithm (ConceptNet only), and removing
+accents from Spanish words (required for Spanish word similarity evaluations).
 
-As an example, in ConceptNet, the text ``give an example'' becomes the
-standardized form {\tt /c/en/give\_example}.
+We adapt a text pre-processing function from ConceptNet to apply a combination
+of all of these processes, yielding a set of standardized, language-tagged
+labels. As an example, the text ``give an example'' becomes the standardized
+form {\tt /c/en/give\_example}. Applying this combined pre-processing function
+to all labels increases the alignment of the various resources while reducing
+the size of the combined vocabulary.
 
-The 42-billion-token version of GloVe, whose results are published in
-\cite{pennington2014glove}, applies some more minimal standardizations that
-include case-folding but not lemmatization. The 840-billion-token version
-applies almost no standardization, and in particular it does not lowercase its
-words.
-
-% TODO: make a table of transformations
-The different vector spaces have different sets of term labels, of course, and
-these term labels have been normalized by different processes. Some labels
-have been case-folded (including ConceptNet and GloVe 42B, but not GloVe 840B),
-and the largest difference is that ConceptNet labels have been run though
-ConceptNet's Morphy-based lemmatizer. word2vec, meanwhile, has replaced digits
-with the character {\tt \#} in all labels that contain two digits in a row.
-
-Due to a quirk in some of the evaluation data, we must apply one more
-transformation. The Spanish translations of word-similarity evaluations
-\cite{hassan2009crosslingual} are written without any accents on the letters,
-such as ``telefono'' instead of ``tel\'{e}fono''. In order to recognize these as
-the correct words instead of out-of-vocabulary words when evaluating in Spanish,
-we need to re-standardize all Spanish terms in ConceptNet to omit all of the
-accents.
-
-To align the vocabularies, we first need to apply the union of all these
-transformations to all labels. Because the transformations are many-to-one, this
-has the effect that a single transformed term can become associated with
-multiple embeddings in a single vector space.
-
-We considered a few options for dealing with these merged terms:
+Because the transformations are many-to-one, this has the effect that a single
+transformed term can become associated with multiple embeddings in a single
+vector space. We considered a few options for dealing with these merged terms:
 
 \begin{enumerate}
 \item Keep only the vector for the term with the highest frequency in the
@@ -297,19 +279,14 @@ The weighted average turns out to be the best approach, as our evaluation will
 show. The multiple rows contain valuable data that should not simply be
 discarded, but lower-frequency rows tend to have lower-quality data.
 
-It is useful to work with pre-trained vectors from systems such as GloVe and
-word2vec, as they allow reproducing evaluations such as semantic similarity
-without having to exactly reproduce every part of the system that built them.
-However, when using pre-trained vectors, it is often the case that intermediate
+When using pre-trained vectors, it is often the case that intermediate
 computations that produced these vectors (such as word frequencies) are not
-available.
-
-What we can do instead is to infer approximate word frequencies from the fact
-that both GloVe and word2vec output their vocabularies in descending order of
-frequency. We approximate the frequency distribution by assuming that the tokens
-are distributed according to Zipf's law \cite{zipf1949human}: the $n$th token in
-rank order has a frequency proportional to $1/n$. We use these proportions in
-the weighted average when combining multiple embeddings.
+available. What we can do instead is to infer approximate word frequencies from
+the fact that both GloVe and word2vec output their vocabularies in descending
+order of frequency. We approximate the frequency distribution by assuming that
+the tokens are distributed according to Zipf's law \cite{zipf1949human}: the
+$n$th token in rank order has a frequency proportional to $1/n$. We use these
+proportions in the weighted average when combining multiple embeddings.
 
 
 \subsection{Normalization}
