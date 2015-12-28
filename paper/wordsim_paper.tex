@@ -45,19 +45,14 @@
 \maketitle
 \begin{abstract}
 
-A currently successful approach to computational semantics is to represent words
-as embeddings in a machine-learned vector space. Embeddings convert the
-representation of sentences as a sequence or bag of discrete words to a dense,
-continuous representation, providing a model of which words are similar and a
-better input to further machine learning than ``one-hot'' representations.
-The effectiveness of embeddings can be evaluated by their ability to identify
-similar or related words like a human would. In this paper, we present an
-ensemble method that combines embeddings produced by GloVe
+A currently successful approach to computational semantics is to represent
+words as embeddings in a machine-learned vector space.  n this paper, we
+present an ensemble method that combines embeddings produced by GloVe
 \cite{pennington2014glove} and word2vec \cite{mikolov2013word2vec} with
 structured knowledge from the semantic network ConceptNet 5
-\cite{speer2012conceptnet}, merging their information into a
-common representation with a large, multilingual vocabulary. The embeddings
-it produces achieve state-of-the-art performance on many word similarity
+\cite{speer2012conceptnet}, merging their information into a common
+representation with a large, multilingual vocabulary. The embeddings it
+produces achieve state-of-the-art performance on many word similarity
 evaluations. Its score of $\rho = \scoreRW{}$ on an evaluation of rare words
 \cite{luong2013rw} is 13.6\% higher than the previous best known system.
 % FIXME: update for final score and data sources
@@ -104,15 +99,13 @@ word embeddings. We extend existing techniques in the following ways:
 many kinds of relationships between words in many languages, as a source of
 structured connections between words.
 \item We modify the retrofitting algorithm, making it not depend on the row
-order of its input matrix, and allowing it to propagate over the structured
-semantic network as well.
+order of its input matrix, and allowing it to propagate over the union of the
+vocabularies. We call this procedure ``expanded retrofitting''.
 \item We align English terms from different sources using a lemmatizer and a
 heuristic for merging together multiple term vectors.
 \item We fill gaps when aligning the two distributional-semantics sources
 (GloVe and word2vec) using a locally linear interpolation.
-\item We re-scale the distributional-semantics features using L1 normalization,
-which particularly improves the performance of GloVe over its suggested L2
-normalization.
+\item We re-scale the distributional-semantics features using L1 normalization.
 \end{itemize}
 
 When we use this process to combine word2vec, GloVe, ConceptNet, and PPDB
@@ -126,7 +119,7 @@ evaluations do.}
 over both common and rare words.
 
 
-\section{Background}
+\subsection{Related work}
 
 % TODO: cite Turney 2010 survey
 % TODO: talk about Zou and multilingual embeddings
@@ -144,72 +137,39 @@ these terms are often referred to as {\em concepts}.
 ConceptNet originated as a machine-parsed version of the early crowd-sourcing
 project called Open Mind Common Sense (OMCS) \cite{singh2002omcs}, and has expanded
 to include several other data sources, both crowd-sourced and expert-created,
-by unifying their vocabularies into a single representation.
-The data sources included in ConceptNet 5.4 are:
-
-\begin{itemize}
-\item Knowledge collected as English sentences on the original OMCS website,
-    and later parsed with pattern-matching rules
-\item OMCS projects that collected similar sentences in Portuguese
-    \cite{anacleto2006portuguese},
-    Dutch \cite{eckhardt2008kid}, and some Korean and Japanese
-    \cite{chung2006globalmind}
-\item ``Games with a purpose'' that have collected relational knowledge, such as
-    Verbosity \cite{vonahn2006verbosity} in English, {\em nadya.jp}
-    \cite{nakahara2011nadya} in Japanese, and the PTT pet game \cite{kuo2009petgame}
-    in Taiwanese Chinese
-\item WordNet 3.0 \cite{miller1998wordnet}, represented as sense-tagged words
-    (whose sense we ignore here)
-\item A parsed version of Wiktionary's entries whose target language is English
-      or German \cite{wiktionary2014en} \cite{wiktionary2014de}, generated
-      by a parser developed as part of the ConceptNet codebase
-\item JMDict \cite{breen2004jmdict}, a Japanese multilingual dictionary
-\item OpenCyc \cite{matuszek2006cyc} as represented in Umbel \cite{bergman2008umbel}
-\end{itemize}
-
-ConceptNet also comes with an alignment to DBPedia \cite{auer2007dbpedia}, but
-the forms of knowledge that ConceptNet and DBPedia represent are somewhat
-different. ConceptNet focuses on the general meaning of words, and while it
-contains occasional sense tags, it is mostly designed for undisambiguated text.
-DBPedia focuses on topics of Wikipedia articles, which are mostly specific
-named entities such as historical figures, villages, and music albums. In
-addition, the relationships between them are often not general knowledge --
-such as the rosters of sports teams from all places and decades, or the
-locations where people were born and died.
-
-Because named entities frequently overlap with common words, they often {\em
-require} disambiguation if they are to be incorporated in a non-destructive
-way. In general, we have found that incorporating DBPedia-like entities would
-require changes to our vocabulary-alignment process that works well for other
-resources, and it does not help us toward our goal of improving the
-understanding of words that appear in undisambiguated text. As such, we do not
-incorporate DBPedia here.\footnote{
+by unifying their vocabularies into a single representation. ConceptNet now includes
+representations of WordNet \cite{miller1998wordnet}, Wiktionary \cite{wiktionary2014en},
+and JMDict \cite{breen2004jmdict}, as well as data from ``games with a purpose'' in
+multiple languages \cite{vonahn2006verbosity} \cite{nakahara2011nadya}
+\cite{kuo2009petgame}. We choose not to include ConceptNet's alignment to DBPedia
+here, as DBPedia focuses on relations between specific named entities, which do not help
+with general word similarity.\footnote{
     Given different goals -- such as achieving a high score on
     \newcite{mikolov2013word2vec}'s analogy evaluation that tests relations
     such as ``{\em A} is the CEO of company {\em B}'' -- including an appropriate
     representation of DBPedia would of course be helpful.
 }
 
-\subsection{Distributional Representations of Word Similarity}
+\subsection{word2vec and GloVe}
 
-A distributional representation of word similarity is one that compares words
-by comparing the collection of words that they appear near in a corpus.
-Systems that implement distributional representations often do so by learning
-compact representations of these sparse collections of co-occurring words.
+word2vec and GloVe are two current systems that learn vector representations
+of words according to their distributional semantics. Given a large text corpus,
+they produce vectors representing similarities in how the words co-occur with
+other words.
 
-\newcite{mikolov2013word2vec} described a system for learning distributional
-word embeddings called Skip-Grams with Negative Sampling (SGNS), which is more
+\newcite{mikolov2013word2vec} described a system of distributional word
+embeddings called Skip-Grams with Negative Sampling (SGNS), which is more
 popularly known by the name of its software implementation, {\em word2vec}.
 (The {\em word2vec} software also implements another representation, Continuous
-Bag-of-Words or CBOW, which is less often used because SGNS generally performs
-better.)
+Bag-of-Words or CBOW, which is less often used for word similarity.)
 
 In SGNS, a neural network with one hidden layer is trained to recognize words
 that are likely to appear near each other. Its goal is to output a high value
 when given examples of co-occurrences that appear in the data, and a low value
 for negative examples where one word is replaced by a random word. The loss
 function is weighted by the frequencies of the words involved and the distance
-between them in the data.
+between them in the data. The word2vec software comes with SGNS embeddings
+of text from Google News.
 
 GloVe \cite{pennington2014glove} is an unsupervised learning algorithm that
 learns a set of word embeddings such that the dot product of two words'
@@ -220,21 +180,13 @@ vector for each context (although the contexts are also words), and a bias
 value for each word and each context. Only the word vectors are used for
 computing similarity.
 
-Learning processes such as GloVe produce results that can conveniently be
-re-used in other projects, simply by re-using the matrix of word embeddings.
 The embeddings that GloVe learns from data sources such as the Common
-Crawl\footnote{\url{http://commoncrawl.org/}} are
-distributed on the GloVe web
-page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}.
+Crawl\footnote{\url{http://commoncrawl.org/}} are distributed on the GloVe web
+page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}. Here we evaluate
+two downloadable sets of GloVe 1.2 embeddings, built from 42 billion and 840
+billion tokens of the Common Crawl, respectively.
 
-The GloVe embeddings that are evaluated most often are the ``GloVe 42B''
-embeddings, calculated from 42 billion tokens of the Common Crawl. There are
-also ``GloVe 840B'' embeddings calculated from 840 billion tokens, which we
-find can perform better, but their term labels require some data cleaning
-first.  We will do this cleaning as part of the ensemble method. We use the
-GloVe 1.2 version of the data, as GloVe 1.0's data files had some incorrectly
-encoded text labels.
-
+% NOTE: we may need to squish the next two paragraphs
 There is some debate about whether GloVe or word2vec is better at representing
 word meanings in general. GloVe is presented by \newcite{pennington2014glove}
 as performing better than word2vec on word similarity tasks, but
@@ -270,7 +222,7 @@ and even words that are not in English.
 
 \subsection{Standardizing Text}
 
-As \newcite{levy2015embeddings} note,
+As \newcite{levy2015embeddings} notes,
 ``[\ldots] much of the performance gains of word embeddings are due to certain
 system design choices and hyperparameter optimizations, rather than the
 embedding algorithms themselves.'' While it is presented as a negative result,
@@ -433,7 +385,7 @@ cosine similarity.
 \subsection{ConceptNet as an Association Matrix}
 % TODO: can this be trimmed?
 
-In order to apply the wide retrofitting method, we need to consider the data in
+In order to apply the expanded retrofitting method, we need to consider the data in
 ConceptNet as a sparse, symmetric matrix of associations between terms. What
 ConceptNet provides is more complex than that, as it connects terms with a
 variety of not-necessarily-symmetric, labeled relations.
@@ -540,7 +492,7 @@ Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN      &     
     ``Norm'' indicates the norm applied to the columns of GloVe.
     ``Text std.'' indicates whether labels are left in their original form or
     standardized according to ConceptNet 5.4. ``Retrofit'' indicates which data
-    is added using wide retrofitting.
+    is added using expanded retrofitting.
     Row {\bf G} reproduces the published GloVe results.
     {\bf WR1} and {\bf WR2} are the two best configurations of our system.
 }
