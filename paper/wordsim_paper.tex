@@ -2,8 +2,9 @@
 \def\thetitle{An Ensemble Method to Produce High-Quality Word Embeddings}
 
 % Update this when our score changes.
-\def\scoreRW{.584}
-\def\scoreMEN{.860}
+\def\scoreRW{.604}   % score on RW [all]
+\def\scoreMEN{.867}  % score on MEN-3000 [test]
+\def\yes{\textbullet}
 
 \documentclass[11pt,letterpaper]{article}
 % Packages required by the paper format
@@ -46,16 +47,16 @@
 \begin{abstract}
 
 A currently successful approach to computational semantics is to represent
-words as embeddings in a machine-learned vector space.  n this paper, we
+words as embeddings in a machine-learned vector space. We
 present an ensemble method that combines embeddings produced by GloVe
 \cite{pennington2014glove} and word2vec \cite{mikolov2013word2vec} with
 structured knowledge from the semantic network ConceptNet 5
-\cite{speer2012conceptnet}, merging their information into a common
-representation with a large, multilingual vocabulary. The embeddings it
-produces achieve state-of-the-art performance on many word similarity
-evaluations. Its score of $\rho = \scoreRW{}$ on an evaluation of rare words
-\cite{luong2013rw} is 13.6\% higher than the previous best known system.
-% FIXME: update for final score and data sources
+\cite{speer2012conceptnet}, merging their
+information into a common representation with a large, multilingual vocabulary.
+The embeddings it produces achieve state-of-the-art performance on many word
+similarity evaluations. Its score of $\rho = \scoreRW{}$ on an evaluation of
+rare words \cite{luong2013rw} is 17.5\% higher than the previous best known
+system.
 
 \end{abstract}
 
@@ -111,7 +112,8 @@ heuristic for merging together multiple term vectors.
 When we use this process to combine word2vec, GloVe, ConceptNet, and PPDB
 \cite{ganitkevitch2013ppdb}, this process produces a space of term embeddings
 that achieves state-of-the-art performance on word-similarity
-evaluations\footnote{Some methods distinguish word similarity from word
+evaluations\footnote{Some methods and evaluations \cite{agirre2009study}
+distinguish word similarity from word
 {\em relatedness}. ``Coffee'' and ``mug'', for example, are quite related,
 but not actually similar because coffee is not {\em like} a mug. In this paper,
 however, we conflate similarity and relatedness into the same metric, as most
@@ -140,14 +142,14 @@ to include several other data sources, both crowd-sourced and expert-created,
 by unifying their vocabularies into a single representation. ConceptNet now includes
 representations of WordNet \cite{miller1998wordnet}, Wiktionary \cite{wiktionary2014en},
 and JMDict \cite{breen2004jmdict}, as well as data from ``games with a purpose'' in
-multiple languages \cite{vonahn2006verbosity} \cite{nakahara2011nadya}
-\cite{kuo2009petgame}. We choose not to include ConceptNet's alignment to DBPedia
+multiple languages \cite{vonahn2006verbosity} \cite{kuo2009petgame}
+\cite{nakahara2011nadya}. We choose not to include ConceptNet's alignment to DBPedia
 here, as DBPedia focuses on relations between specific named entities, which do not help
 with general word similarity.\footnote{
     Given different goals -- such as achieving a high score on
-    \newcite{mikolov2013word2vec}'s analogy evaluation that tests relations
-    such as ``{\em A} is the CEO of company {\em B}'' -- including an appropriate
-    representation of DBPedia would of course be helpful.
+    \newcite{mikolov2013word2vec}'s analogy evaluation that tests for
+    implicit relations such as ``{\em A} is the CEO of company {\em B}'' --
+    including an appropriate representation of DBPedia would of course be helpful.
 }
 
 PPDB \cite{ganitkevitch2013ppdb} is another resource that is useful for
@@ -259,7 +261,7 @@ accents from Spanish words (required for Spanish word similarity evaluations).
 
 We adapt a text pre-processing function from ConceptNet to apply a combination
 of all of these processes, yielding a set of standardized, language-tagged
-labels. As an example, the text ``give an example'' becomes the standardized
+labels. As an example, the text ``Giving an example'' becomes the standardized
 form {\tt /c/en/give\_example}. Applying this combined pre-processing function
 to all labels increases the alignment of the various resources while reducing
 the size of the combined vocabulary.
@@ -313,6 +315,7 @@ normalization. $L_1$ causes occasional large values to have a smaller impact on 
 than $L_2$ normalization. When a learning method such as GloVe has provided
 highly selective features, $L_1$ normalization allows us to use them more effectively
 in measuring similarity.
+
 
 \subsection{Retrofitting}
 
@@ -420,61 +423,11 @@ overall vocabulary more manageable, we filter ConceptNet when building its
 association matrix: we exclude all terms that appear fewer than 3 times, English
 terms that appear fewer than 4 times, and terms with more than 3 words in them.
 
+\subsection{Locally Linear Alignment}
+
+In order to use both word2vec and GloVe at the same time, %FIXME
+
 \section{Evaluation}
-
-\begin{table*}[p]
-\begin{small}
-\begin{tabular}{lllllrrrrrr}
-Label  &Embeddings   & Labels        & Norm  & Network &       RW &      MEN &        WS &      SCWS &    RG-65 &    MC-30 \\
-\midrule
-       & word2vec    & Original      & ---   & ---     &    .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-       & word2vec    & Original      & $L_2$ & ---     &    .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-       & word2vec    & Original      & $L_1$ & ---     &    .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-       & word2vec    & Standardized  & ---   & ---     &    .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-       & word2vec    & Standardized  & $L_2$ & ---     &    .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-       & word2vec    & Standardized  & $L_1$ & ---     &    .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-\midrule
-       &GloVe 42B    & Original      & ---   & ---     &    .348 &     .740 &      .632 &      .440 &     .817 &     .777 \\
-\bf G  &GloVe 42B    & Original      & $L_2$ & ---     &    .448 &     .816 &      .759 &      .595 &     .829 &     .836 \\
-       &GloVe 42B    & Original      & $L_1$ & ---     &    .457 &     .820 &      .766 &      .606 &     .826 &     .829 \\
-       &GloVe 42B    & Standardized  & ---   & ---     &    .366 &     .760 &      .646 &      .444 &     .810 &     .762 \\
-       &GloVe 42B    & Standardized  & $L_2$ & ---     &    .490 &     .815 &      .765 &      .587 &     .779 &     .815 \\
-       &GloVe 42B    & Standardized  & $L_1$ & ---     &    .513 &     .834 &      .794 &      .619 &     .814 &     .828 \\
-\midrule
-       &GloVe 840B   & Original      & ---   & ---     &    .070 &     .728 &      .627 &      .441 &     .648 &     .696 \\
-       &GloVe 840B   & Original      & $L_2$ & ---     &    .089 &     .768 &      .664 &      .496 &     .652 &     .666 \\
-       &GloVe 840B   & Original      & $L_1$ & ---     &    .091 &     .772 &      .667 &      .500 &     .653 &     .682 \\
-       &GloVe 840B   & Standardized  & ---   & ---     &    .434 &     .803 &      .735 &      .552 &     .775 &     .787 \\
-       &GloVe 840B   & Standardized  & $L_2$ & ---     &    .493 &     .811 &      .760 &      .564 &     .717 &     .789 \\
-\bf LE0&GloVe 840B   & Standardized  & $L_1$ & ---     &    .512 &     .840 &      .798 &      .615 &     .774 &     .798 \\
-\midrule
-       & word2vec    & Standardized  & $L_1$ & PPDB    &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-       & word2vec    & Standardized  & $L_1$ & CN5.4   &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-       & word2vec    & Standardized  & $L_1$ & Both    &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-\midrule
-       &GloVe 840B   & Standardized  & $L_1$ & PPDB    &     .560 &     .852 &      .806 & {\bf .674}&     .821 &     .824 \\
-\bf LE1&GloVe 840B   & Standardized  & $L_1$ & CN5.4   &     .581 &{\bf .860}& {\bf .818}&      .668 &{\bf .852}&{\bf .845}\\
-\bf LE2&GloVe 840B   & Standardized  & $L_1$ & Both    &{\bf .584}&{\bf .860}&      .817 &      .671 &     .846 &     .842 \\
-\midrule
-       & 840B + word2vec & Standardized  & $L_1$ & ---     &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-       & 840B + word2vec & Standardized  & $L_1$ & PPDB    &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-       & 840B + word2vec & Standardized  & $L_1$ & CN5.4   &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-       & 840B + word2vec & Standardized  & $L_1$ & Both    &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
-\bottomrule
-\end{tabular}
-\end{small}
-
-\caption{
-    Results on the word similarity task, shown as the Spearman rank correlation
-    ($\rho$) between the learned embeddings and various human-annotated corpora.
-    ``Norm'' indicates the norm applied to the columns of GloVe. ``Labels''
-    indicates whether we used the original labels or standardized them.
-    ``Retrofit'' indicates which data is added using expanded
-    retrofitting.
-    Labels indicate interesting configurations that we will discuss further.
-}
-\label{eval-bigtable}
-\end{table*}
 
 \subsection{Word Similarity Datasets}
 
@@ -530,51 +483,95 @@ development and test data.
 
 \subsection{Results}
 
-% TODO: compare to Rothe
-
-\begin{table}[t]
+\begin{table}[ht]
 \centering
-\begin{tabular}{llrr}
+\footnotesize
+\begin{tabular}{llllllrrr}
 \toprule
-Label     & Method                 & RW [all] &      MEN \\
+\bf CN&\bf PP&\bf St&\bf W& \bf G& $L_1$  & \bf RW  & \bf MEN & \bf  WS \\
 \midrule
-          & Skip-gram (Levy)       &     .470  $(.435, .503)$ &     .774  $(.759, .787)$ \\
-          & SVD (Levy)             &     .514  $(.481, .545)$ &     .777  $(.762, .791)$ \\
-          & Retrofitting (Faruqui) &      ---                 &     .796  $(.783, .809)$ \\
-\bf G     & GloVe (Pennington)     &     .477  $(.443, .510)$ &     .816  $(.804, .828)$ \\
-\bf WR0   & GloVe (our revision)   &     .528  $(.496, .559)$ &     .840  $(.829, .850)$ \\
-\bf WR1   & Wide retrofitting      &     .601  $(.572, .628)$ &{\bf .860} $(.850, .869)$ \\
-\bf WR2   & Wide retrofitting      &{\bf .589} $(.576, .632)$ &{\bf .860} $(.850, .869)$ \\
+     &      &      &      & g    &        &    .448 &    .816 &    .759 \\  % glove.42B.300d.l2.raw.evaluation
+     &      &      &      & g    & $L_1$  &    .457 &    .820 &    .766 \\  % glove.42B.300d.l1.raw.evaluation
+     &      &      &      & G    &        &    .146 &    .787 &    .671 \\  % glove12.840B.300d.l2.raw.evaluation
+     &      &      &      & G    & $L_1$  &    .148 &    .789 &    .676 \\  % glove12.840B.300d.l1.raw.evaluation
+     &      &      & W    &      &        &    .371 &    .732 &    .624 \\  % w2v-google-news.none.raw.evaluation
+     &      &      & W    &      & $L_1$  &    .374 &    .732 &    .622 \\  % w2v-google-news.l1.raw.evaluation
+     &      & St   &      & g    &        &    .492 &    .815 &    .765 \\  % glove.42B.300d.l2.standardized.evaluation
+     &      & St   &      & g    & $L_1$  &    .513 &    .834 &    .794 \\  % glove.42B.300d.l1.standardized.evaluation
+     &      & St   &      & G    &        &    .494 &    .814 &    .763 \\  % glove12.840B.300d.l2.standardized.evaluation
+     &      & St   &      & G    & $L_1$  &    .513 &    .840 &    .798 \\  % glove12.840B.300d.l1.standardized.evaluation
+     &      & St   & W    &      &        &    .453 &    .778 &    .731 \\  % w2v-google-news.none.standardized.evaluation
+     &      & St   & W    &      & $L_1$  &    .452 &    .777 &    .732 \\  % w2v-google-news.l1.standardized.evaluation
+     &      & St   & W    & G    & $L_1$  &    .539 &    .841 &    .796 \\  % combo.l1.standardized.evaluation
+     & PP   & St   &      & G    & $L_1$  &    .565 &    .852 &    .806 \\  % glove12.840B.300d.l1.standardized.ppdb-xl-lexical-standardized.evaluation
+     & PP   & St   & W    &      & $L_1$  &    .481 &    .800 &    .750 \\  % w2v-google-news.l1.standardized.ppdb-xl-lexical-standardized.evaluation
+     & PP   & St   & W    & G    & $L_1$  &    .558 &    .850 &    .806 \\  % combo.l1.standardized.ppdb-xl-lexical-standardized.evaluation
+CN   &      & St   &      & G    & $L_1$  &    .571 &    .856 &    .818 \\  % glove12.840B.300d.l1.standardized.conceptnet5.evaluation
+CN   &      & St   & W    &      & $L_1$  &    .542 &    .813 &    .771 \\  % w2v-google-news.l1.standardized.conceptnet5.evaluation
+CN   &      & St   & W    & G    & $L_1$  &    .611 &\bf .868 &\bf .821 \\  % combo.l1.standardized.conceptnet5.evaluation
+CN   & PP   & St   &      & G    & $L_1$  &    .584 &    .860 &    .818 \\  % glove12.840B.300d.l1.standardized.cnet-ppdb-combined.evaluation
+CN   & PP   & St   & W    &      & $L_1$  &    .543 &    .812 &    .775 \\  % w2v-google-news.l1.standardized.cnet-ppdb-combined.evaluation
+CN   & PP   & St   & W    & G    & $L_1$  &\bf .613 &    .867 &\bf .821 \\  % combo.l1.standardized.cnet-ppdb-combined.evaluation
 \bottomrule
 \end{tabular}
 
 \caption{
-    Comparison between our vector-space word embeddings and previously-published
-    results, on RW and MEN-3000, with 95\% confidence intervals. In order to compare
-    with previous results, we use all of the RW data, not just the 1/3 of it we set
-    aside for testing.
+    Word-similarity results as various components of the ensemble are enabled.
+    The results are the Spearman rank correlation ($\rho$) with the held-out
+    test sets of RW and MEN-3000 and with WordSim-353.
+    The components are: {\bf CN} = ConceptNet 5.4,
+    {\bf PP} = PPDB-xl, {\bf St} = standardized and lemmatized terms,
+    {\bf W} = word2vec Google News vectors, {\bf g} = GloVe 42B vectors,
+    {\bf G} = GloVe 1.2 840B vectors, {\bf $L_1$} = $L_1$-normalized features.
+}
+\label{eval-bigtable}
+\end{table}
+
+
+\begin{table}[t]
+\centering
+\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+Method                        & RW [all]  &      MEN  & WS \\
+\midrule
+word2vec SGNS (Levy)          &     .470  &     .774  & .733* \\
+word2vec SGNS (ours)          &     .476  &     .778  & .731  \\
+GloVe (Pennington)            &     .448  &     .816  & .759  \\
+GloVe (ours)                  &     .528  &     .840  & .798  \\
+SVD (Levy)                    &     .514  &     .778  & .736* \\
+Retrofitting (Faruqui)        &      ---  &     .796  & .741  \\
+Ensemble (ours)               & \bf .604  & \bf .868  & \bf .821 \\
+\bottomrule
+\end{tabular}
+
+\caption{
+    Comparison between our ensemble word embeddings and previous results,
+    on the complete RW data, the MEN-3000 test data, and WordSim-353.
+    Asterisks indicate WordSim results that were estimated based on published
+    data that was split into similarity and relatedness.
+    % TODO: when referring to this table, mention why we use RW [all] and
+    % how we estimate WS
 }
 \label{compare-others}
 \end{table}
 
 \begin{table}[t]
 \centering
+\small
 \begin{tabular}{lrrrr}
 \toprule
-Label   & WS [es] & MC [es] & RG [de] & RG [fr] \\
+Method   & WS [es] & MC [es] & RG [de] & RG [fr] \\
 \midrule
-\bf R   &         --- &       .591 &       .603 &       .606 \\
-\bf WR1 &    \bf .444 &   \bf .765 &       .673 &       .781 \\
-\bf WR2 &        .441 &       .762 &   \bf .677 &   \bf .788 \\
+Retrofitting (Faruqui) &         --- &       .591 &       .603 &       .606 \\
+Our ensemble           &    \bf .444?&   \bf .765?& \bf   .673?& \bf   .781?\\
 \bottomrule
 \end{tabular}
 
 \caption{
     Multilingual evaluation results for Spanish (es), German (de), and French
-    (fr), on translations of WS-353, MC-30, and RG-65. Row {\bf R} contains the
-    published results of retrofitting
-    Universal WordNet onto skip-gram embeddings learned from Wikipedia.
-    {\bf WR1} and {\bf WR2} are our system.
+    (fr), on translations of WS-353, MC-30, and RG-65, for our full ensemble
+    compared to Faruqui et al.'s retrofitting results.
 }
 \label{eval-multilingual}
 \end{table}
