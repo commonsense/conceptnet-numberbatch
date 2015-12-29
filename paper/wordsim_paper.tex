@@ -288,8 +288,18 @@ the tokens are distributed according to Zipf's law \cite{zipf1949human}: the
 $n$th token in rank order has a frequency proportional to $1/n$. We use these
 proportions in the weighted average when combining multiple embeddings.
 
+This process alone is a benefit on word-similarity evaluations, even without
+combining any resources. For example, the Rare Words (RW) dataset
+\cite{luong2013rw} tends to encounter terms that are poorly represented or
+out-of-vocabulary in most word embeddings.  Lemmatizing them before looking
+them up, and combining them with more frequently observed representations,
+hugely increases the evaluation results on these words, even though the process
+loses information. The raw GloVe 840B data gets a Spearman correlation of $\rho
+= .070$ on the RW dataset, which increases to $\rho = .434$ when its embeddings
+are standardized and combined in this way.
 
-\subsection{Normalization}
+
+\subsubsection{Feature Normalization}
 
 As briefly mentioned by \newcite{pennington2014glove}, $L_2$ normalization of
 the columns (that is, the 300 features) of the GloVe matrix provides a notable
@@ -360,7 +370,6 @@ that terms are always represented by unit vectors that can be used directly in
 cosine similarity.
 
 \subsection{ConceptNet as an Association Matrix}
-% TODO: can this be trimmed?
 
 In order to apply the expanded retrofitting method, we need to consider the data in
 ConceptNet as a sparse, symmetric matrix of associations between terms. What
@@ -393,12 +402,17 @@ In our method, we simply omit all instances of negative and antonym
 relations in ConceptNet.
 
 Each remaining assertion in ConceptNet corresponds to two entries in a sparse
-association matrix $S$. ConceptNet assigns a confidence score, or weight, to
-each assertion. An assertion that relates term $i$ to term $j$ with weight $w$
-will contribute $w$ to the values of $S_{ij}$ and $S_{ji}$. If another
-assertion relates the same terms with a different relation, it will add to that
-value. This constructs a symmetric matrix $S$, but the matrix we actually use
-in retrofitting is the asymmetric $S'$, whose rows have been $L_1$-normalized.
+association matrix $S$.  ConceptNet assigns a confidence score, or weight, to
+each assertion.  These weights are not entirely comparable between the data
+sources that comprise ConceptNet, so we re-scaled them so that the average
+weight of each different data source is 1.
+
+An assertion that relates term $i$ to term $j$ with adjusted weight $w$ will
+contribute $w$ to the values of $S_{ij}$ and $S_{ji}$. If another assertion
+relates the same terms with a different relation, it will add to that value.
+This constructs a symmetric matrix $S$, but the matrix we actually use in
+retrofitting is the asymmetric $S'$, whose rows have been $L_1$-normalized to
+prevent high-frequency concepts from overwhelming the results.
 
 Due to the structure of ConceptNet, there exists a large fringe of terms that are
 poorly connected to other nodes. To make the sparse matrix and the size of the
@@ -406,72 +420,58 @@ overall vocabulary more manageable, we filter ConceptNet when building its
 association matrix: we exclude all terms that appear fewer than 3 times, English
 terms that appear fewer than 4 times, and terms with more than 3 words in them.
 
-\subsection{Scaling Data Sources Within ConceptNet}
-
-Each assertion in ConceptNet comes with a weight, indicating how strongly it
-should be believed. A crowd-sourced dataset that collects the same fact from
-many contributors, for example, should assign that fact a higher weight.
-
-There is no absolute scale on these weights, and as a result, the weights can
-be unbalanced when compared across different sources. An assertion entered once
-into Open Mind Common Sense gets a weight of 1.0, for example, while an
-assertion would have to be entered more than 50 times into the
-game-with-a-purpose Verbosity to get the same weight.
-
-In preliminary experimentation, we found that evaluation scores improved when
-we increased the weights on Verbosity by a factor of 10. We followed up on that
-by examining the average weights given by each data source, and found that the
-average weight of a Verbosity assertion was 0.12, while other sources had
-average weights between 1 and 2.
-
-The correction we applied was to re-scale all the weights so that the average
-weight within each data source was 1. This re-scaling had a positive effect
-on all evaluations. For comparison, the ``Don't rebalance'' row of
-Table~\ref{eval-variations} shows the effect of removing this rebalancing.
-
 \section{Evaluation}
 
-\begin{table*}[t]
-\centering
+\begin{table*}[p]
+\begin{small}
 \begin{tabular}{lllllrrrrrr}
-\toprule
-Label  &Embeddings   & Norm  & Text std. & Retrofit &       RW & MEN      &        WS &      SCWS &    RG-65 &    MC-30 \\
+Label  &Embeddings   & Labels        & Norm  & Network &       RW &      MEN &        WS &      SCWS &    RG-65 &    MC-30 \\
 \midrule
-       &GloVe 42B    & ---   & ---       & ---      &     .348 &     .740 &      .632 &      .440 &     .817 &     .777 \\
-       &GloVe 42B    & ---   & CN5.4     & ---      &     .366 &     .760 &      .646 &      .444 &     .810 &     .762 \\
-\bf G  &GloVe 42B    & $L_2$ & ---       & ---      &     .448 &     .816 &      .759 &      .595 &     .829 &     .836 \\
-       &GloVe 42B    & $L_2$ & CN5.4     & ---      &     .490 &     .815 &      .765 &      .587 &     .779 &     .815 \\
-       &GloVe 42B    & $L_1$ & ---       & ---      &     .457 &     .820 &      .766 &      .606 &     .826 &     .829 \\
-       &GloVe 42B    & $L_1$ & CN5.4     & ---      &     .513 &     .834 &      .794 &      .619 &     .814 &     .828 \\
+       & word2vec    & Original      & ---   & ---     &    .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
+       & word2vec    & Original      & $L_2$ & ---     &    .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
+       & word2vec    & Original      & $L_1$ & ---     &    .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
+       & word2vec    & Standardized  & ---   & ---     &    .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
+       & word2vec    & Standardized  & $L_2$ & ---     &    .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
+       & word2vec    & Standardized  & $L_1$ & ---     &    .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
 \midrule
-       &GloVe 840B   & ---   & ---       & ---      &     .070 &     .728 &      .627 &      .441 &     .648 &     .696 \\
-       &GloVe 840B   & ---   & CN5.4     & ---      &     .434 &     .803 &      .735 &      .552 &     .775 &     .787 \\
-       &GloVe 840B   & $L_2$ & ---       & ---      &     .089 &     .768 &      .664 &      .496 &     .652 &     .666 \\
-       &GloVe 840B   & $L_2$ & CN5.4     & ---      &     .493 &     .811 &      .760 &      .564 &     .717 &     .789 \\
-       &GloVe 840B   & $L_1$ & ---       & ---      &     .091 &     .772 &      .667 &      .500 &     .653 &     .682 \\
-\bf WR0&GloVe 840B   & $L_1$ & CN5.4     & ---      &     .512 &     .840 &      .798 &      .615 &     .774 &     .798 \\
+       &GloVe 42B    & Original      & ---   & ---     &    .348 &     .740 &      .632 &      .440 &     .817 &     .777 \\
+\bf G  &GloVe 42B    & Original      & $L_2$ & ---     &    .448 &     .816 &      .759 &      .595 &     .829 &     .836 \\
+       &GloVe 42B    & Original      & $L_1$ & ---     &    .457 &     .820 &      .766 &      .606 &     .826 &     .829 \\
+       &GloVe 42B    & Standardized  & ---   & ---     &    .366 &     .760 &      .646 &      .444 &     .810 &     .762 \\
+       &GloVe 42B    & Standardized  & $L_2$ & ---     &    .490 &     .815 &      .765 &      .587 &     .779 &     .815 \\
+       &GloVe 42B    & Standardized  & $L_1$ & ---     &    .513 &     .834 &      .794 &      .619 &     .814 &     .828 \\
 \midrule
-       &GloVe 840B   & ---   & CN5.4     & PPDB     &     .465 &     .814 &      .716 &      .598 &     .815 &     .815 \\
-       &GloVe 840B   & ---   & CN5.4     & CN5.4    &     .506 &     .830 &      .734 &      .602 &     .842 &     .810 \\
-       &GloVe 840B   & ---   & CN5.4     & Both     &     .507 &     .830 &      .731 &      .604 &     .838 &     .811 \\
-       &GloVe 840B   & $L_2$ & CN5.4     & PPDB     &     .543 &     .829 &      .780 &      .633 &     .788 &     .819 \\
-       &GloVe 840B   & $L_2$ & CN5.4     & CN5.4    &     .564 &     .841 &      .794 &      .631 &     .805 &     .836 \\
-       &GloVe 840B   & $L_2$ & CN5.4     & Both     &     .566 &     .841 &      .794 &      .634 &     .801 &     .829 \\
-       &GloVe 840B   & $L_1$ & CN5.4     & PPDB     &     .560 &     .852 &      .806 & {\bf .674}&     .821 &     .824 \\
-\bf WR1&GloVe 840B   & $L_1$ & CN5.4     & CN5.4    &     .581 &{\bf .860}& {\bf .818}&      .668 &{\bf .852}&{\bf .845}\\
-\bf WR2&GloVe 840B   & $L_1$ & CN5.4     & Both     &{\bf .584}&{\bf .860}&      .817 &      .671 &     .846 &     .842 \\
+       &GloVe 840B   & Original      & ---   & ---     &    .070 &     .728 &      .627 &      .441 &     .648 &     .696 \\
+       &GloVe 840B   & Original      & $L_2$ & ---     &    .089 &     .768 &      .664 &      .496 &     .652 &     .666 \\
+       &GloVe 840B   & Original      & $L_1$ & ---     &    .091 &     .772 &      .667 &      .500 &     .653 &     .682 \\
+       &GloVe 840B   & Standardized  & ---   & ---     &    .434 &     .803 &      .735 &      .552 &     .775 &     .787 \\
+       &GloVe 840B   & Standardized  & $L_2$ & ---     &    .493 &     .811 &      .760 &      .564 &     .717 &     .789 \\
+\bf LE0&GloVe 840B   & Standardized  & $L_1$ & ---     &    .512 &     .840 &      .798 &      .615 &     .774 &     .798 \\
+\midrule
+       & word2vec    & Standardized  & $L_1$ & PPDB    &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
+       & word2vec    & Standardized  & $L_1$ & CN5.4   &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
+       & word2vec    & Standardized  & $L_1$ & Both    &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
+\midrule
+       &GloVe 840B   & Standardized  & $L_1$ & PPDB    &     .560 &     .852 &      .806 & {\bf .674}&     .821 &     .824 \\
+\bf LE1&GloVe 840B   & Standardized  & $L_1$ & CN5.4   &     .581 &{\bf .860}& {\bf .818}&      .668 &{\bf .852}&{\bf .845}\\
+\bf LE2&GloVe 840B   & Standardized  & $L_1$ & Both    &{\bf .584}&{\bf .860}&      .817 &      .671 &     .846 &     .842 \\
+\midrule
+       & 840B + word2vec & Standardized  & $L_1$ & ---     &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
+       & 840B + word2vec & Standardized  & $L_1$ & PPDB    &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
+       & 840B + word2vec & Standardized  & $L_1$ & CN5.4   &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
+       & 840B + word2vec & Standardized  & $L_1$ & Both    &     .??? &     .??? &      .??? &      .??? &     .??? &     .??? \\
 \bottomrule
 \end{tabular}
+\end{small}
 
 \caption{
     Results on the word similarity task, shown as the Spearman rank correlation
     ($\rho$) between the learned embeddings and various human-annotated corpora.
-    ``Norm'' indicates the norm applied to the columns of GloVe.
-    ``Text std.'' indicates whether labels are left in their original form or
-    standardized according to ConceptNet 5.4. ``Retrofit'' indicates which data
-    is added using expanded retrofitting.
-    Row {\bf G} reproduces the published GloVe results.
-    {\bf WR1} and {\bf WR2} are the two best configurations of our system.
+    ``Norm'' indicates the norm applied to the columns of GloVe. ``Labels''
+    indicates whether we used the original labels or standardized them.
+    ``Retrofit'' indicates which data is added using expanded
+    retrofitting.
+    Labels indicate interesting configurations that we will discuss further.
 }
 \label{eval-bigtable}
 \end{table*}
@@ -500,15 +500,10 @@ variety of word-similarity gold standards:
 \end{itemize}
 
 To evaluate our ability to extend the vocabulary to other languages, we also
-used translations of some of the above gold standards:
-
-\begin{itemize}
-\item RG-65 has been translated into German by \newcite{gurevych2005german},
-    and into French by \newcite{joubarne2011french}.
-\item WordSim-353 and MC-30 have been translated into Spanish, written in
-    plain ASCII without accents, by \newcite{hassan2009crosslingual}. The
-    same dataset also includes translations into Romanian and Arabic.
-\end{itemize}
+used translations of some of the above gold standards: WordSim-353 and MC-30
+have been translated into Spanish by \newcite{hassan2009crosslingual}, and
+RG-65 has been translated into German by \newcite{gurevych2005german} and
+French by \newcite{joubarne2011french}.
 
 \subsection{Setting Aside Test Data}
 
@@ -527,11 +522,11 @@ sample of $1/3$ of its word pairs for testing.\footnote{
     data.
 }
 
-Neither of these held-out test sets were used in our evaluations until the code
-and parameters were finalized, shortly before submitting this article. While
-Table~\ref{eval-bigtable} shows our correlation with only the test data on these
-evaluations, Table~\ref{eval-dev-test} compares our performance on development
-and test data.
+Neither of these held-out test sets were used in our evaluations during
+development; they were only run with the final code and parameters. While
+Table~\ref{eval-bigtable} shows our correlation with only the test data on
+these evaluations, Table~\ref{eval-dev-test} compares our performance on
+development and test data.
 
 \subsection{Results}
 
@@ -543,13 +538,13 @@ and test data.
 \toprule
 Label     & Method                 & RW [all] &      MEN \\
 \midrule
-          & Skip-gram (Levy)       &     .470 $(.435, .503)$ &     .774 $(.759, .787)$ \\
-          & SVD (Levy)             &     .514 $(.481, .545)$ &     .777 $(.762, .791)$ \\
-          & Retrofitting (Faruqui) &      ---                &     .796 $(.783, .809)$ \\
-\bf G     & GloVe (Pennington)     &     .477 $(.443, .510)$ &     .816 $(.804, .828)$ \\
-\bf WR0   & GloVe (our revision)   &     .528 $(.496, .559)$ &     .840 $(.829, .850)$ \\
-\bf WR1   & Wide retrofitting      &     .601 $(.572, .628)$ &{\bf .860}$(.850, .869)$ \\
-\bf WR2   & Wide retrofitting      &{\bf .589}$(.576, .632)$ &{\bf .860}$(.850, .869)$ \\
+          & Skip-gram (Levy)       &     .470  $(.435, .503)$ &     .774  $(.759, .787)$ \\
+          & SVD (Levy)             &     .514  $(.481, .545)$ &     .777  $(.762, .791)$ \\
+          & Retrofitting (Faruqui) &      ---                 &     .796  $(.783, .809)$ \\
+\bf G     & GloVe (Pennington)     &     .477  $(.443, .510)$ &     .816  $(.804, .828)$ \\
+\bf WR0   & GloVe (our revision)   &     .528  $(.496, .559)$ &     .840  $(.829, .850)$ \\
+\bf WR1   & Wide retrofitting      &     .601  $(.572, .628)$ &{\bf .860} $(.850, .869)$ \\
+\bf WR2   & Wide retrofitting      &{\bf .589} $(.576, .632)$ &{\bf .860} $(.850, .869)$ \\
 \bottomrule
 \end{tabular}
 
@@ -611,7 +606,7 @@ Label   & WS [es] & MC [es] & RG [de] & RG [fr] \\
 \label{compare-graph}
 \end{figure}
 
-
+% TODO: re-describe for new systems
 We have labeled some of the rows of Table~\ref{eval-bigtable} as particular systems
 that we would like to compare. System {\bf G} represents a configuration of
 GloVe that was evaluated by \newcite{pennington2014glove}. We ran the evaluation
@@ -644,11 +639,6 @@ These systems perform well in German, French, and Spanish, even though only
 German has a data source designed for it in ConceptNet. French and Spanish terms
 are only available because of translations in the English Wiktionary, and
 indirect translations via Japanese in JMDict.
-
-In contrast, we also briefly tried evaluating on the Arabic and Romanian
-translations from \newcite{hassan2009crosslingual}. These languages are not
-currently well-represented in ConceptNet, and their preliminary evaluation
-results were quite poor.
 
 \subsection{Comparisons to Other Published Results}
 
@@ -683,7 +673,6 @@ Modification & RW [dev] & MEN [dev] & WS-353 & SCWS &  RG-65 &  MC-30 \\
 Use first row instead of row-merging & .563 &      .827 &    .787 &  .649 &   .822 &   .794 \\
 Unweighted row-merging               & .526 &      .844 &    .751 &  .586 &   .841 &   .836 \\
 No self-loops in retrofitting        & .570 &      .855 &    .790 & \bf .676 & \bf .873 & \bf .853 \\
-Don't rebalance ConceptNet sources   & .584 &      .854 &    .816 &  .668 &   .846 &   .842 \\
 \bottomrule
 \end{tabular}
 \caption{
@@ -761,11 +750,6 @@ Reversing this decision causes a noticeable drop in performance on RW, the
 evaluation that is most likely to involve words that were poorly represented or
 unrepresented in GloVe. On the other hand, the lack of self-loops seems to {\em
 increase} its score on SCWS, and on the smaller evaluations RG-65 and MC-30.
-
-Rebalancing the weights of the data sources within ConceptNet seems to have
-been a mild improvement. The ``Don't rebalance'' row of Table~\ref{eval-variations}
-confirms what we saw when we introduced rebalancing,
-as leaving the weights unbalanced decreases the scores slightly.
 
 In separate experimentation, we found that when we separate ConceptNet into its
 component datasets and drop each one in turn, the effects on the evaluation
