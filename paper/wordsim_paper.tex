@@ -106,7 +106,7 @@ vocabularies. We call this procedure ``expanded retrofitting''.
 heuristic for merging together multiple term vectors.
 \item We fill gaps when aligning the two distributional-semantics sources
 (GloVe and word2vec) using a locally linear interpolation.
-\item We re-scale the distributional-semantics features using L1 normalization.
+\item We re-scale the distributional-semantics features using $L_1$ normalization.
 \end{itemize}
 
 When we use this process to combine word2vec, GloVe, and ConceptNet, this
@@ -123,10 +123,11 @@ over both common and rare words.
 
 \subsection{Related work}
 
+% TODO: talk about Agirre's observation of distributional vs. structured data
 % TODO: cite Turney 2010 survey
+% TODO: cite Levy 2015
 % TODO: talk about Zou and multilingual embeddings
 % TODO: talk about Bian and word senses
-
 
 \section{Knowledge sources}
 
@@ -177,8 +178,9 @@ that are likely to appear near each other. Its goal is to output a high value
 when given examples of co-occurrences that appear in the data, and a low value
 for negative examples where one word is replaced by a random word. The loss
 function is weighted by the frequencies of the words involved and the distance
-between them in the data. The word2vec software comes with SGNS embeddings
-of text from Google News.
+between them in the data. The word2vec
+software\footnote{\url{https://code.google.com/p/word2vec/}} comes with SGNS
+embeddings of text from Google News.
 
 GloVe \cite{pennington2014glove} is an unsupervised learning algorithm that
 learns a set of word embeddings such that the dot product of two words'
@@ -218,7 +220,7 @@ word2vec's in this case, but a combination of them can perform even better.
 \includegraphics[width=2.5in]{areas.pdf}
 \caption{
     A proportional-area diagram showing the overlap of vocabularies among
-    ConceptNet and the available embeddings for word2vec, and GloVe.
+    ConceptNet and the available embeddings for word2vec and GloVe.
 }
 \label{vocabulary-overlap}
 \end{figure}
@@ -301,11 +303,10 @@ combining any resources. For example, the Rare Words (RW) dataset
 \cite{luong2013rw} tends to encounter terms that are poorly represented or
 out-of-vocabulary in most word embeddings.  Lemmatizing them before looking
 them up, and combining them with more frequently observed representations,
-hugely increases the evaluation results on these words, even though the process
-loses information. The raw GloVe 840B data gets a Spearman correlation of $\rho
-= .070$ on the RW dataset, which increases to $\rho = .434$ when its embeddings
-are standardized and combined in this way.
-
+improves the evaluation results on these words, even though the process
+loses the ability to distinguish some word forms. The raw GloVe 840B data gets
+a Spearman correlation of $\rho = .146$ on the RW dataset, which increases to
+$\rho = .494$ when its embeddings are standardized and combined in this way.
 
 \subsubsection{Feature Normalization}
 
@@ -559,7 +560,7 @@ Our ensemble                      &\bf .891 &\bf .645 &\bf .789 \\
 
 \caption{
     Evaluation results comparing Faruqui et al.'s
-    multilingual retrofitting to ours,
+    multilingual retrofitting of Wikipedia skip-grams to our ensemble,
     on the English RG-65 data and its translations into German and French.
 }
 \label{eval-multilingual}

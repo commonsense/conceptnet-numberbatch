@@ -4,7 +4,7 @@
 # LaTeX output
 paper/*.aux
 paper/*.log
-paper/*.pdf
+paper/wordsim_paper.pdf
 paper/*.bbl
 paper/*.blg
 
