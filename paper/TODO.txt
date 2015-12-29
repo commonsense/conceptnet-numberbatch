@@ -1,0 +1,6 @@
+[ ] Try evaluating with GloVe 42B
+[ ] Code the combo-maker
+[ ] Rewrite the results section
+[ ] Fix area diagram to use CN5.4 and possibly GloVe 42B
+[ ] Refer to the area diagram in the text
+[ ] Sort out annex crap

@@ -22,7 +22,7 @@
 \pgfplotsset{compat=1.9}
 \usepackage{CJKutf8}
 \usepackage{url}
-%\setcounter{secnumdepth}{0}
+\usepackage{graphicx}
 \bibliographystyle{naaclhlt2016}
 
 \title{\thetitle}
@@ -55,7 +55,7 @@ structured knowledge from the semantic network ConceptNet 5
 information into a common representation with a large, multilingual vocabulary.
 The embeddings it produces achieve state-of-the-art performance on many word
 similarity evaluations. Its score of $\rho = \scoreRW{}$ on an evaluation of
-rare words \cite{luong2013rw} is 17.5\% higher than the previous best known
+rare words \cite{luong2013rw} is 17\% higher than the previous best known
 system.
 
 \end{abstract}
@@ -109,8 +109,8 @@ heuristic for merging together multiple term vectors.
 \item We re-scale the distributional-semantics features using L1 normalization.
 \end{itemize}
 
-When we use this process to combine word2vec, GloVe, ConceptNet, and PPDB
-\cite{ganitkevitch2013ppdb}, this process produces a space of term embeddings
+When we use this process to combine word2vec, GloVe, and ConceptNet, this
+process produces a space of term embeddings
 that achieves state-of-the-art performance on word-similarity
 evaluations\footnote{Some methods and evaluations \cite{agirre2009study}
 distinguish word similarity from word
@@ -155,7 +155,9 @@ with general word similarity.\footnote{
 PPDB \cite{ganitkevitch2013ppdb} is another resource that is useful for
 learning about word similarity, providing different information from
 ConceptNet. It lists pairs of words that are translated to the same word in parallel
-corpora, particularly in documents of the European parliament.
+corpora, particularly in documents of the European Parliament. PPDB is used
+as an external knowledge source by \newcite{faruqui2015retrofitting}, so
+we evaluate the effect of adding it to our ensemble as well.
 
 \subsection{word2vec and GloVe}
 
@@ -211,6 +213,16 @@ word2vec's in this case, but a combination of them can perform even better.
 
 \section{Methods}
 
+\begin{figure}
+\centering
+\includegraphics[width=2.5in]{areas.pdf}
+\caption{
+    A proportional-area diagram showing the overlap of vocabularies among
+    ConceptNet and the available embeddings for word2vec, and GloVe.
+}
+\label{vocabulary-overlap}
+\end{figure}
+
 \newcite{faruqui2015retrofitting} introduced the ``retrofitting'' procedure,
 which adjusts dense matrices of embeddings (such as the GloVe output) to take
 into account external knowledge from a sparse semantic network. They tried
@@ -255,9 +267,8 @@ separate words from punctuation (which all inputs except GloVe 840B do),
 joining multi-word phrases with underscores (ConceptNet and word2vec), removing
 a small list of stopwords (ConceptNet only), folding the text to lowercase
 (ConceptNet and GloVe 42B), replacing multiple digits with the character {\tt
-\#} (word2vec only), lemmatizing English words to their root form using a
-modification of WordNet's Morphy algorithm (ConceptNet only), and removing
-accents from Spanish words (required for Spanish word similarity evaluations).
+\#} (word2vec only), and lemmatizing English words to their root form using a
+modification of WordNet's Morphy algorithm (ConceptNet only).
 
 We adapt a text pre-processing function from ConceptNet to apply a combination
 of all of these processes, yielding a set of standardized, language-tagged
@@ -268,22 +279,17 @@ the size of the combined vocabulary.
 
 Because the transformations are many-to-one, this has the effect that a single
 transformed term can become associated with multiple embeddings in a single
-vector space. We considered a few options for dealing with these merged terms:
+vector space. We considered a few options for dealing with these merged terms,
+such as keeping only the highest-frequency term, averaging the vectors together,
+or taking a weighted average based on their word frequency.
 
-\begin{enumerate}
-\item Keep only the vector for the term with the highest frequency in the
-    original data.
-\item Average the vectors together.
-\item Take a weighted average that favors higher-frequency terms.
-\end{enumerate}
-
-The weighted average turns out to be the best approach, as our evaluation will
-show. The multiple rows contain valuable data that should not simply be
+We found in preliminary evaluations that the weighted average was the best
+approach. The multiple rows contain valuable data that should not simply be
 discarded, but lower-frequency rows tend to have lower-quality data.
 
 When using pre-trained vectors, it is often the case that intermediate
 computations that produced these vectors (such as word frequencies) are not
-available. What we can do instead is to infer approximate word frequencies from
+available. What we do instead is to infer approximate word frequencies from
 the fact that both GloVe and word2vec output their vocabularies in descending
 order of frequency. We approximate the frequency distribution by assuming that
 the tokens are distributed according to Zipf's law \cite{zipf1949human}: the
@@ -334,12 +340,7 @@ $W^0$ is an $m \times n$ matrix containing the known term embeddings, with
 rows of all zeroes for terms that are outside the vocabulary of the original embeddings.
 $S$ is an $n \times n$ matrix containing positive weighted values for terms that
 are known to be semantically related, 1 on the diagonal relating each term to
-itself\footnote{
-    These diagonal entries, or ``self-loops'' in the semantic network, are not strictly
-    necessary, but we have found that they help the process converge faster.
-    In Table~\ref{eval-variations}, we examine the effect of omitting the self-loops
-    while running for the same number of steps.
-}, and 0 otherwise.
+itself, and 0 otherwise.
 
 Retrofitting on a matrix $W$ (whose rows are indicated by $w_i$) yields a final
 matrix $W'$ (with rows indicated by $w'_i$) that minimizes
@@ -425,7 +426,8 @@ terms that appear fewer than 4 times, and terms with more than 3 words in them.
 
 \subsection{Locally Linear Alignment}
 
-In order to use both word2vec and GloVe at the same time, %FIXME
+In order to use both word2vec and GloVe at the same time, we need to align their
+partially-overlapping vocabularies.
 
 \section{Evaluation}
 
@@ -441,30 +443,14 @@ variety of word-similarity gold standards:
     similarity judgments for 2034 word pairs, with a bias toward uncommon words.
 \item WordSim-353 \cite{finkelstein2001ws}, a widely-used corpus of similarity
     judgments for 353 word pairs.
-\item SCWS*. SCWS \cite{huang2012scws} contains crowd-sourced similarity
-    judgments for 2003 word pairs in the context of sentences, while SCWS* is
-    the modification of it described by \newcite{luong2013rw}
-    to disregard the context in order to evaluate
-    systems that cannot make use of context. SCWS* discards the pairs of
-    identical words that are only distinguished by context, leaving 1759 pairs.
 \item RG-65 \cite{rubenstein1965rg}, a classic corpus of similarity judgments
-    for 65 word pairs.
-\item MC-30 \cite{miller1991mc}, similarity judgments for 30 word pairs.
+    for 65 word pairs, which has additionally been translated into German
+    \cite{gurevych2005german} and French \cite{joubarne2011french}.
 \end{itemize}
-
-To evaluate our ability to extend the vocabulary to other languages, we also
-used translations of some of the above gold standards: WordSim-353 and MC-30
-have been translated into Spanish by \newcite{hassan2009crosslingual}, and
-RG-65 has been translated into German by \newcite{gurevych2005german} and
-French by \newcite{joubarne2011french}.
-
-\subsection{Setting Aside Test Data}
 
 In striving to maximize an evaluation metric, it is important to hold out some
 data, to avoid overfitting to the data by modifying the algorithm and its
-parameters. The metrics we focused on improving were our rank correlation with
-MEN-3000, which emphasizes having high-quality representations of common words,
-and RW, which emphasizes having a broad vocabulary.
+parameters.
 
 MEN-3000 comes with a development/test split, where 1000 of the 3000 word pairs
 are held out for testing. We applied a similar split to RW, setting aside a
@@ -473,9 +459,10 @@ sample of $1/3$ of its word pairs for testing.\footnote{
     {\tt split -un r/3/3 rw.txt}. Similarly, we split on {\tt r/1/3} and
     {\tt r/2/3} and concatenated the results to get the remaining evaluation
     data.
-}
+} We did not apply a split to WordSim-353, as it is already much smaller than
+the others.
 
-Neither of these held-out test sets were used in our evaluations during
+Neither of the held-out test sets were used in our evaluations during
 development; they were only run with the final code and parameters. While
 Table~\ref{eval-bigtable} shows our correlation with only the test data on
 these evaluations, Table~\ref{eval-dev-test} compares our performance on
@@ -486,8 +473,9 @@ development and test data.
 \begin{table}[ht]
 \centering
 \footnotesize
-\begin{tabular}{llllllrrr}
+\begin{tabular}{llllll|rrr}
 \toprule
+\multicolumn{6}{c|}{Ensemble components} & \multicolumn{3}{c}{Evaluations} \\
 \bf CN&\bf PP&\bf St&\bf W& \bf G& $L_1$  & \bf RW  & \bf MEN & \bf  WS \\
 \midrule
      &      &      &      & g    &        &    .448 &    .816 &    .759 \\  % glove.42B.300d.l2.raw.evaluation
@@ -521,7 +509,7 @@ CN   & PP   & St   & W    & G    & $L_1$  &\bf .613 &    .867 &\bf .821 \\  % co
     test sets of RW and MEN-3000 and with WordSim-353.
     The components are: {\bf CN} = ConceptNet 5.4,
     {\bf PP} = PPDB-xl, {\bf St} = standardized and lemmatized terms,
-    {\bf W} = word2vec Google News vectors, {\bf g} = GloVe 42B vectors,
+    {\bf W} = word2vec vectors from SGNS on Google News, {\bf g} = GloVe 42B vectors,
     {\bf G} = GloVe 1.2 840B vectors, {\bf $L_1$} = $L_1$-normalized features.
 }
 \label{eval-bigtable}
@@ -531,7 +519,7 @@ CN   & PP   & St   & W    & G    & $L_1$  &\bf .613 &    .867 &\bf .821 \\  % co
 \begin{table}[t]
 \centering
 \footnotesize
-\begin{tabular}{lrrr}
+\begin{tabular}{l|rrr}
 \toprule
 Method                        & RW [all]  &      MEN  & WS \\
 \midrule
@@ -558,20 +546,21 @@ Ensemble (ours)               & \bf .604  & \bf .868  & \bf .821 \\
 
 \begin{table}[t]
 \centering
-\small
-\begin{tabular}{lrrrr}
+\footnotesize
+\begin{tabular}{l|rrr}
 \toprule
-Method   & WS [es] & MC [es] & RG [de] & RG [fr] \\
+                                  & \multicolumn{3}{c}{RG-65 language} \\
+Method                            &      en &      de &      fr \\
 \midrule
-Retrofitting (Faruqui) &         --- &       .591 &       .603 &       .606 \\
-Our ensemble           &    \bf .444?&   \bf .765?& \bf   .673?& \bf   .781?\\
+Faruqui et al.: SG + Retrofitting &    .739 &    .603 &    .606 \\
+Our ensemble                      &\bf .891 &\bf .645 &\bf .789 \\
 \bottomrule
 \end{tabular}
 
 \caption{
-    Multilingual evaluation results for Spanish (es), German (de), and French
-    (fr), on translations of WS-353, MC-30, and RG-65, for our full ensemble
-    compared to Faruqui et al.'s retrofitting results.
+    Evaluation results comparing Faruqui et al.'s
+    multilingual retrofitting to ours,
+    on the English RG-65 data and its translations into German and French.
 }
 \label{eval-multilingual}
 \end{table}
@@ -640,6 +629,7 @@ indirect translations via Japanese in JMDict.
 \subsection{Comparisons to Other Published Results}
 
 \begin{table*}[t]
+\footnotesize
 \centering
 \begin{tabular}{lrrrrrr}
 \toprule
@@ -658,26 +648,6 @@ Label   & RW [dev] & RW [test] & RW [all] & MEN [dev] & MEN [test] & MEN [all]\\
     labeled in Table~\ref{eval-bigtable}.
 }
 \label{eval-dev-test}
-\end{table*}
-
-\begin{table*}[t]
-\centering
-\begin{tabular}{lrrrrrr}
-\toprule
-Modification & RW [dev] & MEN [dev] & WS-353 & SCWS &  RG-65 &  MC-30 \\
-\midrule
-{\bf Unmodified}                     & \bf .587 & \bf .858 & \bf .818 &  .668 &   .852 &   .845 \\
-Use first row instead of row-merging & .563 &      .827 &    .787 &  .649 &   .822 &   .794 \\
-Unweighted row-merging               & .526 &      .844 &    .751 &  .586 &   .841 &   .836 \\
-No self-loops in retrofitting        & .570 &      .855 &    .790 & \bf .676 & \bf .873 & \bf .853 \\
-\bottomrule
-\end{tabular}
-\caption{
-    The effects of various modifications to the embeddings of system {\bf WR1}.
-    RW and MEN-3000 were evaluated using their development sets here,
-    not the held-out test data.
-}
-\label{eval-variations}
 \end{table*}
 
 In Table~\ref{compare-others}, we compare our results on the RW and MEN-3000
@@ -724,30 +694,7 @@ messy data sets such as GloVe 840B.
 
 \subsection{Varying the System}
 
-Some of the procedures we implemented in creating systems {\bf WR1} and
-{\bf WR2} require some justification. To show the benefits of certain decisions,
-such as adding self-loops or the way we choose to merge rows of GloVe, we have
-evaluated what happens to the system in the absence of each decision. These
-evaluations appear in Table~\ref{eval-variations}. These evaluations were
-part of how we decided on the best configuration of the system, so they were
-run on the development sets of RW and MEN-3000, not the held-out test sets.
-
-In Table~\ref{eval-variations}, we can see that the choice of how to merge rows
-of GloVe that get the same standardized label makes a large difference.  Recall
-that the method we ultimately used was to assign each row a pseudo-frequency
-based on Zipf's law, and then take a weighted average based on those
-frequencies.  The results drop noticeably when we try the other proposed
-methods, which are taking only the first (most frequent) row that appears, or
-taking the unweighted average of the rows.
-
-In the retrofitting procedure, we made the decision to add ``self-loops'' that
-connect each term to itself, hypothesizing that this would help stabilize the
-representations of terms that are outside the original vocabulary of GloVe.
-Reversing this decision causes a noticeable drop in performance on RW, the
-evaluation that is most likely to involve words that were poorly represented or
-unrepresented in GloVe. On the other hand, the lack of self-loops seems to {\em
-increase} its score on SCWS, and on the smaller evaluations RG-65 and MC-30.
-
+% TODO: update
 In separate experimentation, we found that when we separate ConceptNet into its
 component datasets and drop each one in turn, the effects on the evaluation
 results are mostly quite small. There is no single dataset that acts as the
