@@ -82,6 +82,6 @@ rule rebuild_ninja
 
 build build.ninja: rebuild_ninja | ninja.py rules.ninja
 
-build build-data/combo840.standardized.labels build-data/combo840.none.standardized.npy: merge_interpolate build-data/glove12.840B.300d.standardized.labels build-data/glove12.840B.300d.l1.standardized.npy build-data/w2v-google-news.standardized.labels build-data/w2v-google-news.l1.standardized.npy build-data/conceptnet5.raw.labels
+build build-data/combo840.standardized.labels build-data/combo840.none.standardized.npy: merge_interpolate build-data/glove12.840B.300d.standardized.labels build-data/glove12.840B.300d.none.standardized.npy build-data/w2v-google-news.standardized.labels build-data/w2v-google-news.none.standardized.npy build-data/conceptnet5.raw.labels
 
-build build-data/combo42.standardized.labels build-data/combo42.none.standardized.npy: merge_interpolate build-data/glove.42B.300d.standardized.labels build-data/glove.42B.300d.l1.standardized.npy build-data/w2v-google-news.standardized.labels build-data/w2v-google-news.l1.standardized.npy build-data/conceptnet5.raw.labels
+# build build-data/combo42.standardized.labels build-data/combo42.none.standardized.npy: merge_interpolate build-data/glove.42B.300d.standardized.labels build-data/glove.42B.300d.l1.standardized.npy build-data/w2v-google-news.standardized.labels build-data/w2v-google-news.l1.standardized.npy build-data/conceptnet5.raw.labels
