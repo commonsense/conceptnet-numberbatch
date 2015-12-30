@@ -266,7 +266,7 @@ representations are comparable to each other.
 Pre-processing steps that various resources apply include: tokenizing text to
 separate words from punctuation (which all inputs except GloVe 840B do),
 joining multi-word phrases with underscores (ConceptNet and word2vec), removing
-a small list of stopwords (ConceptNet only), folding the text to lowercase
+a small list of stopwords from multi-word phrases (ConceptNet only), folding the text to lowercase
 (ConceptNet and GloVe 42B), replacing multiple digits with the character {\tt
 \#} (word2vec only), and lemmatizing English words to their root form using a
 modification of WordNet's Morphy algorithm (ConceptNet only).
