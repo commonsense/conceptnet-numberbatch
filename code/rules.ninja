@@ -46,6 +46,10 @@ rule standardize_vecs
 rule standardize_assoc
   command = python -m conceptnet_retrofitting.builders.standardize_assoc $in $out
 
+rule merge_interpolate
+  command = python -m conceptnet_retrofitting.builders.merge_interpolate $in $out
+  pool = memory_hogs
+
 rule concatenate
   command = cat $in > $out
 
@@ -77,3 +81,7 @@ rule rebuild_ninja
   command = python -m ninja
 
 build build.ninja: rebuild_ninja | ninja.py rules.ninja
+
+build build-data/combo840.standardized.labels build-data/combo840.none.standardized.npy: merge_interpolate build-data/glove12.840B.300d.standardized.labels build-data/glove12.840B.300d.l2.standardized.npy build-data/w2v-google-news.standardized.labels build-data/w2v-google-news.none.standardized.npy build-data/conceptnet5.raw.labels
+
+build build-data/combo42.standardized.labels build-data/combo42.none.standardized.npy: merge_interpolate build-data/glove.42B.300d.standardized.labels build-data/glove.42B.300d.l2.standardized.npy build-data/w2v-google-news.standardized.labels build-data/w2v-google-news.none.standardized.npy build-data/conceptnet5.raw.labels

@@ -89,7 +89,7 @@ def main(labels1, vecs1, labels2, vecs2, more_labels, labels_out, vecs_out, verb
 
     if verbose:
         print("Saving")
-    loaders.save_labels(merged.labels, vecs_out)
+    loaders.save_labels(merged.labels, labels_out)
     loaders.save_vecs(merged.vectors, vecs_out)
 
 

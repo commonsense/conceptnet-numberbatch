@@ -8,9 +8,9 @@ from conceptnet_retrofitting.ninja.ninja_util import (
 CONFIG = {
     'source-data-path': 'source-data/',
     'build-data-path': 'build-data/',
-    'glove-versions': ['glove12.840B.300d'],
+    'glove-versions': ['glove.42B.300d', 'glove12.840B.300d'],
     'word2vec-versions': ['w2v-google-news'],
-    'extra-embeddings': ['combo'],
+    'extra-embeddings': ['combo42', 'combo840'],
     'neg-filters': ['jmdict', 'opencyc', 'openmind', 'verbosity', 'wiktionary', 'wordnet'],
     'pos-filters': ['wiktionary'],
     'run-filter': False,
@@ -145,7 +145,7 @@ def build_word2vec(graph):
 
 
 def standardize_glove(graph):
-    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions'] + CONFIG['extra-embeddings']:
+    for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions']:
         graph['standardize_glove'][version] = Dep(
             [
                 GloveLabels(version=version),
@@ -180,6 +180,8 @@ def normalize_glove(graph):
     for version in CONFIG['glove-versions'] + CONFIG['word2vec-versions'] + CONFIG['extra-embeddings']:
         for norm in ('l1', 'l2'):
             for s13n in ('raw', 'standardized'):
+                if version.startswith('combo') and s13n == 'raw':
+                    continue
                 graph['normalize_glove'][version][norm][s13n] = Dep(
                     GloveVectors(version=version, standardization=s13n),
                     GloveVectors(version=version, normalization=norm, standardization=s13n),
@@ -285,6 +287,8 @@ def test(graph):
         vector_files[file.version, file.standardization, file.retrofit].append(file)
 
     for (version, standardization, retrofit), files in vector_files.items():
+        if version.startswith('combo') and standardization == 'raw':
+            continue
         label = GloveLabels(version=version, standardization=standardization, retrofit=retrofit)
         for file in files:
             out = copy.copy(file)
