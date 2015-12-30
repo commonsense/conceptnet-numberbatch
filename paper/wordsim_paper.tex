@@ -126,7 +126,6 @@ over both common and rare words.
 % TODO: talk about Agirre's observation of distributional vs. structured data
 % TODO: cite Turney 2010 survey
 % TODO: cite Levy 2015
-% TODO: talk about Zou and multilingual embeddings
 % TODO: talk about Bian and word senses
 
 \section{Knowledge sources}
@@ -308,6 +307,11 @@ loses the ability to distinguish some word forms. The raw GloVe 840B data gets
 a Spearman correlation of $\rho = .146$ on the RW dataset, which increases to
 $\rho = .494$ when its embeddings are standardized and combined in this way.
 
+Figure~\ref{vocabulary-overlap} shows the size of the vocabularies of
+ConceptNet, GloVe, and word2vec after this transformation, and the sizes of
+the overlaps among them, using a proportional-area Venn diagram produced using
+{\em eulerAPE} \cite{micallef2014euler}.
+
 \subsubsection{Feature Normalization}
 
 As briefly mentioned by \newcite{pennington2014glove}, $L_2$ normalization of
@@ -428,7 +432,26 @@ terms that appear fewer than 4 times, and terms with more than 3 words in them.
 \subsection{Locally Linear Alignment}
 
 In order to use both word2vec and GloVe at the same time, we need to align their
-partially-overlapping vocabularies.
+partially-overlapping vocabularies and merge their features. This is
+straightforward to do on the terms that are shared between the two vocabularies,
+but we would rather not lose the other terms, if we can later benefit from
+learning more about those terms from ConceptNet.
+
+Before merging features, we need to compute GloVe representations for terms
+represented in word2vec but not GloVe, and vice versa. The way we do this
+is inspired by \newcite{zhao2015learning}, who infer translations between
+languages of unknown phrases using a locally-linear projection of known
+translations of similar phrases. Instead of known translations, we have the
+terms that overlap between word2vec and GloVe. Given a non-overlapping term,
+we calculate its vector as the average of the vectors of the nearest
+overlapping terms, weighted by their cosine similarity.
+
+To combine the features of word2vec and GloVe, we first concatenate their
+vectors into 600-dimensional vectors, then make the result more compact and
+less redundant by reducing them back to 300 dimensions using a truncated SVD.
+We factor the 600-dimensional matrix $A$ as $A \approx U \Sigma V^T$, keeping
+only the 300 largest eigenvalues, then compute the new 300-dimensional joint
+features as $U \Sigma^{1/2}$.
 
 \section{Evaluation}
 
@@ -485,6 +508,7 @@ development and test data.
      &      &      &      & G    & $L_1$  &    .148 &    .789 &    .676 \\  % glove12.840B.300d.l1.raw.evaluation
      &      &      & W    &      &        &    .371 &    .732 &    .624 \\  % w2v-google-news.none.raw.evaluation
      &      &      & W    &      & $L_1$  &    .374 &    .732 &    .622 \\  % w2v-google-news.l1.raw.evaluation
+\midrule
      &      & St   &      & g    &        &    .492 &    .815 &    .765 \\  % glove.42B.300d.l2.standardized.evaluation
      &      & St   &      & g    & $L_1$  &    .513 &    .834 &    .794 \\  % glove.42B.300d.l1.standardized.evaluation
      &      & St   &      & G    &        &    .494 &    .814 &    .763 \\  % glove12.840B.300d.l2.standardized.evaluation
@@ -492,6 +516,7 @@ development and test data.
      &      & St   & W    &      &        &    .453 &    .778 &    .731 \\  % w2v-google-news.none.standardized.evaluation
      &      & St   & W    &      & $L_1$  &    .452 &    .777 &    .732 \\  % w2v-google-news.l1.standardized.evaluation
      &      & St   & W    & G    & $L_1$  &    .539 &    .841 &    .796 \\  % combo.l1.standardized.evaluation
+\midrule
      & PP   & St   &      & G    & $L_1$  &    .565 &    .852 &    .806 \\  % glove12.840B.300d.l1.standardized.ppdb-xl-lexical-standardized.evaluation
      & PP   & St   & W    &      & $L_1$  &    .481 &    .800 &    .750 \\  % w2v-google-news.l1.standardized.ppdb-xl-lexical-standardized.evaluation
      & PP   & St   & W    & G    & $L_1$  &    .558 &    .850 &    .806 \\  % combo.l1.standardized.ppdb-xl-lexical-standardized.evaluation
@@ -530,7 +555,7 @@ GloVe (Pennington)            &     .448  &     .816  & .759  \\
 GloVe (ours)                  &     .528  &     .840  & .798  \\
 SVD (Levy)                    &     .514  &     .778  & .736* \\
 Retrofitting (Faruqui)        &      ---  &     .796  & .741  \\
-Ensemble (ours)               & \bf .604  & \bf .868  & \bf .821 \\
+Our ensemble                  & \bf .604  & \bf .868  & \bf .821 \\
 \bottomrule
 \end{tabular}
 
