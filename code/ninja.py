@@ -10,7 +10,7 @@ CONFIG = {
     'build-data-path': 'build-data/',
     'glove-versions': ['glove.42B.300d', 'glove12.840B.300d'],
     'word2vec-versions': ['w2v-google-news'],
-    'extra-embeddings': ['combo42', 'combo840'],
+    'extra-embeddings': ['combo840'],
     'neg-filters': ['jmdict', 'opencyc', 'openmind', 'verbosity', 'wiktionary', 'wordnet'],
     'pos-filters': ['wiktionary'],
     'run-filter': False,
@@ -24,7 +24,7 @@ CONFIG = {
                        #'conceptnet5-wiktionary-only',
                        'ppdb-xl-lexical-standardized', 'cnet-ppdb-combined']
 }
-CONCEPTNET_SOURCE_FILE = 'conceptnet5.csv'
+CONCEPTNET_SOURCE_FILE = 'conceptnet5.5.csv'
 
 
 class GloveVectors:

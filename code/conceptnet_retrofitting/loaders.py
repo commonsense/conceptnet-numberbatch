@@ -57,6 +57,8 @@ def load_word2vec_bin(filename):
         ncols = int(ncols_str)
         for row in range(nrows):
             label = _read_until_space(infile)
+            if label == '</s>':
+                label = 'WORD2VEC_SENTENCE_BOUNDARY'
             vec = _read_vec(infile, ncols)
             label_list.append(label)
             vec_list.append(vec)
