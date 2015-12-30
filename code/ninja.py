@@ -24,7 +24,7 @@ CONFIG = {
                        #'conceptnet5-wiktionary-only',
                        'ppdb-xl-lexical-standardized', 'cnet-ppdb-combined']
 }
-CONCEPTNET_SOURCE_FILE = 'conceptnet5.5.csv'
+CONCEPTNET_SOURCE_FILE = 'conceptnet5.csv'
 
 
 class GloveVectors:
