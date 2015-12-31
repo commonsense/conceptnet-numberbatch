@@ -33,8 +33,8 @@ tests = [
 def test_all(similarity_func):
     for test, file_info, *optional in tests:
         lang = optional[0] if optional else None
-        print(test)
-        print(evaluate(similarity_func, parse_file(**file_info), lang))
+        value = evaluate(similarity_func, parse_file(**file_info), lang)
+        print('%s\t%3.3f' % (test, value))
 
 
 def parse_file(filename, sep=None, preprocess_word=None):
