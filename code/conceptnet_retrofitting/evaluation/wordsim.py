@@ -30,11 +30,21 @@ tests = [
 ]
 
 
+def confidence_interval(rho, N):
+    z = np.arctanh(rho)
+    interval = 1.96 / np.sqrt(N - 3)
+    low = z - interval
+    high = z + interval
+    return (np.tanh(low), np.tanh(high))
+
+
 def test_all(similarity_func):
     for test, file_info, *optional in tests:
         lang = optional[0] if optional else None
-        value = evaluate(similarity_func, parse_file(**file_info), lang)
-        print('%s\t%3.3f' % (test, value))
+        entries = list(parse_file(**file_info))
+        value = evaluate(similarity_func, entries, lang)
+        low, high = confidence_interval(value, len(entries))
+        print('%s\t%3.3f\t(%3.3f ~ %3.3f)' % (test, value, low, high))
 
 
 def parse_file(filename, sep=None, preprocess_word=None):
