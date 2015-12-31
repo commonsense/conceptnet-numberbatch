@@ -92,7 +92,7 @@ distributional semantics of unstructured text with a source of structured
 connections between words. The combined embedding achieves performance on
 word-similarity evaluations superior to either source individually.
 
-Here, we build on the retrofitting process to produce a high-quality space of
+RHere, we build on the retrofitting process to produce a high-quality space of
 word embeddings. We extend existing techniques in the following ways:
 
 \begin{itemize}
@@ -127,8 +127,19 @@ over both common and rare words.
 % TODO: cite Turney 2010 survey
 % TODO: cite Levy 2015
 % TODO: talk about Bian and word senses
+\newcite{agirre2009study} observes that distributional similarity and
+structured knowledge can be combined for a benefit exceeding what each would
+achieve alone, particularly by extending the vocabulary. Their system uses a
+similarity measure over WordNet, and uses distributional similarities to
+recognize words outside of WordNet's vocabulary.
 
-AutoExtend \newcite{rothe2015autoextend} is a system with similar methods to
+\newcite{levy2015embeddings} surveys modern methods of distributional similarity
+and experiments with training them on specific data while varying their
+parameters. In this way, it compares word2vec and GloVe, then proposes a method
+based on the SVD of the Pointwise Mutual Information matrix that outperforms
+both. We use Levy's results as a point of comparison here.
+
+AutoExtend \cite{rothe2015autoextend} is a system with similar methods to
 ours: it extends word2vec embeddings to cover all the word senses and synsets of
 WordNet by propagating information over edges, thus combining distributional and
 structured data after the fact. The primary goal of AutoExtend is word sense
@@ -217,7 +228,7 @@ In this paper, we focus only on the downloadable sets of term embeddings that
 the GloVe and word2vec projects provide, not on re-running them with tuned
 hyperparameters. Using this data makes it possible to reproduce their results
 and compare directly to them, even when their preferred input data is not
-publically available. We find that we can get very good results derived from
+available. We find that we can get very good results derived from
 the downloadable embeddings, and that GloVe's downloadable embeddings outperform
 word2vec's in this case, but a combination of them can perform even better.
 
@@ -408,23 +419,7 @@ most evaluation data for word similarity is also evaluating relatedness, unless
 there has been a specific effort to separate them \cite{agirre2009similarity},
 we erase the labels as in spectral association.
 
-Negated relations and antonym relations, such as the relations expressed by
-``a person does not have a tail'' and ``hot is the opposite of cold'', are
-typically handled specially; a detail of spectral association is that negated
-relations were assigned negative values in the matrix. Intuitively, negated
-relations between two terms should not increase their relatedness. Perhaps
-these relations should in fact decrease relatedness -- while ``hot'' and
-``cold'' are similar in many ways, people providing judgments of relatedness
-are likely to consider them less related because of the obvious contrast
-between them.
-
-However, association matrices are better behaved when they contain no negative
-entries. Saying that vector $A$ should be a bit less related to vector
-$B$ is very different from saying that it should be related to $-B$.
-In our method, we simply omit all instances of negative and antonym
-relations in ConceptNet.
-
-Each remaining assertion in ConceptNet corresponds to two entries in a sparse
+Each assertion in ConceptNet corresponds to two entries in a sparse
 association matrix $S$.  ConceptNet assigns a confidence score, or weight, to
 each assertion.  These weights are not entirely comparable between the data
 sources that comprise ConceptNet, so we re-scaled them so that the average
@@ -563,10 +558,10 @@ System             &       dev &     test &      all &      dev &     test &    
 GloVe 42B          &      .489 &     .448 &     .477 &     .813 &     .816 &     .814 \\
 Mod. GloVe         &      .536 &     .513 &     .528 &     .841 &     .840 &     .841 \\
 \bf Full ensemble  & \bf  .593 & \bf .601 & \bf .596 &     .858 &     .861 &     .859 \\
-Without CN5        &      .533 &     .543 &     .536 &     .842 &     .847 &     .844 \\
-Without PPDB       &      .590 &     .598 &     .592 & \bf .858 & \bf .862 & \bf .860 \\
-Without GloVe      &      .545 &     .543 &     .545 &     .807 &     .812 &     .808 \\
-Without word2vec   &      .591 &     .583 &     .588 &     .857 &     .859 &     .858 \\
+Omit CN5           &      .533 &     .543 &     .536 &     .842 &     .847 &     .844 \\
+Omit PPDB          &      .590 &     .598 &     .592 & \bf .858 & \bf .862 & \bf .860 \\
+Omit GloVe         &      .545 &     .543 &     .545 &     .807 &     .812 &     .808 \\
+Omit word2vec      &      .591 &     .583 &     .588 &     .857 &     .859 &     .858 \\
 \bottomrule
 \end{tabular}
 
@@ -596,16 +591,14 @@ multiple data sources. {\bf CN} and {\bf PP} indicate adding data from
 ConceptNet 5.4, PPDB XL, or both using expanded retrofitting.
 
 While Table~\ref{eval-bigtable} shows our correlation with only the test data on
-these evaluations, Table~\ref{eval-dev-test} compares our performance on
+these evaluations, Table~\ref{eval-dev-test} compares our results on
 development and test data.
 
 \subsection{Benefits of Lemmatization}
 
 Note that the row labeled with {\bf g} alone is simply an evaluation of GloVe
 42B that reproduces the evaluation of \newcite{pennington2014glove}. Our results
-here match the published results to within .001. word2vec, however, provides
-downloadable vectors that are different from the ones used in its original
-publication.
+here match the published results to within .001.
 
 Decisions about how to process the data, even after
 the fact, make a very large difference in word similarity evaluations.
@@ -614,12 +607,14 @@ works better ``out of the box'', and 840B contains messy data that particularly
 causes problems on the Rare Words evaluation. However, our strategy to
 standardize and lemmatize the term labels of GloVe 840B, combining its rows using
 the Zipf estimate, makes it perform better than GloVe 42B and other published
-results, as seen in the {\bf St}, {\bf G}, $L_1$ row. We'll refer to this
-configuration as ``Modified GloVe''. The fact that Modified GloVe performs
-better than GloVe 42B, GloVe 840B and many other systems, even before
-retrofitting any additional data onto it, highlights the unexpectedly large
-benefit of lemmatization: some of the improvements from this paper can be
-realized without introducing any additional data.
+results, as seen in the {\bf St}, {\bf G}, $L_1$ row. We call this
+configuration ``Modified GloVe'' in Table~\ref{compare-others} and Figure~\ref{compare-graph}
+, and similarly, our best configuration of word2vec is ``Modified word2vec''.
+
+The fact that Modified GloVe performs better than GloVe 42B, GloVe 840B and many
+other systems, even before retrofitting any additional data onto it, highlights
+the unexpectedly large benefit of lemmatization: some of the improvements from
+this paper can be realized without introducing any additional data.
 
 It's important to note that we are not changing the evaluation data by using
 a lemmatizer; we are only changing the way we look up its embeddings in the
@@ -637,50 +632,57 @@ appear to far outweigh the drawbacks.
 \footnotesize
 \begin{tabular}{l|rrr}
 \toprule
-Method                        & RW [all]  &      MEN  & WS \\
+Method                        & RW [all]  &      MEN  & WS    \\
 \midrule
 word2vec SGNS (Levy)          &     .470  &     .774  & .733* \\
+Modified word2vec (ours)      &     .476  &     .778  & .731  \\
 GloVe (Pennington)            &     .477  &     .816  & .759  \\
+Modified GloVe (ours)         &     .528  &     .840  & .798  \\
 SVD (Levy)                    &     .514  &     .778  & .736* \\
 Retrofitting (Faruqui)        &      ---  &     .796  & .741  \\
-Modified GloVe (ours)         &     .528  &     .840  & .798  \\
-Our ensemble                  & \bf .604  & \bf .868  & \bf .821 \\
+Our ensemble                  & \bf .596  & \bf .859  & \bf .821 \\
 \bottomrule
 \end{tabular}
 
 \caption{
     Comparison between our ensemble word embeddings and previous results,
     on the complete RW data, the MEN-3000 test data, and WordSim-353.
-    Asterisks indicate WordSim results that were estimated based on published
-    data that was split into similarity and relatedness.
+    Asterisks indicate estimated overall results for WordSim.
 }
 \label{compare-others}
 \end{table}
 
-% TODO: fix this graph
 \begin{figure}
-\begin{tikzpicture}[scale=.9]
-    \begin{axis}[enlargelimits=0.2, xlabel={$\rho$ correlation with MEN-3000 (common words)}, ylabel={$\rho$ correlation with RW (rare words)}]
+\begin{tikzpicture}[scale=.7]
+    \begin{axis}[enlargelimits=0.05, legend style={legend pos=outer north east, font=\footnotesize}, legend cell align=left, %
+                 xlabel={$\rho$ correlation with MEN-3000 (common words)}, ylabel={$\rho$ correlation with RW (rare words)}]
         \addplot[
-          scatter,mark=*,only marks,nodes near coords,
-          point meta=explicit symbolic,
-          visualization depends on={value \thisrow{anchor}\as\myanchor},
-          every node near coord/.append style={anchor=\myanchor}
+          scatter/classes={
+            a={mark=pentagon,black}, b={mark=triangle,black}, c={mark=triangle*,blue}, %
+            d={mark=square,black}, e={mark=square*,blue}, f={mark=*,red}
+          },
+          scatter,only marks,
+          scatter src=explicit symbolic,
+          error bars/error bar style={gray},
+          error bars/.cd,
+          y dir=both,y explicit,x dir=both,x explicit
         ]
-        table[meta=label] {
-            x      y     label             anchor
-            .777   .514  {Levy SVD}        west
-            .774   .470  {Levy skip-gram}  west
-            .8163  .4767 {GloVe}           west
-            .8400  .5280 {WR0}             west
-            .8599  .5850 {WR1}             west
-            .8597  .5887 {WR2}             south
+        table[meta=label,x =x,y =y,x error plus =xplus,x error minus =xminus,y error plus =yplus,y error minus =yminus] {
+            x      xplus   xminus  y     yplus   yminus  label  anchor
+            .777   .023    .026    .514  .032   .033     a      south
+            .774   .023    .026    .470  .033   .034     b      south
+            .778   .023    .026    .476  .033   .034     c      south
+            .8163  .020    .023    .4767 .033   .034     d      south
+            .840   .017    .019    .528  .031   .032     e      south
+            .861   .016    .017    .596  .027   .029     f      south
         };
+        \legend{Levy SVD, word2vec, Mod. word2vec, GloVe, Mod. GloVe, Ensemble}
     \end{axis}
 \end{tikzpicture}
 \caption{
-    Systems discussed in this paper, plotted according to their $\rho$
-    correlation with MEN-3000 and RW.
+    Systems discussed in this paper, plotted according to their Spearman
+    correlation with MEN-3000 and RW. Hollow nodes are previously-reported
+    results; filled nodes are systems created for this paper.
 }
 \label{compare-graph}
 \end{figure}
@@ -701,7 +703,7 @@ Our ensemble                      &\bf .891 &\bf .645 &\bf .789 \\
 \caption{
     Evaluation results comparing Faruqui et al.'s
     multilingual retrofitting of Wikipedia skip-grams to our ensemble,
-    on the English RG-65 data and its translations into German and French.
+    on RG-65 and its translations.
 }
 \label{eval-multilingual}
 \end{table}
@@ -728,11 +730,9 @@ from a hypothetical larger data set.
 \subsection{Which System is Best?}
 
 Our full ensemble with all six components performs significantly better
-than the previously published systems, with $p < .01$. It may be the
-best-performing system of all the configurations, but the ensemble of
-everything but PPDB was very close to it in performance. We conclude that our
-ensemble, with or without PPDB, is an improvement on the state of the art, and
-that it's inconclusive what the best particular configuration of the system is.
+than the previously published systems, with $p < .01$. It is inconclusive
+whether it is better to include or exclude PPDB in the ensemble, as the results
+are very close.
 
 Table~\ref{eval-multilingual} shows the performance of these systems on
 gold standards that have been translated to other languages, in comparison to
@@ -742,20 +742,20 @@ word2vec and GloVe are assumed to be English only. The representations of
 non-English words come from expanded retrofitting, which allows information to
 propagate over the inter-language links in ConceptNet.
 
-\subsection{Varying the System}
+%\subsection{Varying the System}
 
-In separate experimentation, we found that when we separate ConceptNet into its
-component datasets and drop each one in turn, the effects on the evaluation
-results are mostly quite small. There is no single dataset that acts as the
-``keystone'' without which the system falls apart, but one dataset ---
-Wiktionary --- unsurprisingly has a larger effect than the others, because it
-is responsible for most of the assertions. Of the 5,631,250 filtered assertions
-that come from ConceptNet, 4,244,410 of them are credited to Wiktionary.
+%In separate experimentation, we found that when we separate ConceptNet into its
+%component datasets and drop each one in turn, the effects on the evaluation
+%results are mostly quite small. There is no single dataset that acts as the
+%``keystone'' without which the system falls apart, but one dataset ---
+%Wiktionary --- unsurprisingly has a larger effect than the others, because it
+%is responsible for most of the assertions. Of the 5,631,250 filtered assertions
+%that come from ConceptNet, 4,244,410 of them are credited to Wiktionary.
 
-Without Wiktionary, the score on RW drops from .587 to .541. However, at the
-same time, the MEN-3000 score {\em increases} from .858 to .865. The system
-continues to do what it is designed to do without Wiktionary, but there seems to
-be a tradeoff in performance on rare words and common words involved.
+%Without Wiktionary, the score on RW drops from .587 to .541. However, at the
+%same time, the MEN-3000 score {\em increases} from .858 to .865. The system
+%continues to do what it is designed to do without Wiktionary, but there seems to
+%be a tradeoff in performance on rare words and common words involved.
 
 \subsection{The Limits of Similarity Judgments}
 
@@ -819,8 +819,7 @@ We aim for these results to be reproducible and reusable by others. The code
 that we ran to produce the results in this paper is available in a GitHub
 repository [{\em currently private pending blind review}]. We have tagged
 this revision as [{\em TBD}], as we intend to continue to revise and improve the
-code afterward. The data files are available at [{\em TBD}] and can be
-version-controlled along with the code using {\tt git-annex}.
+code afterward.
 
 \section*{Acknowledgements}
 
