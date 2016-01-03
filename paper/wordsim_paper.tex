@@ -314,15 +314,15 @@ the tokens are distributed according to Zipf's law \cite{zipf1949human}: the
 $n$th token in rank order has a frequency proportional to $1/n$. We use these
 proportions in the weighted average when combining multiple embeddings.
 
-This process alone is a benefit on word-similarity evaluations, even without
-combining any resources. For example, the Rare Words (RW) dataset
-\cite{luong2013rw} tends to encounter terms that are poorly represented or
-out-of-vocabulary in most word embeddings.  Lemmatizing them before looking
-them up, and combining them with more frequently observed representations,
-improves the evaluation results on these words, even though the process
-loses the ability to distinguish some word forms. The raw GloVe 840B data gets
-a Spearman correlation of $\rho = .146$ on the RW dataset, which increases to
-$\rho = .494$ when its embeddings are standardized and combined in this way.
+%This process alone is a benefit on word-similarity evaluations, even without
+%combining any resources. For example, the Rare Words (RW) dataset
+%\cite{luong2013rw} tends to encounter terms that are poorly represented or
+%out-of-vocabulary in most word embeddings.  Lemmatizing them before looking
+%them up, and combining them with more frequently observed representations,
+%improves the evaluation results on these words, even though the process
+%loses the ability to distinguish some word forms. The raw GloVe 840B data gets
+%a Spearman correlation of $\rho = .146$ on the RW dataset, which increases to
+%$\rho = .494$ when its embeddings are standardized and combined in this way.
 
 Figure~\ref{vocabulary-overlap} shows the size of the vocabularies of
 ConceptNet, GloVe, and word2vec after this transformation, and the sizes of
@@ -353,12 +353,8 @@ the problem in terms of updates that propagate over a set of edges, we have
 found it more convenient to express it and implement it in terms of an update
 to a matrix.
 
-The inputs to retrofitting are an initial dense matrix of term embeddings,
-$W^0$, and a list of known semantic relationships. Let the size
-of the vocabulary be $m$ and the dimensionality of the embeddings be $n$.
-$W^0$ contains rows $w^0_i$ for $i = 1 \ldots m$, each one corresponding to
-a term in the vocabulary of the embeddings, associating it with an
-$n$-dimensional vector.
+The inputs to retrofitting are an initial $m \times n$ dense matrix of term
+embeddings, $W^0$, and a list of known semantic relationships.
 
 Faruqui et al.'s retrofitting procedure aims to minimize a sum of
 a word's distance from its neighbors in the semantic network and its distance
@@ -375,31 +371,24 @@ is that the results depend on the order in which the nodes of the graph are
 iterated, which is arbitrary.
 
 We instead choose to update the embeddings all at once by multiplying them by a
-sparse matrix $S$ of semantic connections. Letting $m$ now be the size of the
-{\em merged} vocabulary, $S$ is an $m \times m$ matrix containing positive
+sparse matrix $S$ of semantic connections. Letting $m'$ be the size of the
+merged vocabulary, $S$ is an $m' \times m'$ matrix containing positive
 weighted values for terms that are known to be semantically related, 1 on the
 diagonal relating each term to itself, and 0 otherwise.
 
-We need to take this expanded vocabulary into account in $W$ as well. $W^0$ is
-an $m \times n$ matrix whose rows come from the original embeddings if available,
-and are all zeroes for terms outside the vocabulary of the original embeddings.
-To neutralize the effect of these zero rows, we assign
-weights $\alpha_i$ to the rows, letting $\alpha_i = 1$ when word $i$ is
-in the vocabulary of the original embeddings and $0$ otherwise, and collect these
-weights in the diagonal matrix $A$ so we can multiply by it row-wise.
-
-We can now update $W$ iteratively so that the next iteration of $W$ is a
-combination of its product with $S$ and its original state:
-
+Let $W^0$ be an $m' \times n$ matrix whose rows come from the original
+embeddings if available, and are all zeroes for terms outside the vocabulary of
+the original embeddings. $A$ is a diagonal matrix in which $A_{ii}$ is 1 if term
+$i$ is in the original vocabulary, and 0 otherwise. We can now update $W$
+iteratively so that the next iteration of $W$ is a combination of its product
+with $S$ and its original state, followed by $L_2$ normalization of its
+non-zero rows\footnote{
+    We maintain $L_2$ normalization so that minimizing distance and maximizing
+    cosine similarity are always linked.
+}:
 $$
-W^{k+1} = L_2\left[ \left( S W^k + W^0 A \right)\left( 1 + A \right)^{-1} \right]
+W^{k+1} = \mathrm{normalize}\left[ \left( S W^k + W^0 A \right)\left( 1 + A \right)^{-1} \right]
 $$
-
-$L_2$ here is a function that applies $L_2$ normalization to each non-zero row
-of its argument, ensuring that terms are always represented by unit vectors.
-Keeping this constraint makes minimizing the distance of semantically-related
-words (the objective of this optimization process) interchangeable with
-maximizing their cosine similarity (the objective of the evaluation).
 
 \subsection{ConceptNet as an Association Matrix}
 
@@ -540,7 +529,7 @@ CN   & PP   & St   & W    & G    & $L_1$  &\bf .601 &    .861 &    .802 \\  % co
     test sets of RW and MEN-3000 and with WordSim-353.
     The components are: {\bf CN} = ConceptNet 5.4,
     {\bf PP} = PPDB XL, {\bf St} = standardized and lemmatized terms,
-    {\bf W} = word2vec vectors from SGNS on Google News, {\bf g} = GloVe 42B vectors,
+    {\bf W} = word2vec SGNS vectors, {\bf g} = GloVe 42B vectors,
     {\bf G} = GloVe 1.2 840B vectors, {\bf $L_1$} = $L_1$-normalized features.
 }
 \label{eval-bigtable}
@@ -580,10 +569,10 @@ that they are word2vec's SGNS embeddings built from Google News. When both
 {\bf W} and {\bf G} are present, the embeddings are combined as in
 Section~\ref{locally-linear-alignment}. $L_1$ indicates that the columns of
 features were $L_1$-normalized; otherwise we used the existing scale of the
-features\footnote{
+features.\footnote{
     When GloVe is not $L_1$-normalized, it is $L_2$-normalized instead,
     following \newcite{pennington2014glove}.
-}.
+}
 
 {\bf St} indicates that the labels were transformed and rows combined using the
 method of Section~\ref{standardizing-text}, which is a prerequisite to combining
@@ -617,13 +606,14 @@ the unexpectedly large benefit of lemmatization: some of the improvements from
 this paper can be realized without introducing any additional data.
 
 It's important to note that we are not changing the evaluation data by using
-a lemmatizer; we are only changing the way we look up its embeddings in the
-vector space that we are evaluating. For example, if an evaluation requires
-similarities for the words ``dry'' and ``dried'' to be ranked differently, or
-the words ``polish'' and ``Polish'', the lemmatized system will rank them the
-same, and will be penalized in its Spearman correlation.
-However, the benefits of lemmatization when evaluating semantic similarity
-appear to far outweigh the drawbacks.
+a lemmatizer; we are only changing the way we look it up as embeddings in the
+vector space that we are evaluating.
+%For example, if an evaluation requires
+%similarities for the words ``dry'' and ``dried'' to be ranked differently, or
+%the words ``polish'' and ``Polish'', the lemmatized system will rank them the
+%same, and will be penalized in its Spearman correlation.
+%However, the benefits of lemmatization when evaluating semantic similarity
+%appear to far outweigh the drawbacks.
 
 \subsection{Comparisons to Other Published Results}
 
@@ -727,8 +717,6 @@ indicate 95\% confidence intervals based on the Fisher transformation of $\rho$
 \cite{fisher1915frequency}, supposing that each evaluation is randomly sampled
 from a hypothetical larger data set.
 
-\subsection{Which System is Best?}
-
 Our full ensemble with all six components performs significantly better
 than the previously published systems, with $p < .01$. It is inconclusive
 whether it is better to include or exclude PPDB in the ensemble, as the results
@@ -757,45 +745,15 @@ propagate over the inter-language links in ConceptNet.
 %continues to do what it is designed to do without Wiktionary, but there seems to
 %be a tradeoff in performance on rare words and common words involved.
 
-\subsection{The Limits of Similarity Judgments}
-
-\newcite{bruni2014men} describe a substitute for inter-annotator agreement on
-their MEN-3000 dataset:
-
-\begin{quote}
-``The Spearman correlation of the two authors is at 0.68, the correlation of their
-average ratings with the MEN scores is at 0.84. On the one hand, this high
-correlation suggests that MEN contains meaningful semantic ratings. On the
-other, it can also be taken as an upper bound on what computational models can
-realistically achieve when simulating the human MEN judgments.''
-\end{quote}
-
-Our model achieves a MEN score of \scoreMEN{} on the
-held-out test data, putting its performance above that upper bound. In many
-circumstances, this would be an indication that the model has overfit to the
-MEN data. However, we have tried to eliminate the possibility of overfitting.
-The MEN data is never used as an input to the system; the same system also
-achieves good results on all other data sets; and we did not use or even
-look at the held-out data when setting parameters. Strikingly, the evaluation
-score on MEN goes {\em up} when the held-out data is evaluated instead.
-
-We postulate instead that similarity evaluations become easier to match
-computationally when averaged over the judgments of many people. Notice, for
-example, that the two MEN-3000 authors who evaluated their own ratings
-agreed more with the average of the crowd than they did with each other.
-While these results may be approaching it, the true upper bound of the MEN
-evaluation is likely higher than claimed.
-
 \subsection{Future Work}
 
 One aspect of our method that clearly has room for improvement is the fact that
-we disregard the labels on relations in ConceptNet, and exclude antonym
-relations altogether. There is valuable knowledge there that we might be able
-to take into account with a more sophisticated extension of retrofitting, one
-that goes beyond simply knowing that particular words should be related, to
-handling them differently based on {\em how} they are related. This seems
-particularly important for antonyms, which indicate that words are similar
-overall but different in a key aspect.
+we disregard the labels on relations in ConceptNet.  There is valuable
+knowledge there that we might be able to take into account with a more
+sophisticated extension of retrofitting, one that goes beyond simply knowing
+that particular words should be related, to handling them differently based on
+{\em how} they are related. This seems particularly important for antonyms,
+which indicate that words are similar overall but different in a key aspect.
 
 Lemmatization was clearly very useful, but it loses information. Representing
 morphological relationships as operations in the vector space, as in
@@ -821,7 +779,7 @@ repository [{\em currently private pending blind review}]. We have tagged
 this revision as [{\em TBD}], as we intend to continue to revise and improve the
 code afterward.
 
-\section*{Acknowledgements}
+% \section*{Acknowledgements}
 
 \begin{CJK*}{UTF8}{min}
 \bibliography{wordsim_paper}
