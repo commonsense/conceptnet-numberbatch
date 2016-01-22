@@ -93,7 +93,7 @@ def load_sparse_relations(filename):
 
 
 def load_labels(filename, encoding='utf-8'):
-    return [line.strip() for line in open(filename, encoding=encoding)]
+    return [line.strip() for line in open(filename, encoding=encoding, errors='replace')]
 
 
 def load_replacements(filename):

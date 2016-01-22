@@ -1,25 +1,59 @@
 import numpy as np
 
-from conceptnet_retrofitting.standardization import standardize
+from conceptnet5.language.english import uri_and_residue
 from ordered_set import OrderedSet
+from conceptnet_retrofitting.word_vectors import normalize, normalize_vec
+
+
+def first_ending(residue):
+    for token in residue.split(' '):
+        if '+' in token:
+            return token.format('')
+    return ''
+
 
 def standardize_vecs(labels, vecs):
     standardized_labels = OrderedSet()
     standardized_vecs = []
+    vec_denominators = []
+
+    # First pass: find average vectors for endings
+    for index, (label, vec) in enumerate(zip(labels, vecs)):
+        stem, residue = uri_and_residue(label)
+        ending = first_ending(residue)
+        if ending and stem in labels:
+            stem_index = labels.index(stem)
+            diff = (vec - vecs[stem_index]) / (index + 1)
+            if ending not in standardized_labels:
+                ending_index = standardized_labels.add(ending)
+                standardized_vecs.append(diff)
+                vec_denominators.append((index + 1))
+            else:
+                ending_index = standardized_labels.index(ending)
+                standardized_vecs[ending_index] += vec
+                vec_denominators[ending_index] += index + 1
+
+    for i in range(len(standardized_vecs)):
+        standardized_vecs[i] /= vec_denominators[i]
 
     for index, (label, vec) in enumerate(zip(labels, vecs)):
-        label = standardize(label)
+        stem, residue = uri_and_residue(label)
+        ending = first_ending(residue)
+        if ending:
+            diff_vec = standardized_vecs[standardized_labels.index(ending)]
+            vec -= diff_vec
 
-        vec /= (index + 1)
+        scaled_vec = vec / (index + 1)
 
-        if label not in standardized_labels:
-            standardized_labels.add(label)
+        if stem not in standardized_labels:
+            standardized_labels.add(stem)
             standardized_vecs.append(vec)
         else:
-            index = standardized_labels.index(label)
-            standardized_vecs[index] += vec
+            existing_index = standardized_labels.index(stem)
+            standardized_vecs[existing_index] += vec
 
     return list(standardized_labels), np.array(standardized_vecs)
+
 
 def main(labels_in, vecs_in, labels_out, vecs_out):
     from conceptnet_retrofitting import loaders
@@ -31,6 +65,7 @@ def main(labels_in, vecs_in, labels_out, vecs_out):
 
     loaders.save_labels(labels, labels_out)
     loaders.save_vecs(vecs, vecs_out)
+
 
 if __name__ == '__main__':
     import sys
