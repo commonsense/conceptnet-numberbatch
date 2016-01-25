@@ -19,7 +19,7 @@ def first_ending(residue):
 def standardize_vecs(labels, vecs):
     standardized_labels = OrderedSet()
     standardized_vecs = []
-    vec_denominators = []
+    vec_weights = []
 
     transformed_indices = {}
 
@@ -40,14 +40,14 @@ def standardize_vecs(labels, vecs):
             if ending not in standardized_labels:
                 ending_index = standardized_labels.add(ending)
                 standardized_vecs.append(diff)
-                vec_denominators.append((index + 1))
+                vec_weights.append((index + 1))
             else:
                 ending_index = standardized_labels.index(ending)
                 standardized_vecs[ending_index] += diff
-                vec_denominators[ending_index] += index + 1
+                vec_weights[ending_index] += 1 / (index + 1)
 
     for i in range(len(standardized_vecs)):
-        standardized_vecs[i] /= vec_denominators[i]
+        standardized_vecs[i] /= vec_weights[i]
 
     # Third pass: handle all vectors, subtracting out difference
     # vectors from inflected versions
