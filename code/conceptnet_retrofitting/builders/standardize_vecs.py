@@ -6,9 +6,13 @@ from conceptnet_retrofitting.word_vectors import normalize, normalize_vec
 
 
 def first_ending(residue):
-    for token in residue.split(' '):
-        if '+' in token:
-            return token.format('')
+    chunks = residue.split(' ')
+    if len(chunks) > 5:
+        # Something's being inappropriately used as a term. Probably a URL.
+        return ''
+    for chunk in chunks:
+        if '+' in chunk:
+            return chunk.format('', '', '', '', '')
     return ''
 
 
@@ -17,12 +21,26 @@ def standardize_vecs(labels, vecs):
     standardized_vecs = []
     vec_denominators = []
 
-    # First pass: find average vectors for endings
+    transformed_indices = {}
+
+    # First pass: find indexes of fully-stemmed terms
     for index, (label, vec) in enumerate(zip(labels, vecs)):
+        if index % 1000 == 0:
+            print(index)
         stem, residue = uri_and_residue(label)
         ending = first_ending(residue)
-        if ending and stem in labels:
-            stem_index = labels.index(stem)
+        if not ending:
+            transformed_indices[stem] = index
+
+    # Second pass: find average vectors for endings
+    for index, (label, vec) in enumerate(zip(labels, vecs)):
+        if index % 1000 == 0:
+            print(index)
+        stem, residue = uri_and_residue(label)
+        ending = first_ending(residue)
+        if ending and stem in transformed_indices:
+            print(index, label, stem, ending)
+            stem_index = transformed_indices[stem]
             diff = (vec - vecs[stem_index]) / (index + 1)
             if ending not in standardized_labels:
                 ending_index = standardized_labels.add(ending)
@@ -36,7 +54,11 @@ def standardize_vecs(labels, vecs):
     for i in range(len(standardized_vecs)):
         standardized_vecs[i] /= vec_denominators[i]
 
+    # Third pass: handle all vectors, subtracting out difference
+    # vectors from inflected versions
     for index, (label, vec) in enumerate(zip(labels, vecs)):
+        if index % 1000 == 0:
+            print(index)
         stem, residue = uri_and_residue(label)
         ending = first_ending(residue)
         if ending:
