@@ -25,8 +25,6 @@ def standardize_vecs(labels, vecs):
 
     # First pass: find indexes of fully-stemmed terms
     for index, (label, vec) in enumerate(zip(labels, vecs)):
-        if index % 1000 == 0:
-            print(index)
         stem, residue = uri_and_residue(label)
         ending = first_ending(residue)
         if not ending:
@@ -34,12 +32,9 @@ def standardize_vecs(labels, vecs):
 
     # Second pass: find average vectors for endings
     for index, (label, vec) in enumerate(zip(labels, vecs)):
-        if index % 1000 == 0:
-            print(index)
         stem, residue = uri_and_residue(label)
         ending = first_ending(residue)
         if ending and stem in transformed_indices:
-            print(index, label, stem, ending)
             stem_index = transformed_indices[stem]
             diff = (vec - vecs[stem_index]) / (index + 1)
             if ending not in standardized_labels:
@@ -48,7 +43,7 @@ def standardize_vecs(labels, vecs):
                 vec_denominators.append((index + 1))
             else:
                 ending_index = standardized_labels.index(ending)
-                standardized_vecs[ending_index] += vec
+                standardized_vecs[ending_index] += diff
                 vec_denominators[ending_index] += index + 1
 
     for i in range(len(standardized_vecs)):

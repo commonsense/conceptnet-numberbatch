@@ -25,15 +25,19 @@ class WordVectors:
         assert(len(labels) == len(vectors))
         self.labels = OrderedSet(labels)
         self.raw_vectors = vectors
-        self.vectors = normalize(vectors)
+        self.vectors = None
         self.replacements = replacements
         self._standardizer = standardizer
         self._mean_vec = np.mean(self.vectors, axis=0)
 
+    def _normalize_vectors(self):
+        if self.vectors is None:
+            self.vectors = normalize(vectors)
+
     def truncate(self, size):
         return WordVectors(
             list(self.labels)[:size],
-            self.vectors[:size],
+            self.raw_vectors[:size],
             self.replacements,
             self._standardizer
         )
@@ -45,6 +49,7 @@ class WordVectors:
             return 0
 
     def to_vector(self, word, lang=None, default_zero=False) -> np.ndarray:
+        self._normalize_vectors()
         if isinstance(word, list):
             vec = np.zeros(self.vectors.shape[1])
             for actual_word, weight in word:
@@ -70,6 +75,7 @@ class WordVectors:
         return vec * max_sim
 
     def similar_to(self, word_or_vector, num=20, only=None):
+        self._normalize_vectors()
         if isinstance(word_or_vector, str):
             vec = self.to_vector(word_or_vector)
         else:
@@ -88,6 +94,7 @@ class WordVectors:
         return out
 
     def which_relation(self, rel_array, v1, v2):
+        self._normalize_vectors()
         if isinstance(v1, str):
             v1 = self.to_vector(v1)
         if isinstance(v2, str):
@@ -98,6 +105,7 @@ class WordVectors:
         return diff / np.sum(diff)
 
     def analogy_values(self, rel_array, c1, c2, c3, vector_choices):
+        self._normalize_vectors()
         # Convert the input concepts to vectors
         v1, v2, v3 = [self.to_vector(c, default_zero=True) for c in (c1, c2, c3)]
         # relA and relB are vectors whose length is the number of relations.
@@ -118,6 +126,7 @@ class WordVectors:
         return ratings
 
     def rank_analogies(self, rel_array, c1, c2, c3, only=None, num=20):
+        self._normalize_vectors()
         ratings = self.analogy_values(rel_array, c1, c2, c3, self.vectors)
         indices = np.argsort(ratings)[::-1]
 
@@ -130,5 +139,6 @@ class WordVectors:
         return out
 
     def rate_analogy(self, rel_array, c1, c2, c3, c4):
+        self._normalize_vectors()
         v4 = self.to_vector(c4)
         return self.analogy_values(rel_array, c1, c2, c3, v4)
