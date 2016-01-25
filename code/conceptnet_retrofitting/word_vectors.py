@@ -28,11 +28,11 @@ class WordVectors:
         self.vectors = None
         self.replacements = replacements
         self._standardizer = standardizer
-        self._mean_vec = np.mean(self.vectors, axis=0)
+        self._mean_vec = np.mean(self.raw_vectors, axis=0)
 
     def _normalize_vectors(self):
         if self.vectors is None:
-            self.vectors = normalize(vectors)
+            self.vectors = normalize(self.raw_vectors)
 
     def truncate(self, size):
         return WordVectors(
