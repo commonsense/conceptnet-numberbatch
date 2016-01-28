@@ -13,8 +13,8 @@ def merge_interpolate(wv1, wv2, extra_labels, verbose=False):
     interpolated_vocab_2 = (wv2.labels - wv1.labels) & extra_labels
     assert isinstance(common_vocab, OrderedSet)
 
-    n1, k1 = wv1.vectors.shape
-    n2, k2 = wv2.vectors.shape
+    n1, k1 = wv1.raw_vectors.shape
+    n2, k2 = wv2.raw_vectors.shape
     nmerged = len(common_vocab)
 
     if verbose:
@@ -70,13 +70,12 @@ def merge_interpolate(wv1, wv2, extra_labels, verbose=False):
         print("Reducing dimensionality of common vocabulary")
 
     U, S, Vt = np.linalg.svd(full_vectors, full_matrices=False)
+    U = U[:, :k1]
+    S = S[:k1]
     wv = WordVectors(full_labels, U * np.sqrt(S), standardizer=wv1._standardizer)
 
     # Output the word vectors, as well as V for diagnostic purposes
     return wv, Vt.T
-
-    wv = WordVectors(common_vocab, joined_vecs, standardizer=wv1._standardizer)
-    return wv
 
 
 def main(labels1, vecs1, labels2, vecs2, more_labels, labels_out, vecs_out, verbose=False):
