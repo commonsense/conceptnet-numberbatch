@@ -16,8 +16,10 @@ implementing the code that was used in the paper.
 
 - Set up the Python package:
 
-      cd code
-      python setup.py develop
+```sh
+cd code
+python setup.py develop
+```
 
 Next you'll need to set up git-annex so you can get the large data files and
 track them when they change:
@@ -30,15 +32,19 @@ track them when they change:
 
 - Get the files (this should default to downloading them over the web):
 
-      cd code/data
-      git annex get
+```sh
+cd code/data
+git annex get
+```
 
 Finally, start the build process that will create and evaluate the various
 spaces of term embeddings that are described in the paper:
 
-      cd ..                # this should return you to the `code/` directory
-      python ninja.py      # generate the build script
-      ninja                # run the build
+```sh
+cd ..                # this should return you to the `code/` directory
+python ninja.py      # generate the build script
+ninja                # run the build
+```
 
 ## Requirements for building
 
