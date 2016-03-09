@@ -14,7 +14,7 @@
 \usepackage{amsmath}
 \usepackage{booktabs}
 
-%\naaclfinalcopy % Uncomment this line for the final submission
+\naaclfinalcopy % Uncomment this line for the final submission
 \def\naaclpaperid{***} %  Enter the naacl Paper ID here
 
 % Packages we need
@@ -92,7 +92,7 @@ distributional semantics of unstructured text with a source of structured
 connections between words. The combined embedding achieves performance on
 word-similarity evaluations superior to either source individually.
 
-RHere, we build on the retrofitting process to produce a high-quality space of
+Here, we build on the retrofitting process to produce a high-quality space of
 word embeddings. We extend existing techniques in the following ways:
 
 \begin{itemize}
@@ -123,10 +123,10 @@ over both common and rare words.
 
 \subsection{Related work}
 
-% TODO: talk about Agirre's observation of distributional vs. structured data
 % TODO: cite Turney 2010 survey
 % TODO: cite Levy 2015
 % TODO: talk about Bian and word senses
+
 \newcite{agirre2009study} observes that distributional similarity and
 structured knowledge can be combined for a benefit exceeding what each would
 achieve alone, particularly by extending the vocabulary. Their system uses a
@@ -608,8 +608,8 @@ causes problems on the Rare Words evaluation. However, our strategy to
 standardize and lemmatize the term labels of GloVe 840B, combining its rows using
 the Zipf estimate, makes it perform better than GloVe 42B and other published
 results, as seen in the {\bf St}, {\bf G}, $L_1$ row. We call this
-configuration ``Modified GloVe'' in Table~\ref{compare-others} and Figure~\ref{compare-graph}
-, and similarly, our best configuration of word2vec is ``Modified word2vec''.
+configuration ``Modified GloVe'' in Table~\ref{compare-others} and Figure~\ref{compare-graph},
+and similarly, our best configuration of word2vec is ``Modified word2vec''.
 
 The fact that Modified GloVe performs better than GloVe 42B, GloVe 840B and many
 other systems, even before retrofitting any additional data onto it, highlights
@@ -727,12 +727,11 @@ indicate 95\% confidence intervals based on the Fisher transformation of $\rho$
 \cite{fisher1915frequency}, supposing that each evaluation is randomly sampled
 from a hypothetical larger data set.
 
-\subsection{Which System is Best?}
-
-Our full ensemble with all six components performs significantly better
-than the previously published systems, with $p < .01$. It is inconclusive
+Our full ensemble with all six components performs better than the previously
+published systems: we can reject the null hypothesis that our ensemble performs
+the same as one of these published systems with $p < .01$.  It is inconclusive
 whether it is better to include or exclude PPDB in the ensemble, as the results
-are very close.
+with and without it are very close.
 
 Table~\ref{eval-multilingual} shows the performance of these systems on
 gold standards that have been translated to other languages, in comparison to
@@ -742,20 +741,22 @@ word2vec and GloVe are assumed to be English only. The representations of
 non-English words come from expanded retrofitting, which allows information to
 propagate over the inter-language links in ConceptNet.
 
-%\subsection{Varying the System}
+\subsection{Varying the System}
 
-%In separate experimentation, we found that when we separate ConceptNet into its
-%component datasets and drop each one in turn, the effects on the evaluation
-%results are mostly quite small. There is no single dataset that acts as the
-%``keystone'' without which the system falls apart, but one dataset ---
-%Wiktionary --- unsurprisingly has a larger effect than the others, because it
-%is responsible for most of the assertions. Of the 5,631,250 filtered assertions
-%that come from ConceptNet, 4,244,410 of them are credited to Wiktionary.
+% TODO: restore the table of variations
 
-%Without Wiktionary, the score on RW drops from .587 to .541. However, at the
-%same time, the MEN-3000 score {\em increases} from .858 to .865. The system
-%continues to do what it is designed to do without Wiktionary, but there seems to
-%be a tradeoff in performance on rare words and common words involved.
+In separate experimentation, we found that when we separate ConceptNet into its
+component datasets and drop each one in turn, the effects on the evaluation
+results are mostly quite small. There is no single dataset that acts as the
+``keystone'' without which the system falls apart, but one dataset ---
+Wiktionary --- unsurprisingly has a larger effect than the others, because it
+is responsible for most of the assertions. Of the 5,631,250 filtered assertions
+that come from ConceptNet, 4,244,410 of them are credited to Wiktionary.
+
+Without Wiktionary, the score on RW drops from .587 to .541. However, at the
+same time, the MEN-3000 score {\em increases} from .858 to .865. The system
+continues to do what it is designed to do without Wiktionary, but there seems to
+be a tradeoff in performance on rare words and common words involved.
 
 \subsection{The Limits of Similarity Judgments}
 
@@ -797,8 +798,9 @@ handling them differently based on {\em how} they are related. This seems
 particularly important for antonyms, which indicate that words are similar
 overall but different in a key aspect.
 
-Lemmatization was clearly very useful, but it loses information. Representing
-morphological relationships as operations in the vector space, as in
+Lemmatization is clearly a useful component of our word-similarity
+representation, but it loses information. Representing morphological
+relationships as operations in the vector space, as in
 \newcite{soricut2015unsupervised}, could yield a better representation of
 similarities between forms of words.
 
@@ -810,7 +812,7 @@ standardizations that could be applied to the text to align more data. An
 appropriate representation of Universal WordNet \cite{demelo2009uwn} could
 improve the multilingual performance, for example, as could embeddings built
 from the distribution of words in non-English text. Adapting Rothe and
-Sch\"{u}tze's AutoExtend representation could provide a representation of word
+Schütze's AutoExtend representation could provide a representation of word
 senses and a more specific understanding of words to the system.
 
 \section{Reproducing These Results}
