@@ -314,15 +314,15 @@ the tokens are distributed according to Zipf's law \cite{zipf1949human}: the
 $n$th token in rank order has a frequency proportional to $1/n$. We use these
 proportions in the weighted average when combining multiple embeddings.
 
-%This process alone is a benefit on word-similarity evaluations, even without
-%combining any resources. For example, the Rare Words (RW) dataset
-%\cite{luong2013rw} tends to encounter terms that are poorly represented or
-%out-of-vocabulary in most word embeddings.  Lemmatizing them before looking
-%them up, and combining them with more frequently observed representations,
-%improves the evaluation results on these words, even though the process
-%loses the ability to distinguish some word forms. The raw GloVe 840B data gets
-%a Spearman correlation of $\rho = .146$ on the RW dataset, which increases to
-%$\rho = .494$ when its embeddings are standardized and combined in this way.
+This process alone is a benefit on word-similarity evaluations, even without
+combining any resources. For example, the Rare Words (RW) dataset
+\cite{luong2013rw} tends to encounter terms that are poorly represented or
+out-of-vocabulary in most word embeddings.  Lemmatizing them before looking
+them up, and combining them with more frequently observed representations,
+improves the evaluation results on these words, even though the process
+loses the ability to distinguish some word forms. The raw GloVe 840B data gets
+a Spearman correlation of $\rho = .146$ on the RW dataset, which increases to
+$\rho = .494$ when its embeddings are standardized and combined in this way.
 
 Figure~\ref{vocabulary-overlap} shows the size of the vocabularies of
 ConceptNet, GloVe, and word2vec after this transformation, and the sizes of
@@ -372,9 +372,10 @@ iterated, which is arbitrary.
 
 We instead choose to update the embeddings all at once by multiplying them by a
 sparse matrix $S$ of semantic connections. Letting $m'$ be the size of the
-merged vocabulary, $S$ is an $m' \times m'$ matrix containing positive
-weighted values for terms that are known to be semantically related, 1 on the
-diagonal relating each term to itself, and 0 otherwise.
+merged vocabulary, $S$ is an $m' \times m'$ matrix containing positive weighted
+values for terms that are known to be semantically related, and 0 otherwise.
+The rows of $S$ are scaled to have a sum of 1. We then add 1 to its diagonal to
+help new terms converge on a single vector, as described in more detail below.
 
 Let $W^0$ be an $m' \times n$ matrix whose rows come from the original
 embeddings if available, and are all zeroes for terms outside the vocabulary of
@@ -390,9 +391,22 @@ $$
 W^{k+1} = \mathrm{normalize}\left[ \left( S W^k + W^0 A \right)\left( 1 + A \right)^{-1} \right]
 $$
 
-\subsection{ConceptNet as an Association Matrix}
+The diagonal of the $S$ matrix relates each term to itself. We have found that
+adding 1 to the diagonal -- effectively adding ``self-loops'' to the semantic
+network -- helps the expanded retrofitting process converge.  Without this
+diagonal, terms that only appear in the semantic network, and not in the
+original embedding space, would get their value only from their neighbors at
+every step, because their ``original position'' is the zero vector. This causes
+large oscillations that prevent convergence.  With the diagonal, each term
+vector is influenced by the vector it had in the previous step.
 
-% TODO: squish
+As a practical effect of this, Table~\ref{eval-variations} shows that expanded
+retrofitting with self-loops added to the diagonal performs better on word
+similarity evaluations than it does without, when allowed to run for 10 steps
+of retrofitting.
+
+
+\subsection{ConceptNet as an Association Matrix}
 
 In order to apply the expanded retrofitting method, we need to consider the data in
 ConceptNet as a sparse, symmetric matrix of associations between terms. What
@@ -473,16 +487,18 @@ variety of word-similarity gold standards:
 
 In striving to maximize an evaluation metric, it is important to hold out some
 data, to avoid overfitting to the data by modifying the algorithm and its
-parameters.
+parameters. The metrics we focused on improving were our rank correlation with
+MEN-3000, which emphasizes having high-quality representations of common words,
+and RW, which emphasizes having a broad vocabulary.
 
 MEN-3000 comes with a development/test split, where 1000 of the 3000 word pairs
 are held out for testing. We applied a similar split to RW, setting aside a
-sample of $1/3$ of its word pairs for testing.\footnote{
-    We set aside every third row, starting from row 3, using the Unix command
-    {\tt split -un r/3/3 rw.txt}. Similarly, we split on {\tt r/1/3} and
-    {\tt r/2/3} and concatenated the results to get the remaining evaluation
-    data.
-} We did not apply a split to WordSim-353, as it is already much smaller than
+sample of $1/3$ of its word pairs for testing. In particular, We set aside
+every third row, starting from row 3, using the Unix command {\tt split -un
+r/3/3 rw.txt}. Similarly, we split on {\tt r/1/3} and {\tt r/2/3} and
+concatenated the results to get the remaining evaluation data.
+
+We did not apply a split to WordSim-353, as it is already much smaller than
 the others. Neither of the held-out test sets were used in our evaluations
 during development; they were only run with the final code and parameters.
 
@@ -561,6 +577,28 @@ Omit word2vec      &      .591 &     .583 &     .588 &     .857 &     .859 &    
 \label{eval-dev-test}
 \end{table}
 
+\begin{table*}[t]
+\footnotesize
+\centering
+\begin{tabular}{lrrrrrr}
+\toprule
+Modification & RW [dev] & MEN [dev] & WS-353 \\
+\midrule
+% FIXME: rerun this with new data!
+{\bf Unmodified}                     & \bf .587 & \bf .858 & \bf .818 \\
+Use first row instead of row-merging & .563 &      .827 &    .787 \\
+Unweighted row-merging               & .526 &      .844 &    .751 \\
+No self-loops in retrofitting        & .570 &      .855 &    .790 \\
+\bottomrule
+\end{tabular}
+\caption{
+    The effects of various modifications to the full ensemble.
+    RW and MEN-3000 were evaluated using their development sets here,
+    not the held-out test data.
+}
+\label{eval-variations}
+\end{table*}
+
 
 Table~\ref{eval-bigtable} shows the performance of the ensemble as various
 components of it are enabled. {\bf G} and {\bf g} indicate that the initial
@@ -608,12 +646,12 @@ this paper can be realized without introducing any additional data.
 It's important to note that we are not changing the evaluation data by using
 a lemmatizer; we are only changing the way we look it up as embeddings in the
 vector space that we are evaluating.
-%For example, if an evaluation requires
-%similarities for the words ``dry'' and ``dried'' to be ranked differently, or
-%the words ``polish'' and ``Polish'', the lemmatized system will rank them the
-%same, and will be penalized in its Spearman correlation.
-%However, the benefits of lemmatization when evaluating semantic similarity
-%appear to far outweigh the drawbacks.
+For example, if an evaluation requires
+similarities for the words ``dry'' and ``dried'' to be ranked differently, or
+the words ``polish'' and ``Polish'', the lemmatized system will rank them the
+same, and will be penalized in its Spearman correlation.
+However, the benefits of lemmatization when evaluating semantic similarity
+appear to far outweigh the drawbacks.
 
 \subsection{Comparisons to Other Published Results}
 
@@ -733,7 +771,28 @@ propagate over the inter-language links in ConceptNet.
 
 \subsection{Varying the System}
 
-% TODO: restore the table of variations
+Some of the procedures we implemented in creating the ensemble systems
+require some justification. To show the benefits of certain decisions,
+such as adding self-loops or the way we choose to merge rows of GloVe, we have
+evaluated what happens to the system in the absence of each decision. These
+evaluations appear in Table~\ref{eval-variations}. These evaluations were
+part of how we decided on the best configuration of the system, so they were
+run on the development sets of RW and MEN-3000, not the held-out test sets.
+
+In Table~\ref{eval-variations}, we can see that the choice of how to merge rows
+of GloVe that get the same standardized label makes a large difference.  Recall
+that the method we ultimately used was to assign each row a pseudo-frequency
+based on Zipf's law, and then take a weighted average based on those
+frequencies.  The results drop noticeably when we try the other proposed
+methods, which are taking only the first (most frequent) row that appears, or
+taking the unweighted average of the rows.
+
+In the retrofitting procedure, we made the decision to add ``self-loops'' that
+connect each term to itself, because this helps stabilize the
+representations of terms that are outside the original vocabulary of GloVe.
+Reversing this decision (and running for the same number of steps) causes a
+noticeable drop in performance on RW, the evaluation that is most likely to
+involve words that were poorly represented or unrepresented in GloVe.
 
 In separate experimentation, we found that when we separate ConceptNet into its
 component datasets and drop each one in turn, the effects on the evaluation
@@ -778,12 +837,26 @@ senses and a more specific understanding of words to the system.
 \section{Reproducing These Results}
 
 We aim for these results to be reproducible and reusable by others. The code
-that we ran to produce the results in this paper is available in a GitHub
-repository [{\em currently private pending blind review}]. We have tagged
-this revision as [{\em TBD}], as we intend to continue to revise and improve the
-code afterward.
+that we ran to produce the results in this paper is available in the GitHub
+repository \url{https://github.com/LuminosoInsight/conceptnet-vector-ensemble}.
+We have tagged this revision as {\em submitted-20160309}, so that this paper
+can be reproduced as-is, even if we update the code later.
 
-% \section*{Acknowledgements}
+The matrix of embeddings for the full ensemble can also be downloaded from
+Amazon S3. The matrix values in NumPy form are located at [TODO], and the
+ConceptNet-normalized labels corresponding to the rows of this matrix are
+located at [TODO].
+
+\section*{Acknowledgements}
+
+We thank Catherine Havasi for overseeing and reviewing this work, and Avril Kenney,
+Dennis Clark, and Alice Kaanta for providing feedback on drafts of this paper.
+
+We thank the word2vec and GloVe teams for opening their data so that new
+techniques can be built on top of their results. We also thank the tens of
+thousands of pseudonymous contributors to Wiktionary, Open Mind Common Sense,
+and related projects, for their frequently uncredited work in providing
+freely-available lexical knowledge.
 
 \begin{CJK*}{UTF8}{min}
 \bibliography{wordsim_paper}
