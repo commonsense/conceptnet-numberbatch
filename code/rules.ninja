@@ -40,7 +40,7 @@ rule filter_vecs
   pool = memory_hogs
 
 rule standardize_vecs
-  command = python3 -m conceptnet_retrofitting.builders.standardize_vecs $in $out
+  command = python3 -m conceptnet_retrofitting.builders.standardize_vecs $in $out -m first
   pool = memory_hogs
 
 rule standardize_assoc

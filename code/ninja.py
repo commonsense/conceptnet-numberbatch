@@ -8,21 +8,13 @@ from conceptnet_retrofitting.ninja.ninja_util import (
 CONFIG = {
     'source-data-path': 'source-data/',
     'build-data-path': 'build-data/',
-    'glove-versions': ['glove.42B.300d', 'glove12.840B.300d'],
+    'glove-versions': ['glove12.840B.300d'],
     'word2vec-versions': ['w2v-google-news'],
     'extra-embeddings': ['combo840'],
-    'neg-filters': ['jmdict', 'opencyc', 'openmind', 'verbosity', 'wiktionary', 'wordnet'],
-    'pos-filters': ['wiktionary'],
+    'neg-filters': [],
+    'pos-filters': [],
     'run-filter': False,
-    'retrofit-items': ['conceptnet5',
-                       'conceptnet5-minus-jmdict',
-                       'conceptnet5-minus-opencyc',
-                       'conceptnet5-minus-openmind',
-                       'conceptnet5-minus-verbosity',
-                       'conceptnet5-minus-wiktionary',
-                       'conceptnet5-minus-wordnet',
-                       'conceptnet5-wiktionary-only',
-                       'ppdb-xl-lexical-standardized', 'cnet-ppdb-combined']
+    'retrofit-items': ['cnet-ppdb-combined']
 }
 CONCEPTNET_SOURCE_FILE = 'conceptnet5.csv'
 
