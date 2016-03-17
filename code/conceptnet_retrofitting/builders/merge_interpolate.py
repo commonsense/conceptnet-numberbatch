@@ -69,8 +69,7 @@ def merge_interpolate(wv1, wv2, extra_labels, verbose=False):
     if verbose:
         print("Reducing dimensionality of common vocabulary")
 
-    U, S, Vt = np.linalg.svd(full_vectors, full_matrices=False)
-    wv = WordVectors(full_labels, U * np.sqrt(S), standardizer=wv1._standardizer)
+    wv = WordVectors(full_labels, full_vectors, standardizer=wv1._standardizer)
 
     # Output the word vectors, as well as V for diagnostic purposes
     return wv, Vt.T
