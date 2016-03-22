@@ -1,11 +1,36 @@
 # conceptnet-vector-ensemble
 
 This repository describes implements an ensemble method that combines
-ConceptNet, word2vec, and GloVe using a variation on retrofitting.
+ConceptNet, word2vec, GloVe, and PPDB using a variation on retrofitting.
 
 The `paper/` directory contains the LaTeX source of our paper.  The `code/`
 directory contains a Python module called `conceptnet_retrofitting`,
 implementing the code that was used in the paper.
+
+
+## Downloading the term vectors
+
+This code produces high-quality term vectors (that is, word embeddings) that
+can be used directly as a representation of word meanings or as a starting
+point for further machine learning. Instead of setting up the dependencies
+for this code, you may just want to download them directly.
+
+You will need to download one of the two matrices, as well as the text file of
+row labels, a UTF-8 plain text file which associates natural-language terms
+with the vectors that form the rows of that matrix. Each line of the text file
+corresponds to a row of the matrix, in order.
+
+* Matrices in NumPy format: [600 dimensions][600d] or [300 dimensions][300d]
+* [Row labels][row-labels] in ConceptNet normalized form
+
+[600d]: http://conceptnet-api-1.media.mit.edu/downloads/vector-ensemble/conceptnet-ensemble-201603-600d.npy
+[300d]: http://conceptnet-api-1.media.mit.edu/downloads/vector-ensemble/conceptnet-ensemble-201603-300d.npy
+[row-labels]: http://conceptnet-api-1.media.mit.edu/downloads/vector-ensemble/conceptnet-ensemble-201603-labels.txt
+
+The 300d matrix is just the first 300 columns of the 600d matrix; the 600d
+matrix may be slightly more accurate, but of course it requires twice as much
+computation to use.
+
 
 ## Installing the code
 
