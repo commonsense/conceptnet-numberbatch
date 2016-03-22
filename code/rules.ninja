@@ -64,8 +64,9 @@ rule l2_normalize
 rule network_to_assoc
   command = python3 -m conceptnet_retrofitting.builders.build_assoc $in $out
 
+# adding self-loops is disabled in this branch by replacing the command with `cp`
 rule add_self_loops
-  command = python3 -m conceptnet_retrofitting.builders.self_loops $in $out
+  command = cp $in $out
 
 rule retrofit
   command = python3 -m conceptnet_retrofitting.builders.retrofit $in $out
