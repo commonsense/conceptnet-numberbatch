@@ -110,8 +110,8 @@ heuristic for merging together multiple term vectors.
 \end{itemize}
 
 When we use this process to combine word2vec, GloVe, and ConceptNet, this
-process produces a space of term embeddings
-that achieves state-of-the-art performance on word-similarity
+process produces a space of term embeddings we call the ``ConceptNet vector
+ensemble'' that achieves state-of-the-art performance on word-similarity
 evaluations\footnote{Some methods and evaluations \cite{agirre2009similarity}
 distinguish word similarity from word
 {\em relatedness}. ``Coffee'' and ``mug'', for example, are quite related,
@@ -123,9 +123,8 @@ over both common and rare words.
 
 \subsection{Related work}
 
-% TODO: cite Turney 2010 survey
-% TODO: cite Levy 2015
-% TODO: talk about Bian and word senses
+% TODO: cite Turney 2010 survey?
+% TODO: talk about Bian and word senses?
 
 \newcite{agirre2009similarity} observes that distributional similarity and
 structured knowledge can be combined for a benefit exceeding what each would
@@ -216,7 +215,6 @@ page\footnote{\url{http://nlp.stanford.edu/projects/glove/}}. Here we evaluate
 two downloadable sets of GloVe 1.2 embeddings, built from 42 billion and 840
 billion tokens of the Common Crawl, respectively.
 
-% NOTE: we may need to squish the next two paragraphs
 There is some debate about whether GloVe or word2vec is better at representing
 word meanings in general. GloVe is presented by \newcite{pennington2014glove}
 as performing better than word2vec on word similarity tasks, but
@@ -236,12 +234,12 @@ word2vec's in this case, but a combination of them can perform even better.
 
 \begin{figure}
 \centering
-\includegraphics[width=2.5in]{areas.pdf}
+\includegraphics[width=3.0in]{dataflow.pdf}
 \caption{
-    A proportional-area diagram showing the overlap of vocabularies among
-    ConceptNet and the available embeddings for word2vec and GloVe.
+    The flow of data in building the ConceptNet vector ensemble from its
+    data sources.
 }
-\label{vocabulary-overlap}
+\label{dataflow}
 \end{figure}
 
 \newcite{faruqui2015retrofitting} introduced the ``retrofitting'' procedure,
@@ -260,6 +258,9 @@ be shared among these various representations, including words that were not in
 the vocabulary of the original representations. This includes low-frequency words
 and even words that are not in English.
 
+The complete process of building this vector space, whose steps will be explained
+throughout this paper, appears in Figure~\ref{dataflow}.
+
 As \newcite{levy2015embeddings} notes,
 ``[\ldots] much of the performance gains of word embeddings are due to certain
 system design choices and hyperparameter optimizations, rather than the
@@ -274,6 +275,16 @@ another involves the scale of the various features in the embeddings.
 
 \subsection{Transforming and Aligning Vocabularies}
 \label{standardizing-text}
+
+\begin{figure}
+\centering
+\includegraphics[width=3.0in]{areas.pdf}
+\caption{
+    A proportional-area diagram showing the overlap of vocabularies among
+    ConceptNet and the available embeddings for word2vec and GloVe.
+}
+\label{vocabulary-overlap}
+\end{figure}
 
 Different representations apply
 different pre-processing steps, placing strings in different equivalence
@@ -460,11 +471,24 @@ we calculate its vector as the average of the vectors of the nearest
 overlapping terms, weighted by their cosine similarity.
 
 To combine the features of word2vec and GloVe, we first concatenate their
-vectors into 600-dimensional vectors, then make the result more compact and
-less redundant by reducing them back to 300 dimensions using a truncated SVD.
-We factor the 600-dimensional matrix $A$ as $A \approx U \Sigma V^T$, keeping
-only the 300 largest eigenvalues, then compute the new 300-dimensional joint
-features as $U \Sigma^{1/2}$.
+vectors into 600-dimensional vectors. We then discount redundancy between its
+features by transforming these 600-dimensional vectors with a singular value
+decomposition.  We factor the matrix $A$ of concatenated vectors as $A = U
+\Sigma V^T$, then compute the new joint features as $U \Sigma^{1/2}$.
+
+$U \Sigma$ would be an orthogonal rotation of the original features;
+$U \Sigma^{1/2}$ reduces the effect of its largest eigenvalues, making
+over-represented features relatively smaller.
+
+As with many decisions we make in preparing this data, we evaluated the benefit
+of this step on our development data sets.  Discounting redundancy by replacing
+$\Sigma$ by $\Sigma^{1/2}$ provides a benefit on two out of three data sets for
+evaluating word similarity, as shown in Table~\ref{eval-variations}.
+
+It is common to use SVD as a form of dimensionality reduction, by discarding
+the smallest eigenvalues and truncating the matrix accordingly.
+Table~\ref{eval-variations} shows that we can reduce the interpolated matrix to
+from 600 dimensions to 450 or 300 dimensions without much loss in performance.
 
 \section{Evaluation}
 
@@ -498,9 +522,15 @@ every third row, starting from row 3, using the Unix command {\tt split -un
 r/3/3 rw.txt}. Similarly, we split on {\tt r/1/3} and {\tt r/2/3} and
 concatenated the results to get the remaining evaluation data.
 
-We did not apply a split to WordSim-353, as it is already much smaller than
-the others. Neither of the held-out test sets were used in our evaluations
-during development; they were only run with the final code and parameters.
+We did not apply a development/test split to WordSim-353 or RG-65, as they are
+already much smaller than MEN and RW.
+
+For the resources where we applied a development/test split, we evaluated
+decisions we made in the code -- such as those in Table~\ref{eval-variations}
+-- using only the development set, to preserve the integrity of the test set
+and avoid ``overfitting via code''. We then evaluated the final ensemble, with
+various pieces enabled, all at once on the held-out test data to produce the
+results in this paper.
 
 \subsection{Results}
 
@@ -584,11 +614,13 @@ Omit word2vec      &      .591 &     .583 &     .588 &     .857 &     .859 &    
 \toprule
 Modification & RW [dev] & MEN [dev] & WS-353 \\
 \midrule
-% FIXME: rerun this with new data!
-{\bf Unmodified}                     & \bf .587 & \bf .858 & \bf .818 \\
-Use first row instead of row-merging & .563 &      .827 &    .787 \\
-Unweighted row-merging               & .526 &      .844 &    .751 \\
-No self-loops in retrofitting        & .570 &      .855 &    .790 \\
+{\bf Unmodified}                     & \bf .593 &     .858 &     .802 \\
+Use first row instead of row-merging &     .572 &     .816 &     .764 \\
+Unweighted row-merging               &     .582 &     .856 &     .779 \\
+No self-loops in retrofitting        &     .563 &     .857 &     .764 \\
+Interpolate without SVD              &     .579 &     .856 & \bf .813 \\
+Reduce from 600 to 450 dimensions    &     .586 &     .858 &     .797 \\
+Reduce from 600 to 300 dimensions    &     .583 & \bf .859 &     .791 \\
 \bottomrule
 \end{tabular}
 \caption{
@@ -668,7 +700,7 @@ GloVe (Pennington)            &     .477  &     .816  & .759  \\
 Modified GloVe (ours)         &     .528  &     .840  & .798  \\
 SVD (Levy)                    &     .514  &     .778  & .736* \\
 Retrofitting (Faruqui)        &      ---  &     .796  & .741  \\
-Our ensemble                  & \bf .596  & \bf .859  & \bf .821 \\
+ConceptNet vector ensemble    & \bf .596  & \bf .859  & \bf .821 \\
 \bottomrule
 \end{tabular}
 
@@ -724,7 +756,7 @@ Our ensemble                  & \bf .596  & \bf .859  & \bf .821 \\
 Method                            &      en &      de &      fr \\
 \midrule
 Faruqui et al.: SG + Retrofitting &    .739 &    .603 &    .606 \\
-Our ensemble                      &\bf .891 &\bf .645 &\bf .789 \\
+ConceptNet vector ensemble        &\bf .891 &\bf .645 &\bf .789 \\
 \bottomrule
 \end{tabular}
 
@@ -755,11 +787,11 @@ indicate 95\% confidence intervals based on the Fisher transformation of $\rho$
 \cite{fisher1915frequency}, supposing that each evaluation is randomly sampled
 from a hypothetical larger data set.
 
-Our full ensemble with all six components performs better than the previously
-published systems: we can reject the null hypothesis that our ensemble performs
-the same as one of these published systems with $p < .01$.  It is inconclusive
-whether it is better to include or exclude PPDB in the ensemble, as the results
-with and without it are very close.
+The ConceptNet vector ensemble with all six components performs better than the
+previously published systems: we can reject the null hypothesis that the
+ensemble performs the same as one of these published systems with $p < .01$.
+It is inconclusive whether it is better to include or exclude PPDB in the
+ensemble, as the results with and without it are very close.
 
 Table~\ref{eval-multilingual} shows the performance of these systems on
 gold standards that have been translated to other languages, in comparison to
@@ -771,13 +803,13 @@ propagate over the inter-language links in ConceptNet.
 
 \subsection{Varying the System}
 
-Some of the procedures we implemented in creating the ensemble systems
-require some justification. To show the benefits of certain decisions,
-such as adding self-loops or the way we choose to merge rows of GloVe, we have
-evaluated what happens to the system in the absence of each decision. These
-evaluations appear in Table~\ref{eval-variations}. These evaluations were
-part of how we decided on the best configuration of the system, so they were
-run on the development sets of RW and MEN-3000, not the held-out test sets.
+Some of the procedures we implemented in creating the ensemble require some
+justification. To show the benefits of certain decisions, such as adding
+self-loops or the way we choose to merge rows of GloVe, we have evaluated what
+happens to the system in the absence of each decision. These evaluations appear
+in Table~\ref{eval-variations}. These evaluations were part of how we decided
+on the best configuration of the system, so they were run on the development
+sets of RW and MEN-3000, not the held-out test sets.
 
 In Table~\ref{eval-variations}, we can see that the choice of how to merge rows
 of GloVe that get the same standardized label makes a large difference.  Recall
@@ -786,6 +818,12 @@ based on Zipf's law, and then take a weighted average based on those
 frequencies.  The results drop noticeably when we try the other proposed
 methods, which are taking only the first (most frequent) row that appears, or
 taking the unweighted average of the rows.
+
+The same table shows that we can save some computation time and space by
+reducing the dimensionality of the feature vectors while building the matrix
+that combines word2vec and GloVe. Reducing the dimensionality seems to cause a
+small degradation in RW score, but the MEN and WordSim scores stay around the
+same value, even increasing by an inconclusive amount in some cases.
 
 In the retrofitting procedure, we made the decision to add ``self-loops'' that
 connect each term to itself, because this helps stabilize the
@@ -815,7 +853,8 @@ knowledge there that we might be able to take into account with a more
 sophisticated extension of retrofitting, one that goes beyond simply knowing
 that particular words should be related, to handling them differently based on
 {\em how} they are related. This seems particularly important for antonyms,
-which indicate that words are similar overall but different in a key aspect.
+which indicate that words are similar overall but different in a key aspect,
+such as forming two ends of the same scale.
 
 Lemmatization is clearly a useful component of our word-similarity
 representation, but it loses information. Representing morphological
@@ -839,24 +878,24 @@ senses and a more specific understanding of words to the system.
 We aim for these results to be reproducible and reusable by others. The code
 that we ran to produce the results in this paper is available in the GitHub
 repository \url{https://github.com/LuminosoInsight/conceptnet-vector-ensemble}.
-We have tagged this revision as {\em submitted-20160309}, so that this paper
+We have tagged this revision as {\em submitted-20160323}, so that this paper
 can be reproduced as-is, even if we update the code later.
 
-The matrix of embeddings for the full ensemble can also be downloaded from
-Amazon S3. The matrix values in NumPy form are located at [TODO], and the
-ConceptNet-normalized labels corresponding to the rows of this matrix are
-located at [TODO].
+The README of that repository also points to URLs where the computed results
+can be downloaded, as a $1453348 \times 600$ matrix of embeddings in NumPy
+format and a corresponding list of row labels.
 
 \section*{Acknowledgements}
 
 We thank Catherine Havasi for overseeing and reviewing this work, and Avril Kenney,
 Dennis Clark, and Alice Kaanta for providing feedback on drafts of this paper.
 
-We thank the word2vec and GloVe teams for opening their data so that new
-techniques can be built on top of their results. We also thank the tens of
-thousands of pseudonymous contributors to Wiktionary, Open Mind Common Sense,
-and related projects, for their frequently uncredited work in providing
-freely-available lexical knowledge.
+We thank the word2vec, GloVe, and PPDB teams for opening their data so that new
+techniques can be built on top of their results. We also thank our
+collaborators who have contributed code and data to ConceptNet over the years,
+and the tens of thousands of pseudonymous contributors to Wiktionary, Open Mind
+Common Sense, and related projects, for their frequently uncredited work in
+providing freely-available lexical knowledge.
 
 \begin{CJK*}{UTF8}{min}
 \bibliography{wordsim_paper}
