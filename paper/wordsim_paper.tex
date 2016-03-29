@@ -411,10 +411,10 @@ every step, because their ``original position'' is the zero vector. This causes
 large oscillations that prevent convergence.  With the diagonal, each term
 vector is influenced by the vector it had in the previous step.
 
-As a practical effect of this, Table~\ref{eval-variations} shows that expanded
-retrofitting with self-loops added to the diagonal performs better on word
-similarity evaluations than it does without, when allowed to run for 10 steps
-of retrofitting.
+As a practical effect of this, Section~\ref{variations} (Varying the System)
+will show that expanded retrofitting with self-loops added to the diagonal
+performs better on word similarity evaluations than it does without, when
+allowed to run for 10 steps of retrofitting.
 
 
 \subsection{ConceptNet as an Association Matrix}
@@ -483,11 +483,11 @@ over-represented features relatively smaller.
 As with many decisions we make in preparing this data, we evaluated the benefit
 of this step on our development data sets.  Discounting redundancy by replacing
 $\Sigma$ by $\Sigma^{1/2}$ provides a benefit on two out of three data sets for
-evaluating word similarity, as shown in Table~\ref{eval-variations}.
+evaluating word similarity, as shown in Section~\ref{variations}.
 
 It is common to use SVD as a form of dimensionality reduction, by discarding
 the smallest eigenvalues and truncating the matrix accordingly.
-Table~\ref{eval-variations} shows that we can reduce the interpolated matrix to
+Section~\ref{variations} shows that we can reduce the interpolated matrix to
 from 600 dimensions to 450 or 300 dimensions without much loss in performance.
 
 \section{Evaluation}
@@ -526,11 +526,11 @@ We did not apply a development/test split to WordSim-353 or RG-65, as they are
 already much smaller than MEN and RW.
 
 For the resources where we applied a development/test split, we evaluated
-decisions we made in the code -- such as those in Table~\ref{eval-variations}
--- using only the development set, to preserve the integrity of the test set
-and avoid ``overfitting via code''. We then evaluated the final ensemble, with
-various pieces enabled, all at once on the held-out test data to produce the
-results in this paper.
+decisions we made in the code -- such as those described in
+Section~\ref{variations} -- using only the development set, to preserve the
+integrity of the test set and avoid ``overfitting via code''. We then evaluated
+the final ensemble, with various pieces enabled, all at once on the held-out
+test data to produce the results in this paper.
 
 \subsection{Results}
 
@@ -606,30 +606,6 @@ Omit word2vec      &      .591 &     .583 &     .588 &     .857 &     .859 &    
 }
 \label{eval-dev-test}
 \end{table}
-
-\begin{table*}[t]
-\footnotesize
-\centering
-\begin{tabular}{lrrrrrr}
-\toprule
-Modification & RW [dev] & MEN [dev] & WS-353 \\
-\midrule
-{\bf Unmodified}                     & \bf .593 &     .858 &     .802 \\
-Use first row instead of row-merging &     .572 &     .816 &     .764 \\
-Unweighted row-merging               &     .582 &     .856 &     .779 \\
-No self-loops in retrofitting        &     .563 &     .857 &     .764 \\
-Interpolate without SVD              &     .579 &     .856 & \bf .813 \\
-Reduce from 600 to 450 dimensions    &     .586 &     .858 &     .797 \\
-Reduce from 600 to 300 dimensions    &     .583 & \bf .859 &     .791 \\
-\bottomrule
-\end{tabular}
-\caption{
-    The effects of various modifications to the full ensemble.
-    RW and MEN-3000 were evaluated using their development sets here,
-    not the held-out test data.
-}
-\label{eval-variations}
-\end{table*}
 
 
 Table~\ref{eval-bigtable} shows the performance of the ensemble as various
@@ -802,6 +778,31 @@ non-English words come from expanded retrofitting, which allows information to
 propagate over the inter-language links in ConceptNet.
 
 \subsection{Varying the System}
+\label{variations}
+
+\begin{table*}[t]
+\footnotesize
+\centering
+\begin{tabular}{lrrrrrr}
+\toprule
+Modification & RW [dev] & MEN [dev] & WS-353 \\
+\midrule
+{\bf Unmodified}                     & \bf .593 &     .858 &     .802 \\
+Use first row instead of row-merging &     .572 &     .816 &     .764 \\
+Unweighted row-merging               &     .582 &     .856 &     .779 \\
+No self-loops in retrofitting        &     .563 &     .857 &     .764 \\
+Interpolate without SVD              &     .579 &     .856 & \bf .813 \\
+Reduce from 600 to 450 dimensions    &     .586 &     .858 &     .797 \\
+Reduce from 600 to 300 dimensions    &     .583 & \bf .859 &     .791 \\
+\bottomrule
+\end{tabular}
+\caption{
+    The effects of various modifications to the full ensemble.
+    RW and MEN-3000 were evaluated using their development sets here,
+    not the held-out test data.
+}
+\label{eval-variations}
+\end{table*}
 
 Some of the procedures we implemented in creating the ensemble require some
 justification. To show the benefits of certain decisions, such as adding
@@ -824,6 +825,11 @@ reducing the dimensionality of the feature vectors while building the matrix
 that combines word2vec and GloVe. Reducing the dimensionality seems to cause a
 small degradation in RW score, but the MEN and WordSim scores stay around the
 same value, even increasing by an inconclusive amount in some cases.
+
+If we skip applying the SVD at all in the interpolation step -- that is, when a
+term has features in word2vec and GloVe, we simply concatenate those features
+with all their redundancy -- it lowers the RW score somewhat, but raises the
+WordSim-353 score.
 
 In the retrofitting procedure, we made the decision to add ``self-loops'' that
 connect each term to itself, because this helps stabilize the
