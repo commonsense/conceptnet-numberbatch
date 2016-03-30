@@ -50,11 +50,10 @@ A currently successful approach to computational semantics is to represent
 words as embeddings in a machine-learned vector space. We
 present an ensemble method that combines embeddings produced by GloVe
 \cite{pennington2014glove} and word2vec \cite{mikolov2013word2vec} with
-structured knowledge from the semantic network ConceptNet 5
+structured knowledge from the semantic networks ConceptNet
 \cite{speer2012conceptnet} and PPDB \cite{ganitkevitch2013ppdb}, merging their
 information into a common representation with a large, multilingual vocabulary.
-The embeddings it produces achieve state-of-the-art performance on many word
-similarity evaluations. Its score of $\rho = \scoreRW{}$ on an evaluation of
+The embeddings it produces achieve state-of-the-art performance on many word-similarity evaluations. Its score of $\rho = \scoreRW{}$ on an evaluation of
 rare words \cite{luong2013rw} is 16\% higher than the previous best known
 system.
 
@@ -65,13 +64,11 @@ system.
 Vector space models are an effective way to express the meanings of
 natural-language terms in a computational system. These models are created
 using machine-learning techniques that represent words or phrases as
-vectors in a high dimensional space, such that the cosine similarity of any two
+vectors in a high-dimensional space, such that the cosine similarity of any two
 terms corresponds to their semantic similarity.
 
 These vectors, referred to as
-the {\em embeddings} of the terms in the vector space, can be compared directly
-to measure the similarity of two terms (as the cosine similarity of their
-respective vectors), and can also be used as an input to further steps of
+the {\em embeddings} of the terms in the vector space, can also be used as an input to further steps of
 machine learning. When algorithms expect dense vectors as input, embeddings
 provide a representation that is both more compact and more informative than the
 ``one-hot'' representation in which every term in the vocabulary gets its own
@@ -122,7 +119,7 @@ however, we conflate similarity and relatedness into the same metric, as most
 evaluations do.} over both common and rare words.
 
 
-\subsection{Related work}
+\subsection{Related Work}
 
 % TODO: cite Turney 2010 survey?
 % TODO: talk about Bian and word senses?
@@ -148,7 +145,7 @@ disambiguation, and as such it is optimized for and evaluated on WSD tasks.
 Our ensemble aims to extend and improve a vocabulary of undisambiguated words,
 so there is no direct comparison between AutoExtend's results and ours.
 
-\section{Knowledge sources}
+\section{Knowledge Sources}
 
 \subsection{ConceptNet and PPDB}
 ConceptNet \cite{speer2012conceptnet} is a semantic network of terms
@@ -220,7 +217,7 @@ billion tokens of the Common Crawl, respectively.
 
 There is some debate about whether GloVe or word2vec is better at representing
 word meanings in general. GloVe is presented by \newcite{pennington2014glove}
-as performing better than word2vec on word similarity tasks, but
+as performing better than word2vec on word-similarity tasks, but
 \newcite{levy2015embeddings} finds that word2vec performs better with an
 optimized setting of hyperparameters than GloVe does, when retrained with a
 particular corpus.
@@ -375,7 +372,7 @@ a word's distance from its neighbors in the semantic network and its distance
 from its original vector. Its implementation in code\footnote{
     \url{https://github.com/mfaruqui/retrofitting}
 } takes steps along the gradient toward this minimum
-by iteratively updating one vector $w'_i$ at a time, and updating it to be a linear
+by iteratively updating one vector $w'_i$ at a time to be a linear
 combination between its original position $w^0_i$ and the average of its neighbors
 in the semantic network.
 
@@ -393,16 +390,18 @@ help new terms converge on a single vector, as described in more detail below.
 
 Let $W^0$ be an $m' \times n$ matrix whose rows come from the original
 embeddings if available, and are all zeroes for terms outside the vocabulary of
-the original embeddings. $A$ is a diagonal matrix in which $A_{ii}$ is 1 if term
-$i$ is in the original vocabulary, and 0 otherwise. We can now update $W$
+the original embeddings. $A$ is a diagonal matrix of weights in which $A_{ii}$
+is 1 if term $i$ is in the original vocabulary, and 0 otherwise (allowing us to
+keep terms near their original embeddings without also keeping out-of-vocabulary
+terms near the zero vector). We can now update $W$
 iteratively so that the next iteration of $W$ is a combination of its product
-with $S$ and its original state, followed by $L_2$ normalization of its
+with $S$ and its weighted original state, followed by $L_2$ normalization of its
 non-zero rows\footnote{
     We maintain $L_2$ normalization so that minimizing distance and maximizing
     cosine similarity are always linked.
 }:
 $$
-W^{k+1} = \mathrm{normalize}\left[ \left( S W^k + W^0 A \right)\left( 1 + A \right)^{-1} \right]
+W^{k+1} = \mathrm{normalize}\left[ \left( S W^k + A W^0 \right)\left( I + A \right)^{-1} \right]
 $$
 
 The diagonal of the $S$ matrix relates each term to itself. We have found that
@@ -416,7 +415,7 @@ vector is influenced by the vector it had in the previous step.
 
 As a practical effect of this, Section~\ref{variations} (Varying the System)
 will show that expanded retrofitting with self-loops added to the diagonal
-performs better on word similarity evaluations than it does without, when
+performs better on word-similarity evaluations than it does without, when
 allowed to run for 10 steps of retrofitting.
 
 
@@ -476,7 +475,7 @@ overlapping terms, weighted by their cosine similarity.
 To combine the features of word2vec and GloVe, we first concatenate their
 vectors into 600-dimensional vectors. We then discount redundancy between its
 features by transforming these 600-dimensional vectors with a singular value
-decomposition.  We factor the matrix $A$ of concatenated vectors as $A = U
+decomposition (SVD).  We factor the matrix $M$ of concatenated vectors as $M = U
 \Sigma V^T$, then compute the new joint features as $U \Sigma^{1/2}$.
 
 $U \Sigma$ would be an orthogonal rotation of the original features;
@@ -489,13 +488,13 @@ $\Sigma$ by $\Sigma^{1/2}$ provides a benefit on two out of three data sets for
 evaluating word similarity, as shown in Section~\ref{variations}.
 
 It is common to use SVD as a form of dimensionality reduction, by discarding
-the smallest eigenvalues and truncating the matrix accordingly.
+the smallest singular values and truncating the matrix accordingly.
 Section~\ref{variations} shows that we can reduce the interpolated matrix to
 from 600 dimensions to 450 or 300 dimensions without much loss in performance.
 
 \section{Evaluation}
 
-\subsection{Word Similarity Datasets}
+\subsection{Word-Similarity Datasets}
 
 We evaluate our model's performance at identifying similar words using a
 variety of word-similarity gold standards:
@@ -576,8 +575,8 @@ CN   & PP   & St   & W    & G    & $L_1$  &\bf .601 &    .861 &    .802 \\  % co
     Word-similarity results as various components of the ensemble are enabled.
     The results are the Spearman rank correlation ($\rho$) with the held-out
     test sets of RW and MEN-3000 and with WordSim-353.
-    The components are: {\bf CN} = ConceptNet 5.4,
-    {\bf PP} = PPDB XL, {\bf St} = standardized and lemmatized terms,
+    The components are: {\bf CN} = ConceptNet,
+    {\bf PP} = PPDB, {\bf St} = standardized and lemmatized terms,
     {\bf W} = word2vec SGNS vectors, {\bf g} = GloVe 42B vectors,
     {\bf G} = GloVe 1.2 840B vectors, {\bf $L_1$} = $L_1$-normalized features.
 }
@@ -626,7 +625,10 @@ features.\footnote{
 {\bf St} indicates that the labels were transformed and rows combined using the
 method of Section~\ref{standardizing-text}, which is a prerequisite to combining
 multiple data sources. {\bf CN} and {\bf PP} indicate adding data from
-ConceptNet 5.4, PPDB XL, or both using expanded retrofitting.
+ConceptNet, PPDB, or both using expanded retrofitting.
+Note that the row labeled with {\bf g} alone is simply an evaluation of GloVe
+42B that reproduces the evaluation of \newcite{pennington2014glove}. Our results
+here match the published results to within .001.
 
 While Table~\ref{eval-bigtable} shows our correlation with only the test data on
 these evaluations, Table~\ref{eval-dev-test} compares our results on
@@ -634,22 +636,18 @@ development and test data.
 
 \subsection{Benefits of Lemmatization}
 
-Note that the row labeled with {\bf g} alone is simply an evaluation of GloVe
-42B that reproduces the evaluation of \newcite{pennington2014glove}. Our results
-here match the published results to within .001.
-
 Decisions about how to process the data, even after
-the fact, make a very large difference in word similarity evaluations.
-Comparing the GloVe 42B results to the 840B results, we see that GloVe 42B
+the fact, make a very large difference in word-similarity evaluations.
+Comparing the GloVe 42B results to the 840B results (Table~\ref{eval-bigtable}), we see that GloVe 42B
 works better ``out of the box'', and 840B contains messy data that particularly
 causes problems on the Rare Words evaluation. However, our strategy to
 standardize and lemmatize the term labels of GloVe 840B, combining its rows using
 the Zipf estimate, makes it perform better than GloVe 42B and other published
 results, as seen in the {\bf St}, {\bf G}, $L_1$ row. We call this
-configuration ``Modified GloVe'' in Table~\ref{compare-others} and Figure~\ref{compare-graph},
+configuration ``Modified GloVe'',
 and similarly, our best configuration of word2vec is ``Modified word2vec''.
 
-The fact that Modified GloVe performs better than GloVe 42B, GloVe 840B and many
+The fact that Modified GloVe performs better than GloVe 42B, GloVe 840B, and many
 other systems, even before retrofitting any additional data onto it, highlights
 the unexpectedly large benefit of lemmatization: some of the improvements from
 this paper can be realized without introducing any additional data.
@@ -752,8 +750,8 @@ datasets to the best published results that we know of.
 \newcite{levy2015embeddings} present results including an SVD-based method that
 scores $\rho = .514$ on the RW evaluation, as well as an implementation of
 skip-grams with negative sampling (SGNS), originally introduced by
-\newcite{mikolov2013word2vec}. We also compare to the original results from
-GloVe's 42-billion-token dataset, and the best MEN-3000 result from
+\newcite{mikolov2013word2vec}, with optimized hyperparameters. We also compare to the original results from
+GloVe 42B, and the best MEN-3000 result from
 \newcite{faruqui2015retrofitting}. We use the complete RW data, not our test
 set, so that we can compare directly to previous results.
 
