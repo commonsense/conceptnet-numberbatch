@@ -50,11 +50,10 @@ A currently successful approach to computational semantics is to represent
 words as embeddings in a machine-learned vector space. We
 present an ensemble method that combines embeddings produced by GloVe
 \cite{pennington2014glove} and word2vec \cite{mikolov2013word2vec} with
-structured knowledge from the semantic networks ConceptNet 5
+structured knowledge from the semantic networks ConceptNet
 \cite{speer2012conceptnet} and PPDB \cite{ganitkevitch2013ppdb}, merging their
 information into a common representation with a large, multilingual vocabulary.
-The embeddings it produces achieve state-of-the-art performance on many word
-similarity evaluations. Its score of $\rho = \scoreRW{}$ on an evaluation of
+The embeddings it produces achieve state-of-the-art performance on many word-similarity evaluations. Its score of $\rho = \scoreRW{}$ on an evaluation of
 rare words \cite{luong2013rw} is 16\% higher than the previous best known
 system.
 
@@ -217,7 +216,7 @@ billion tokens of the Common Crawl, respectively.
 
 There is some debate about whether GloVe or word2vec is better at representing
 word meanings in general. GloVe is presented by \newcite{pennington2014glove}
-as performing better than word2vec on word similarity tasks, but
+as performing better than word2vec on word-similarity tasks, but
 \newcite{levy2015embeddings} finds that word2vec performs better with an
 optimized setting of hyperparameters than GloVe does, when retrained with a
 particular corpus.
@@ -413,7 +412,7 @@ vector is influenced by the vector it had in the previous step.
 
 As a practical effect of this, Section~\ref{variations} (Varying the System)
 will show that expanded retrofitting with self-loops added to the diagonal
-performs better on word similarity evaluations than it does without, when
+performs better on word-similarity evaluations than it does without, when
 allowed to run for 10 steps of retrofitting.
 
 
@@ -492,7 +491,7 @@ from 600 dimensions to 450 or 300 dimensions without much loss in performance.
 
 \section{Evaluation}
 
-\subsection{Word Similarity Datasets}
+\subsection{Word-Similarity Datasets}
 
 We evaluate our model's performance at identifying similar words using a
 variety of word-similarity gold standards:
@@ -573,8 +572,8 @@ CN   & PP   & St   & W    & G    & $L_1$  &\bf .601 &    .861 &    .802 \\  % co
     Word-similarity results as various components of the ensemble are enabled.
     The results are the Spearman rank correlation ($\rho$) with the held-out
     test sets of RW and MEN-3000 and with WordSim-353.
-    The components are: {\bf CN} = ConceptNet 5.4,
-    {\bf PP} = PPDB XL, {\bf St} = standardized and lemmatized terms,
+    The components are: {\bf CN} = ConceptNet,
+    {\bf PP} = PPDB, {\bf St} = standardized and lemmatized terms,
     {\bf W} = word2vec SGNS vectors, {\bf g} = GloVe 42B vectors,
     {\bf G} = GloVe 1.2 840B vectors, {\bf $L_1$} = $L_1$-normalized features.
 }
@@ -623,7 +622,7 @@ features.\footnote{
 {\bf St} indicates that the labels were transformed and rows combined using the
 method of Section~\ref{standardizing-text}, which is a prerequisite to combining
 multiple data sources. {\bf CN} and {\bf PP} indicate adding data from
-ConceptNet 5.4, PPDB XL, or both using expanded retrofitting.
+ConceptNet, PPDB, or both using expanded retrofitting.
 
 While Table~\ref{eval-bigtable} shows our correlation with only the test data on
 these evaluations, Table~\ref{eval-dev-test} compares our results on
@@ -636,7 +635,7 @@ Note that the row labeled with {\bf g} alone is simply an evaluation of GloVe
 here match the published results to within .001.
 
 Decisions about how to process the data, even after
-the fact, make a very large difference in word similarity evaluations.
+the fact, make a very large difference in word-similarity evaluations.
 Comparing the GloVe 42B results to the 840B results, we see that GloVe 42B
 works better ``out of the box'', and 840B contains messy data that particularly
 causes problems on the Rare Words evaluation. However, our strategy to
@@ -750,7 +749,7 @@ datasets to the best published results that we know of.
 scores $\rho = .514$ on the RW evaluation, as well as an implementation of
 skip-grams with negative sampling (SGNS), originally introduced by
 \newcite{mikolov2013word2vec}. We also compare to the original results from
-GloVe's 42-billion-token dataset, and the best MEN-3000 result from
+GloVe 42B, and the best MEN-3000 result from
 \newcite{faruqui2015retrofitting}. We use the complete RW data, not our test
 set, so that we can compare directly to previous results.
 
