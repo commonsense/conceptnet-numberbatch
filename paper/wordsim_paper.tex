@@ -64,13 +64,11 @@ system.
 Vector space models are an effective way to express the meanings of
 natural-language terms in a computational system. These models are created
 using machine-learning techniques that represent words or phrases as
-vectors in a high dimensional space, such that the cosine similarity of any two
+vectors in a high-dimensional space, such that the cosine similarity of any two
 terms corresponds to their semantic similarity.
 
 These vectors, referred to as
-the {\em embeddings} of the terms in the vector space, can be compared directly
-to measure the similarity of two terms (as the cosine similarity of their
-respective vectors), and can also be used as an input to further steps of
+the {\em embeddings} of the terms in the vector space, can also be used as an input to further steps of
 machine learning. When algorithms expect dense vectors as input, embeddings
 provide a representation that is both more compact and more informative than the
 ``one-hot'' representation in which every term in the vocabulary gets its own
@@ -371,7 +369,7 @@ a word's distance from its neighbors in the semantic network and its distance
 from its original vector. Its implementation in code\footnote{
     \url{https://github.com/mfaruqui/retrofitting}
 } takes steps along the gradient toward this minimum
-by iteratively updating one vector $w'_i$ at a time, and updating it to be a linear
+by iteratively updating one vector $w'_i$ at a time to be a linear
 combination between its original position $w^0_i$ and the average of its neighbors
 in the semantic network.
 
@@ -472,7 +470,7 @@ overlapping terms, weighted by their cosine similarity.
 To combine the features of word2vec and GloVe, we first concatenate their
 vectors into 600-dimensional vectors. We then discount redundancy between its
 features by transforming these 600-dimensional vectors with a singular value
-decomposition.  We factor the matrix $A$ of concatenated vectors as $A = U
+decomposition (SVD).  We factor the matrix $A$ of concatenated vectors as $A = U
 \Sigma V^T$, then compute the new joint features as $U \Sigma^{1/2}$.
 
 $U \Sigma$ would be an orthogonal rotation of the original features;
@@ -485,7 +483,7 @@ $\Sigma$ by $\Sigma^{1/2}$ provides a benefit on two out of three data sets for
 evaluating word similarity, as shown in Section~\ref{variations}.
 
 It is common to use SVD as a form of dimensionality reduction, by discarding
-the smallest eigenvalues and truncating the matrix accordingly.
+the smallest singular values and truncating the matrix accordingly.
 Section~\ref{variations} shows that we can reduce the interpolated matrix to
 from 600 dimensions to 450 or 300 dimensions without much loss in performance.
 
@@ -636,13 +634,13 @@ here match the published results to within .001.
 
 Decisions about how to process the data, even after
 the fact, make a very large difference in word-similarity evaluations.
-Comparing the GloVe 42B results to the 840B results, we see that GloVe 42B
+Comparing the GloVe 42B results to the 840B results (Table~\ref{eval-bigtable}), we see that GloVe 42B
 works better ``out of the box'', and 840B contains messy data that particularly
 causes problems on the Rare Words evaluation. However, our strategy to
 standardize and lemmatize the term labels of GloVe 840B, combining its rows using
 the Zipf estimate, makes it perform better than GloVe 42B and other published
 results, as seen in the {\bf St}, {\bf G}, $L_1$ row. We call this
-configuration ``Modified GloVe'' in Table~\ref{compare-others} and Figure~\ref{compare-graph},
+configuration ``Modified GloVe'',
 and similarly, our best configuration of word2vec is ``Modified word2vec''.
 
 The fact that Modified GloVe performs better than GloVe 42B, GloVe 840B, and many
