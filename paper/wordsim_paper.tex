@@ -96,12 +96,14 @@ Here, we build on the retrofitting process to produce a high-quality space of
 word embeddings. We extend existing techniques in the following ways:
 
 \begin{itemize}
+\item We modify the retrofitting algorithm, making it not depend on the row
+order of its input matrix, and allowing it to propagate over the union of the
+vocabularies. This allows retrofitting to benefit from structured links outside
+the original vocabulary, such as translations into other languages.
+We call this procedure ``expanded retrofitting''.
 \item We include ConceptNet, a Linked Open Data semantic network that expresses
 many kinds of relationships between words in many languages, as a source of
 structured connections between words.
-\item We modify the retrofitting algorithm, making it not depend on the row
-order of its input matrix, and allowing it to propagate over the union of the
-vocabularies. We call this procedure ``expanded retrofitting''.
 \item We align English terms from different sources using a lemmatizer and a
 heuristic for merging together multiple term vectors.
 \item We fill gaps when aligning the two distributional-semantics sources
@@ -109,16 +111,15 @@ heuristic for merging together multiple term vectors.
 \item We re-scale the distributional-semantics features using $L_1$ normalization.
 \end{itemize}
 
-When we use this process to combine word2vec, GloVe, and ConceptNet, this
-process produces a space of term embeddings we call the ``ConceptNet vector
-ensemble'' that achieves state-of-the-art performance on word-similarity
-evaluations\footnote{Some methods and evaluations \cite{agirre2009similarity}
-distinguish word similarity from word
-{\em relatedness}. ``Coffee'' and ``mug'', for example, are quite related,
-but not actually similar because coffee is not {\em like} a mug. In this paper,
+When we use this process to combine word2vec, GloVe, PPDB, and ConceptNet, this
+process produces a space of multilingual term embeddings we call the
+``ConceptNet vector ensemble'' that achieves state-of-the-art performance on
+word-similarity evaluations\footnote{Some methods and evaluations
+\cite{agirre2009similarity} distinguish word similarity from word {\em
+relatedness}. ``Coffee'' and ``mug'', for example, are quite related, but
+not actually similar because coffee is not {\em like} a mug. In this paper,
 however, we conflate similarity and relatedness into the same metric, as most
-evaluations do.}
-over both common and rare words.
+evaluations do.} over both common and rare words.
 
 
 \subsection{Related work}
@@ -132,11 +133,12 @@ achieve alone, particularly by extending the vocabulary. Their system uses a
 similarity measure over WordNet, and uses distributional similarities to
 recognize words outside of WordNet's vocabulary.
 
-\newcite{levy2015embeddings} surveys modern methods of distributional similarity
-and experiments with training them on specific data while varying their
-parameters. In this way, it compares word2vec and GloVe, then proposes a method
-based on the SVD of the Pointwise Mutual Information matrix that outperforms
-both. We use Levy's results as a point of comparison here.
+\newcite{levy2015embeddings} surveys modern methods of distributional
+similarity and experiments with training them on specific data while varying
+their parameters. They compare word2vec and GloVe, tune their hyperparameters
+in a way that particularly improves word2vec, then proposes a method based on
+the SVD of the Pointwise Mutual Information matrix that outperforms both. We
+use Levy's results as a point of comparison here.
 
 AutoExtend \cite{rothe2015autoextend} is a system with similar methods to
 ours: it extends word2vec embeddings to cover all the word senses and synsets of
@@ -176,7 +178,8 @@ learning about word similarity, providing different information from
 ConceptNet. It lists pairs of words that are translated to the same word in parallel
 corpora, particularly in documents of the European Parliament. PPDB is used
 as an external knowledge source by \newcite{faruqui2015retrofitting}, so
-we evaluate the effect of adding it to our ensemble as well.
+we have evaluated the effect of adding it to our ensemble as well. As it seems to have
+a small beneficial effect, we include it as part of the full ensemble.
 
 \subsection{word2vec and GloVe}
 
@@ -851,6 +854,28 @@ same time, the MEN-3000 score {\em increases} from .858 to .865. The system
 continues to do what it is designed to do without Wiktionary, but there seems to
 be a tradeoff in performance on rare words and common words involved.
 
+\section{Conclusions}
+
+The work we have presented here involves building on many previous techniques,
+while adding some new techniques and new sources of knowledge.
+
+As \newcite{levy2015embeddings} found, high-level choices about how to use a
+system can significantly affect its performance. While Levy found settings of
+hyperparameters that made word2vec outperform GloVe, we found that we can make
+GloVe outperform Levy's tuned word2vec by pre-processing the words in GloVe
+with case-folding and lemmatization, and re-weighting the features using $L_1$
+normalization.
+
+We also showed that it isn't necessary to choose just one of word2vec or GloVe
+as a starting point. Instead, we can benefit from both of them using a
+locally-linear interpolation between them.
+
+We showed that ConceptNet is a useful source of structured knowledge that was
+not considered in previous work on {\em retrofitting} distributional semantics
+with structured knowledge, especially when retrofitting is generalized into our
+{\em expanded retrofitting} technique, which can benefit from links that are
+outside the original vocabulary.
+
 \subsection{Future Work}
 
 One aspect of our method that clearly has room for improvement is the fact that
@@ -858,9 +883,10 @@ we disregard the labels on relations in ConceptNet.  There is valuable
 knowledge there that we might be able to take into account with a more
 sophisticated extension of retrofitting, one that goes beyond simply knowing
 that particular words should be related, to handling them differently based on
-{\em how} they are related. This seems particularly important for antonyms,
-which indicate that words are similar overall but different in a key aspect,
-such as forming two ends of the same scale.
+{\em how} they are related, as in the RESCAL representation
+\cite{nickel2011rescal}. This seems particularly important for antonyms, which
+indicate that words are similar overall but different in a key aspect, such as
+forming two ends of the same scale.
 
 Lemmatization is clearly a useful component of our word-similarity
 representation, but it loses information. Representing morphological
@@ -884,7 +910,7 @@ senses and a more specific understanding of words to the system.
 We aim for these results to be reproducible and reusable by others. The code
 that we ran to produce the results in this paper is available in the GitHub
 repository \url{https://github.com/LuminosoInsight/conceptnet-vector-ensemble}.
-We have tagged this revision as {\em submitted-20160323}, so that this paper
+We have tagged this revision as {\em submitted-20160331}, so that this paper
 can be reproduced as-is, even if we update the code later.
 
 The README of that repository also points to URLs where the computed results
