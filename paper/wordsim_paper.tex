@@ -50,7 +50,7 @@ A currently successful approach to computational semantics is to represent
 words as embeddings in a machine-learned vector space. We
 present an ensemble method that combines embeddings produced by GloVe
 \cite{pennington2014glove} and word2vec \cite{mikolov2013word2vec} with
-structured knowledge from the semantic network ConceptNet 5
+structured knowledge from the semantic networks ConceptNet 5
 \cite{speer2012conceptnet} and PPDB \cite{ganitkevitch2013ppdb}, merging their
 information into a common representation with a large, multilingual vocabulary.
 The embeddings it produces achieve state-of-the-art performance on many word
@@ -646,7 +646,7 @@ results, as seen in the {\bf St}, {\bf G}, $L_1$ row. We call this
 configuration ``Modified GloVe'' in Table~\ref{compare-others} and Figure~\ref{compare-graph},
 and similarly, our best configuration of word2vec is ``Modified word2vec''.
 
-The fact that Modified GloVe performs better than GloVe 42B, GloVe 840B and many
+The fact that Modified GloVe performs better than GloVe 42B, GloVe 840B, and many
 other systems, even before retrofitting any additional data onto it, highlights
 the unexpectedly large benefit of lemmatization: some of the improvements from
 this paper can be realized without introducing any additional data.
