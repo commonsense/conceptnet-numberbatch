@@ -470,7 +470,7 @@ overlapping terms, weighted by their cosine similarity.
 To combine the features of word2vec and GloVe, we first concatenate their
 vectors into 600-dimensional vectors. We then discount redundancy between its
 features by transforming these 600-dimensional vectors with a singular value
-decomposition (SVD).  We factor the matrix $A$ of concatenated vectors as $A = U
+decomposition (SVD).  We factor the matrix $M$ of concatenated vectors as $M = U
 \Sigma V^T$, then compute the new joint features as $U \Sigma^{1/2}$.
 
 $U \Sigma$ would be an orthogonal rotation of the original features;
