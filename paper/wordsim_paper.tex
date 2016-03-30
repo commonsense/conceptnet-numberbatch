@@ -387,16 +387,18 @@ help new terms converge on a single vector, as described in more detail below.
 
 Let $W^0$ be an $m' \times n$ matrix whose rows come from the original
 embeddings if available, and are all zeroes for terms outside the vocabulary of
-the original embeddings. $A$ is a diagonal matrix in which $A_{ii}$ is 1 if term
-$i$ is in the original vocabulary, and 0 otherwise. We can now update $W$
+the original embeddings. $A$ is a diagonal matrix of weights in which $A_{ii}$
+is 1 if term $i$ is in the original vocabulary, and 0 otherwise (allowing us to
+keep terms near their original embeddings without also keeping out-of-vocabulary
+terms near the zero vector). We can now update $W$
 iteratively so that the next iteration of $W$ is a combination of its product
-with $S$ and its original state, followed by $L_2$ normalization of its
+with $S$ and its weighted original state, followed by $L_2$ normalization of its
 non-zero rows\footnote{
     We maintain $L_2$ normalization so that minimizing distance and maximizing
     cosine similarity are always linked.
 }:
 $$
-W^{k+1} = \mathrm{normalize}\left[ \left( S W^k + W^0 A \right)\left( 1 + A \right)^{-1} \right]
+W^{k+1} = \mathrm{normalize}\left[ \left( S W^k + A W^0 \right)\left( I + A \right)^{-1} \right]
 $$
 
 The diagonal of the $S$ matrix relates each term to itself. We have found that
