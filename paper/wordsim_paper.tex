@@ -621,16 +621,15 @@ features.\footnote{
 method of Section~\ref{standardizing-text}, which is a prerequisite to combining
 multiple data sources. {\bf CN} and {\bf PP} indicate adding data from
 ConceptNet, PPDB, or both using expanded retrofitting.
+Note that the row labeled with {\bf g} alone is simply an evaluation of GloVe
+42B that reproduces the evaluation of \newcite{pennington2014glove}. Our results
+here match the published results to within .001.
 
 While Table~\ref{eval-bigtable} shows our correlation with only the test data on
 these evaluations, Table~\ref{eval-dev-test} compares our results on
 development and test data.
 
 \subsection{Benefits of Lemmatization}
-
-Note that the row labeled with {\bf g} alone is simply an evaluation of GloVe
-42B that reproduces the evaluation of \newcite{pennington2014glove}. Our results
-here match the published results to within .001.
 
 Decisions about how to process the data, even after
 the fact, make a very large difference in word-similarity evaluations.
