@@ -7,18 +7,58 @@ The `paper/` directory contains the LaTeX source of our paper.  The `code/`
 directory contains a Python module called `conceptnet_retrofitting`,
 implementing the code that was used in the paper.
 
+This code produces high-quality term vectors (that is, word embeddings) that
+can be used directly as a representation of word meanings or as a starting
+point for further machine learning. Instead of setting up the dependencies for
+this code, you may just want to download them directly: see "Downloading the
+term vectors" below.
+
+The code and paper were created as a research project of [Luminoso
+Technologies, Inc.][luminoso], by Rob Speer and Joshua Chin.
+
+
+## License and attribution
+
+These vectors are distributed under the [CC-By-SA 4.0][cc-by-sa] license. In
+short, if you distribute a transformed or modified version of these vectors,
+you must release them under a compatible Share-Alike license and give due
+credit to [Luminoso][luminoso].
+
+Some suggested text:
+
+    This data contains semantic vectors from the ConceptNet Vector Ensemble, by
+    [Luminoso Technologies, Inc.][luminoso] You may redistribute or modify the
+    data under the terms of the [CC-By-SA 4.0][cc-by-sa] license.
+
+[cc-by-sa]: https://creativecommons.org/licenses/by-sa/4.0/
+[luminoso]: http://luminoso.com
+
+This data is itself built on:
+
+  - [ConceptNet 5.4][conceptnet], which contains data from Wiktionary,
+    WordNet, and many contributors to Open Mind Common Sense projects,
+    edited by Rob Speer
+
+  - [GloVe][glove], by Jeffrey Pennington, Richard Socher, and Christopher
+    Manning
+
+  - [word2vec][], by Tomas Mikolov and Google Research
+
+  - [PPDB][ppdb], by Juri Ganitkevitch, Benjamin Van Durme, and Chris
+    Callison-Burch
+
+[conceptnet]: http://conceptnet5.media.mit.edu
+[glove]: http://nlp.stanford.edu/projects/glove/
+[word2vec]: https://code.google.com/archive/p/word2vec/
+[ppdb]: http://www.cis.upenn.edu/~ccb/ppdb/
+
 
 ## Downloading the term vectors
 
-This code produces high-quality term vectors (that is, word embeddings) that
-can be used directly as a representation of word meanings or as a starting
-point for further machine learning. Instead of setting up the dependencies
-for this code, you may just want to download them directly.
-
-You will need to download one of the two matrices, as well as the text file of
-row labels, a UTF-8 plain text file which associates natural-language terms
-with the vectors that form the rows of that matrix. Each line of the text file
-corresponds to a row of the matrix, in order.
+To use these vectors, you should download one of the following two matrices, as
+well as the text file of row labels, a UTF-8 plain text file which associates
+natural-language terms with the vectors that form the rows of that matrix. Each
+line of the text file corresponds to a row of the matrix, in order.
 
 * Matrices in NumPy format: [600 dimensions][600d] or [300 dimensions][300d]
 * [Row labels][row-labels] in ConceptNet normalized form
@@ -31,8 +71,22 @@ The 300d matrix is just the first 300 columns of the 600d matrix; the 600d
 matrix may be slightly more accurate, but of course it requires twice as much
 computation to use.
 
+The `conceptnet` Python package can transform text into ConceptNet normalized
+form. This transformation is important to the performance of the term vectors.
+If you run `pip install conceptnet`, you should then be able to transform text
+like this:
+
+```python
+>>> from conceptnet5.nodes import standardized_concept_uri
+
+>>> standardized_concept_uri('en', 'this is an example')
+'/c/en/be_example'
+```
 
 ## Installing the code
+
+If you want to be able to run the code included here, to reproduce the results
+or build a similar set of term vectors:
 
 - Install base dependencies such as Python 3, NumPy, and SciPy.
 
@@ -71,7 +125,7 @@ python ninja.py      # generate the build script
 ninja                # run the build
 ```
 
-## Requirements for building
+### Requirements for building
 
 - A POSIX-compatible system with utilities such as `grep` and `cut`
 - **System dependencies**: git-annex, ninja-build, Python 3.3 or later
