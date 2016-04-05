@@ -83,6 +83,7 @@ like this:
 '/c/en/be_example'
 ```
 
+
 ## Installing the code
 
 If you want to be able to run the code included here, to reproduce the results
@@ -124,6 +125,9 @@ cd ..                # this should return you to the `code/` directory
 python ninja.py      # generate the build script
 ninja                # run the build
 ```
+
+The code itself is distributed under the MIT license; see MIT-LICENSE.
+
 
 ### Requirements for building
 
