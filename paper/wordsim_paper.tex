@@ -19,12 +19,14 @@
 \def\naaclpaperid{***} %  Enter the naacl Paper ID here
 
 % Packages we need
-\usepackage{pgfplots}
-\usepackage{tikz}
-\usetikzlibrary{external}
-\tikzexternalize
 
-\pgfplotsset{compat=1.9}
+% These will need to be uncommented to regenerate the graph
+%\usepackage{pgfplots}
+%\usepackage{tikz}
+%\usetikzlibrary{external}
+%\tikzexternalize
+%\pgfplotsset{compat=1.9}
+
 \usepackage{CJKutf8}
 \usepackage{url}
 \usepackage{graphicx}
@@ -372,14 +374,12 @@ to a matrix.
 The inputs to retrofitting are an initial $m \times n$ dense matrix of term
 embeddings, $W^0$, and a list of known semantic relationships.
 
-Faruqui et al.'s retrofitting procedure aims to minimize a sum of
-a word's distance from its neighbors in the semantic network and its distance
-from its original vector. Its implementation in code\footnote{
-    \url{https://github.com/mfaruqui/retrofitting}
-} takes steps along the gradient toward this minimum
-by iteratively updating one vector $w'_i$ at a time to be a linear
-combination between its original position $w^0_i$ and the average of its neighbors
-in the semantic network.
+Faruqui et al.'s retrofitting procedure aims to minimize a sum of a word's
+distance from its neighbors in the semantic network and its distance from its
+original vector. Its implementation in code takes steps along the gradient
+toward this minimum by iteratively updating one vector $w'_i$ at a time to be a
+linear combination between its original position $w^0_i$ and the average of its
+neighbors in the semantic network.
 
 The advantage of this iterative update is that it only requires two copies of
 $W$ in memory ($W^0$ and the current state) and converges quickly. A disadvantage
@@ -695,32 +695,7 @@ ConceptNet vector ensemble    & \bf .596  & \bf .859  & \bf .821 \\
 \end{table}
 
 \begin{figure}
-\begin{tikzpicture}[scale=.7]
-    \begin{axis}[enlargelimits=0.05, legend style={legend pos=outer north east, font=\footnotesize}, legend cell align=left, %
-                 xlabel={$\rho$ correlation with MEN-3000 (common words)}, ylabel={$\rho$ correlation with RW (rare words)}]
-        \addplot[
-          scatter/classes={
-            a={mark=pentagon,black}, b={mark=triangle,black}, c={mark=triangle*,blue}, %
-            d={mark=square,black}, e={mark=square*,blue}, f={mark=*,red}
-          },
-          scatter,only marks,
-          scatter src=explicit symbolic,
-          error bars/error bar style={gray},
-          error bars/.cd,
-          y dir=both,y explicit,x dir=both,x explicit
-        ]
-        table[meta=label,x =x,y =y,x error plus =xplus,x error minus =xminus,y error plus =yplus,y error minus =yminus] {
-            x      xplus   xminus  y     yplus   yminus  label  anchor
-            .777   .023    .026    .514  .032   .033     a      south
-            .774   .023    .026    .470  .033   .034     b      south
-            .778   .023    .026    .476  .033   .034     c      south
-            .8163  .020    .023    .4767 .033   .034     d      south
-            .840   .017    .019    .528  .031   .032     e      south
-            .861   .016    .017    .596  .027   .029     f      south
-        };
-        \legend{Levy SVD, word2vec, Mod. word2vec, GloVe, Mod. GloVe, Ensemble}
-    \end{axis}
-\end{tikzpicture}
+\includegraphics[width=3.0in]{wordsim_paper-figure0.pdf}
 \caption{
     Systems discussed in this paper, plotted according to their Spearman
     correlation with MEN-3000 and RW. Hollow nodes are previously-reported
