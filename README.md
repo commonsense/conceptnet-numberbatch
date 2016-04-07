@@ -26,9 +26,9 @@ credit to [Luminoso][luminoso].
 
 Some suggested text:
 
-    This data contains semantic vectors from the ConceptNet Vector Ensemble, by
-    [Luminoso Technologies, Inc.][luminoso] You may redistribute or modify the
-    data under the terms of the [CC-By-SA 4.0][cc-by-sa] license.
+This data contains semantic vectors from the ConceptNet Vector Ensemble, by
+[Luminoso Technologies, Inc.][luminoso] You may redistribute or modify the
+data under the terms of the [CC-By-SA 4.0][cc-by-sa] license.
 
 [cc-by-sa]: https://creativecommons.org/licenses/by-sa/4.0/
 [luminoso]: http://luminoso.com
