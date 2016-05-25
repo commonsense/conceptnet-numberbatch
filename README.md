@@ -1,7 +1,9 @@
-# conceptnet-vector-ensemble
+# conceptnet-numberbatch
 
-This repository describes implements an ensemble method that combines
+This repository describes and implements an ensemble method that combines
 ConceptNet, word2vec, GloVe, and PPDB using a variation on retrofitting.
+It was previously known as the "ConceptNet Vector Ensemble", including in
+a paper we've written about the system.
 
 The `paper/` directory contains the LaTeX source of our paper.  The `code/`
 directory contains a Python module called `conceptnet_retrofitting`,
@@ -26,12 +28,27 @@ credit to [Luminoso][luminoso].
 
 Some suggested text:
 
-    This data contains semantic vectors from the ConceptNet Vector Ensemble, by
+    This data contains semantic vectors from Conceptnet Numberbatch, by
     Luminoso Technologies, Inc. You may redistribute or modify the
     data under the terms of the CC-By-SA 4.0 license.
 
 [cc-by-sa]: https://creativecommons.org/licenses/by-sa/4.0/
 [luminoso]: http://luminoso.com
+
+If you build on this data, you should cite it. We recommend citing the
+arXiV preprint for now:
+
+> Robert Speer and Joshua Chin. "An Ensemble Method to Produce High-Quality Word Embeddings." arXiv preprint arXiv:1604.01692 (2016).
+
+In BibTeX form, the citation is:
+
+    @article{speer2016ensemble,
+      title={An Ensemble Method to Produce High-Quality Word Embeddings},
+      author={Speer, Robert and Chin, Joshua},
+      journal={arXiv preprint arXiv:1604.01692},
+      year={2016}
+    }
+
 
 This data is itself built on:
 
@@ -73,7 +90,7 @@ computation to use.
 
 The `conceptnet` Python package can transform text into ConceptNet normalized
 form. This transformation is important to the performance of the term vectors.
-If you run `pip install conceptnet`, you should then be able to transform text
+If you run `pip install conceptnet==5.4.2`, you should then be able to transform text
 like this:
 
 ```python
@@ -82,6 +99,9 @@ like this:
 >>> standardized_concept_uri('en', 'this is an example')
 '/c/en/be_example'
 ```
+
+ConceptNet 5.5 will handle stemming differently and require a new version of Numberbatch,
+so make sure to get version 5.4.2 when reproducing this paper.
 
 
 ## Installing the code
