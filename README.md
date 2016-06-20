@@ -133,7 +133,6 @@ track them when they change:
 - Get the files (this should default to downloading them over the web):
 
 ```sh
-cd code/data
 git annex get
 ```
 
