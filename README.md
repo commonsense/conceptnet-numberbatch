@@ -3,7 +3,7 @@
 This repository describes and implements an ensemble method that combines
 ConceptNet, word2vec, GloVe, and PPDB using a variation on retrofitting.
 It was previously known as the "ConceptNet Vector Ensemble", including in
-a paper we've written about the system.
+[a paper we've written about the system](https://arxiv.org/pdf/1604.01692v1.pdf).
 
 The `paper/` directory contains the LaTeX source of our paper.  The `code/`
 directory contains a Python module called `conceptnet_retrofitting`,
