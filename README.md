@@ -69,9 +69,9 @@ This data is itself built on:
 
 ## Downloading the term vectors
 
-If you got this package from Zenodo, the `*.txt.gz` files of term vectors are
-included. They are too large to include in the GitHub repository for this package,
-so in that case you should follow the links provided here to download them.
+The `*.txt.gz` files of term vectors are too large to include in the GitHub
+repository for this package.  You should follow the links provided here to
+download them.
 
 ## Format of the term vectors
 
@@ -86,7 +86,7 @@ separated by spaces:
     /c/en/absolutely_convergent 0.4119 0.1030 -0.0579 0.2609 -0.0179 -0.29...
 
 
-There are four files in the `data` directory, providing different representations
+There are four files available for download, providing different representations
 of the data:
 
 * [`conceptnet-numberbatch-201609_uris_main.txt.gz`][uris_main]
