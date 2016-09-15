@@ -63,9 +63,9 @@ This data is itself built on:
 
 ## Downloading the term vectors
 
-If you got this package from Zenodo, the term vectors are included. They
-are too large to include in the GitHub repository for this package,
-so you should follow the links to doownload them.
+If you got this package from Zenodo, the `*.txt.gz` files of term vectors are
+included. They are too large to include in the GitHub repository for this package,
+so in that case you should follow the links provided here to download them.
 
 ## Format of the term vectors
 
