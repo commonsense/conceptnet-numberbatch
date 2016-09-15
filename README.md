@@ -2,7 +2,7 @@
 
 The main location of this repository is on GitHub, which may contain updates:
 
-  http://github.com/LuminosoInsight/conceptnet-numberbatch
+  http://github.com/commonsense/conceptnet-numberbatch
 
 
 ## Introduction
