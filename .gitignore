@@ -77,3 +77,5 @@ build.ninja
 code/data
 code/build-data
 code/prev-build-data
+*.auxlock
+*.out
