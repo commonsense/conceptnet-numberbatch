@@ -1,17 +1,23 @@
 # conceptnet-numberbatch
 
-This repository describes and implements an ensemble method that combines
-ConceptNet, word2vec, and GloVe using a variation on retrofitting.
-It was previously known as the "ConceptNet Vector Ensemble".
+The main location of this repository is on GitHub, which may contain updates:
 
-This code produces high-quality term vectors (that is, word embeddings) that
-can be used directly as a representation of word meanings or as a starting
-point for further machine learning.
+  http://github.com/LuminosoInsight/conceptnet-numberbatch
 
-Here is [a paper we wrote about the system](https://arxiv.org/pdf/1604.01692v1.pdf) in early 2016.
 
-The code and paper were created as a research project of [Luminoso
-Technologies, Inc.][luminoso], by Rob Speer and Joshua Chin.
+## Introduction
+
+This is the data from an ensemble that combines ConceptNet, word2vec, and GloVe
+using a variation on retrofitting.  It was previously known as the "ConceptNet
+Vector Ensemble".
+
+ConceptNet Numberbatch consists of high-quality term vectors (that is, word
+embeddings) that can be used directly as a representation of word meanings or
+as a starting point for further machine learning.
+
+Here is [a paper we wrote about the previous version](https://arxiv.org/pdf/1604.01692v1.pdf) in early 2016.
+
+The code and paper were created as a research project of [Luminoso Technologies, Inc.][luminoso], by Rob Speer and Joshua Chin.
 
 
 ## License and attribution
