@@ -1,81 +1,13 @@
-.ninja_deps
-.ninja_log
-
-# LaTeX output
-paper/*.aux
-paper/*.log
-paper/wordsim_paper.pdf
-paper/*.bbl
-paper/*.blg
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*,cover
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff
-*.log
 
 # Editor stuff
 *~
 *.swp
 .idea
 
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-build.ninja
-
-code/data
-code/build-data
-code/prev-build-data
-*.auxlock
-*.out
+# Large data files
+data/*.gz
+data/*.h5
