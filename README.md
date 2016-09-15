@@ -1,19 +1,14 @@
 # conceptnet-numberbatch
 
 This repository describes and implements an ensemble method that combines
-ConceptNet, word2vec, GloVe, and PPDB using a variation on retrofitting.
-It was previously known as the "ConceptNet Vector Ensemble", including in
-[a paper we've written about the system](https://arxiv.org/pdf/1604.01692v1.pdf).
-
-The `paper/` directory contains the LaTeX source of our paper.  The `code/`
-directory contains a Python module called `conceptnet_retrofitting`,
-implementing the code that was used in the paper.
+ConceptNet, word2vec, and GloVe using a variation on retrofitting.
+It was previously known as the "ConceptNet Vector Ensemble".
 
 This code produces high-quality term vectors (that is, word embeddings) that
 can be used directly as a representation of word meanings or as a starting
-point for further machine learning. Instead of setting up the dependencies for
-this code, you may just want to download them directly: see "Downloading the
-term vectors" below.
+point for further machine learning.
+
+Here is [a paper we wrote about the system](https://arxiv.org/pdf/1604.01692v1.pdf) in early 2016.
 
 The code and paper were created as a research project of [Luminoso
 Technologies, Inc.][luminoso], by Rob Speer and Joshua Chin.
@@ -52,7 +47,7 @@ In BibTeX form, the citation is:
 
 This data is itself built on:
 
-  - [ConceptNet 5.4][conceptnet], which contains data from Wiktionary,
+  - [ConceptNet 5.5][conceptnet], which contains data from Wiktionary,
     WordNet, and many contributors to Open Mind Common Sense projects,
     edited by Rob Speer
 
@@ -61,100 +56,57 @@ This data is itself built on:
 
   - [word2vec][], by Tomas Mikolov and Google Research
 
-  - [PPDB][ppdb], by Juri Ganitkevitch, Benjamin Van Durme, and Chris
-    Callison-Burch
-
 [conceptnet]: http://conceptnet5.media.mit.edu
 [glove]: http://nlp.stanford.edu/projects/glove/
 [word2vec]: https://code.google.com/archive/p/word2vec/
-[ppdb]: http://www.cis.upenn.edu/~ccb/ppdb/
 
 
 ## Downloading the term vectors
 
-To use these vectors, you should download one of the following two matrices, as
-well as the text file of row labels, a UTF-8 plain text file which associates
-natural-language terms with the vectors that form the rows of that matrix. Each
-line of the text file corresponds to a row of the matrix, in order.
+If you got this package from Zenodo, the term vectors are included. They
+are too large to include in the GitHub repository for this package,
+so you should follow the links to doownload them.
 
-* Matrices in NumPy format: [600 dimensions][600d] or [300 dimensions][300d]
-* [Row labels][row-labels] in ConceptNet normalized form
+## Format of the term vectors
 
-[600d]: http://conceptnet-api-1.media.mit.edu/downloads/vector-ensemble/conceptnet-ensemble-201603-600d.npy
-[300d]: http://conceptnet-api-1.media.mit.edu/downloads/vector-ensemble/conceptnet-ensemble-201603-300d.npy
-[row-labels]: http://conceptnet-api-1.media.mit.edu/downloads/vector-ensemble/conceptnet-ensemble-201603-labels.txt
+The term vectors are in the same text format used by GloVe, word2vec, and
+LexVec. Each line contains a term label followed by 300 floating-point numbers,
+separated by spaces:
 
-The 300d matrix is just the first 300 columns of the 600d matrix; the 600d
-matrix may be slightly more accurate, but of course it requires twice as much
-computation to use.
-
-The `conceptnet` Python package can transform text into ConceptNet normalized
-form. This transformation is important to the performance of the term vectors.
-If you run `pip install conceptnet==5.4.2`, you should then be able to transform text
-like this:
-
-```python
->>> from conceptnet5.nodes import standardized_concept_uri
-
->>> standardized_concept_uri('en', 'this is an example')
-'/c/en/be_example'
-```
-
-ConceptNet 5.5 will handle stemming differently and require a new version of Numberbatch,
-so make sure to get version 5.4.2 when reproducing this paper.
+    /c/en/absolute_value -0.1410 -0.0641 -0.0618 0.2627 -0.0177 -0.2862 -0...
+    /c/en/absolute_zero 0.0074 -0.0272 -0.1510 0.0817 0.0648 -0.2144 -0.03...
+    /c/en/absoluteless 0.3960 -0.0599 0.0875 0.1853 -0.1459 -0.0827 0.0142...
+    /c/en/absolutely -0.0455 -0.1817 0.1297 0.0954 0.0150 0.0417 0.0772 0....
+    /c/en/absolutely_convergent 0.4119 0.1030 -0.0579 0.2609 -0.0179 -0.29...
 
 
-## Installing the code
+There are four files in the `data` directory, providing different representations
+of the data:
 
-If you want to be able to run the code included here, to reproduce the results
-or build a similar set of term vectors:
+* [`conceptnet-numberbatch-201609_uris_main.txt.gz`][uris_main]
+  contains terms from many languages, specified by their complete ConceptNet
+  URI (the strings starting with `/c/en/` in the example above).
 
-- Install base dependencies such as Python 3, NumPy, and SciPy.
+* [`conceptnet-numberbatch-201609_en_main.txt.gz`][en_main] contains only
+  English terms, and strips the `/c/en/` prefix to provide just the term text.
+  This form is the most compatible with other systems, as long as you only
+  want English.
 
-- Install [git-annex](http://git-annex.branchable.com) and
-  [ninja](http://ninja-build.org).
+* [`conceptnet-numberbatch-201609_en_extra.txt.gz`][en_extra] contains additional
+  single words of English whose vectors could be inferred as the average of their
+  neighbors in ConceptNet.
 
-- Set up the Python package:
+* [`conceptnet-numberbatch-201609.h5`][h5] contains the data in its native
+  HDF5 format, which can be loaded with the Python library `pandas`.
 
-```sh
-cd code
-python setup.py develop
-```
+If you have the ConceptNet database, the `extra` data should be redundant,
+but it provides a convenient way to expand the vocabulary without looking
+terms up in ConceptNet.
 
-Next you'll need to set up git-annex so you can get the large data files and
-track them when they change:
+[uris_main]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_en_extra.txt.gz
+[en_main]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_en_main.txt.gz
+[en_extra]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_en_extra.txt.gz
+[h5]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609.h5
 
-- Read the git-annex walkthrough at
-  https://git-annex.branchable.com/walkthrough/.  git-annex is very useful but
-  you don't want to do anything to your files behind its back. If you find that
-  git-annex has prevented you from modifying a file, don't override it. It is
-  probably stopping you from doing something dumb.
-
-- Get the files (this should default to downloading them over the web):
-
-```sh
-git annex get
-```
-
-Finally, start the build process that will create and evaluate the various
-spaces of term embeddings that are described in the paper:
-
-```sh
-cd ..                # this should return you to the `code/` directory
-python ninja.py      # generate the build script
-ninja                # run the build
-```
-
-The code itself is distributed under the MIT license; see MIT-LICENSE.
-
-
-### Requirements for building
-
-- A POSIX-compatible system with utilities such as `grep` and `cut`
-- **System dependencies**: git-annex, ninja-build, Python 3.3 or later
-- **Python dependencies**: numpy, scipy, pandas, ftfy, scikit-learn, wordfreq,
-  and ordered-set. These will mostly be installed automatically via `setup.py`,
-  but large dependencies such as numpy and scipy may be easier to install
-  separately.
-- 32 GB of RAM
-
+We have included here the code necessary to convert text into ConceptNet URIs,
+in `text_to_uri.py`.
