@@ -4,6 +4,10 @@ The main location of this repository is on GitHub, which may contain updates:
 
   http://github.com/commonsense/conceptnet-numberbatch
 
+The code and paper for the previous version of this system, also referred to as
+the 'ConceptNet Vector Ensemble', are available in a branch of this repository:
+
+  https://github.com/commonsense/conceptnet-numberbatch/tree/16.04
 
 ## Introduction
 
@@ -75,8 +79,10 @@ download them.
 
 ## Format of the term vectors
 
-The term vectors are in the same text format used by GloVe, word2vec, and
-LexVec. Each line contains a term label followed by 300 floating-point numbers,
+The term vectors are in the text format used by GloVe, which is similar to
+the format used by word2vec but without a header line.
+
+Each line contains a term label followed by 300 floating-point numbers,
 separated by spaces:
 
     /c/en/absolute_value -0.1410 -0.0641 -0.0618 0.2627 -0.0177 -0.2862 -0...
@@ -85,25 +91,28 @@ separated by spaces:
     /c/en/absolutely -0.0455 -0.1817 0.1297 0.0954 0.0150 0.0417 0.0772 0....
     /c/en/absolutely_convergent 0.4119 0.1030 -0.0579 0.2609 -0.0179 -0.29...
 
+To make this into word2vec format, add a header line with two numbers
+representing the height and width of the matrix. These dimensions are listed
+below.
 
 There are four files available for download, providing different representations
 of the data:
 
-* [`conceptnet-numberbatch-201609_uris_main.txt.gz`][uris_main]
+* [`conceptnet-numberbatch-201609_uris_main.txt.gz`][uris_main] (1928481 × 300)
   contains terms from many languages, specified by their complete ConceptNet
   URI (the strings starting with `/c/en/` in the example above).
 
-* [`conceptnet-numberbatch-201609_en_main.txt.gz`][en_main] contains only
-  English terms, and strips the `/c/en/` prefix to provide just the term text.
-  This form is the most compatible with other systems, as long as you only
-  want English.
+* [`conceptnet-numberbatch-201609_en_main.txt.gz`][en_main] (426572 × 300)
+  contains only English terms, and strips the `/c/en/` prefix to provide just
+  the term text.  This form is the most compatible with other systems, as long
+  as you only want English.
 
-* [`conceptnet-numberbatch-201609_en_extra.txt.gz`][en_extra] contains additional
-  single words of English whose vectors could be inferred as the average of their
-  neighbors in ConceptNet.
+* [`conceptnet-numberbatch-201609_en_extra.txt.gz`][en_extra] (233488 × 300)
+  contains additional single words of English whose vectors could be inferred
+  as the average of their neighbors in ConceptNet.
 
-* [`conceptnet-numberbatch-201609.h5`][h5] contains the data in its native
-  HDF5 format, which can be loaded with the Python library `pandas`.
+* [`conceptnet-numberbatch-201609.h5`][h5] contains the data in
+  its native HDF5 format, which can be loaded with the Python library `pandas`.
 
 If you have the ConceptNet database, the `extra` data should be redundant,
 but it provides a convenient way to expand the vocabulary without looking
