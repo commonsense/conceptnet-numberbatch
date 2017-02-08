@@ -12,16 +12,18 @@ the 'ConceptNet Vector Ensemble', are available in a branch of this repository:
 ## Introduction
 
 This is the data from an ensemble that combines ConceptNet, word2vec, and GloVe
-using a variation on retrofitting.  It was previously known as the "ConceptNet
-Vector Ensemble".
+using a variation on retrofitting.
 
 ConceptNet Numberbatch consists of high-quality term vectors (that is, word
 embeddings) that can be used directly as a representation of word meanings or
 as a starting point for further machine learning.
 
-Here is [a paper we wrote about the previous version](https://arxiv.org/pdf/1604.01692v1.pdf) in early 2016.
+It is described in the paper [ConceptNet 5.5: An Open Multilingual Graph of General Knowledge][cn55paper],
+presented at AAAI 2017.
 
-The code and paper were created as a research project of [Luminoso Technologies, Inc.][luminoso], by Rob Speer and Joshua Chin.
+[cn55paper]: https://arxiv.org/abs/1612.03975
+
+The code and paper were created as a research project of [Luminoso Technologies, Inc.][luminoso], by Rob Speer, Joshua Chin, and Catherine Havasi.
 
 
 ## License and attribution
@@ -33,27 +35,26 @@ credit to [Luminoso][luminoso].
 
 Some suggested text:
 
-    This data contains semantic vectors from Conceptnet Numberbatch, by
+    This data contains semantic vectors from ConceptNet Numberbatch, by
     Luminoso Technologies, Inc. You may redistribute or modify the
     data under the terms of the CC-By-SA 4.0 license.
 
 [cc-by-sa]: https://creativecommons.org/licenses/by-sa/4.0/
 [luminoso]: http://luminoso.com
 
-If you build on this data, you should cite it. We recommend citing the
-arXiV preprint for now:
+If you build on this data, you should cite it. Here is a straightforward citation:
 
-> Robert Speer and Joshua Chin. "An Ensemble Method to Produce High-Quality Word Embeddings." arXiv preprint arXiv:1604.01692 (2016).
+> Robert Speer, Joshua Chin, and Catherine Havasi (2017). "ConceptNet 5.5: An Open Multilingual Graph of General Knowledge." In proceedings of AAAI 2017.
 
 In BibTeX form, the citation is:
 
-    @article{speer2016ensemble,
-      title={An Ensemble Method to Produce High-Quality Word Embeddings},
-      author={Speer, Robert and Chin, Joshua},
-      journal={arXiv preprint arXiv:1604.01692},
-      year={2016}
+    @inproceedings{speer2017conceptnet,
+        author    = {Robert Speer and Joshua Chin and Catherine Havasi},
+        title     = {ConceptNet 5.5: An Open Multilingual Graph of General Knowledge},
+        book      = {AAAI},
+        year      = {2017},
+        url       = {http://arxiv.org/abs/1612.03975}
     }
-
 
 This data is itself built on:
 
