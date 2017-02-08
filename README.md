@@ -126,3 +126,89 @@ terms up in ConceptNet.
 
 We have included here the code necessary to convert text into ConceptNet URIs,
 in `text_to_uri.py`.
+
+# Available languages
+Conceptnet-Numberbatch contains entities for 78 languages. This entities are aligned between languages, so '/c/en/mother' ~= '/c/fr/mère'.
+
+The available languages are :
+
+| language| n_entities |
+|---------|------------|
+| en      | 426572     |
+| fr      | 298650     |
+| de      | 129382     |
+| ja      | 121508     |
+| it      | 91821      |
+| fi      | 56882      |
+| zh      | 50437      |
+| pt      | 47586      |
+| la      | 46722      |
+| nl      | 45238      |
+| es      | 44756      |
+| ru      | 37498      |
+| sh      | 31503      |
+| sv      | 28516      |
+| cs      | 25937      |
+| pl      | 22387      |
+| ms      | 20979      |
+| bg      | 20873      |
+| ca      | 20402      |
+| eo      | 18821      |
+| hu      | 17512      |
+| el      | 16926      |
+| no      | 14590      |
+| is      | 12645      |
+| sl      | 11457      |
+| ro      | 10872      |
+| ga      | 10865      |
+| vi      | 10576      |
+| lv      | 10127      |
+| grc     | 9896       |
+| tr      | 9876       |
+| da      | 9700       |
+| ar      | 9293       |
+| fa      | 8620       |
+| ko      | 7732       |
+| hy      | 7593       |
+| eu      | 7436       |
+| fro     | 7361       |
+| io      | 7317       |
+| oc      | 7008       |
+| gd      | 6852       |
+| gl      | 6378       |
+| nrf     | 6190       |
+| ka      | 6130       |
+| th      | 6121       |
+| he      | 5940       |
+| sq      | 5511       |
+| fo      | 4760       |
+| te      | 4617       |
+| mk      | 4369       |
+| se      | 4329       |
+| mul     | 4239       |
+| et      | 4122       |
+| gv      | 4071       |
+| sk      | 4060       |
+| xcl     | 4033       |
+| hi      | 3979       |
+| af      | 3753       |
+| ang     | 3661       |
+| lt      | 3486       |
+| ast     | 3429       |
+| uk      | 3075       |
+| cy      | 2761       |
+| nv      | 2698       |
+| mg      | 2696       |
+| kk      | 2462       |
+| rup     | 2317       |
+| sa      | 2257       |
+| non     | 2247       |
+| vo      | 2115       |
+| be      | 2097       |
+| sw      | 1995       |
+| ur      | 1834       |
+| ku      | 1813       |
+| fil     | 1571       |
+| az      | 976        |
+| ta      | 925        |
+| hsb     | 740        |
