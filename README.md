@@ -155,3 +155,98 @@ terms up in ConceptNet.
 [en_main]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_en_main.txt.gz
 [en_extra]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_en_extra.txt.gz
 [h5]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609.h5
+
+
+## Language statistics
+
+The multilingual data in ConceptNet Numberbatch represents 78 different language
+codes, though some have vocabularies with much more coverage than others. The following
+table lists the languages and their vocabulary size.
+
+You may notice a focus on even the smaller languages of Europe, and
+under-representation of widely-spoken languages from outside Europe, which is
+an effect of the availability of linguistic resources for these languages. We
+would like to change this, but it requires finding good source data for
+ConceptNet in these under-represented languages.
+
+| code | language                      | vocab size |
+|------|-------------------------------|------------|
+| en   | English                       |     484557 |
+| fr   | French                        |     296987 |
+| de   | German                        |     129405 |
+| ja   | Japanese                      |     121683 |
+| it   | Italian                       |      91828 |
+| fi   | Finnish                       |      56900 |
+| zh   | Chinese (Simp. + Trad.)       |      50185 |
+| pt   | Portuguese                    |      47592 |
+| la   | Latin                         |      46720 |
+| nl   | Dutch                         |      45245 |
+| es   | Spanish                       |      44756 |
+| ru   | Russian                       |      37503 |
+| sh   | Bosnian + Croatian + Serbian  |      31516 |
+| sv   | Swedish                       |      28519 |
+| cs   | Czech                         |      25934 |
+| pl   | Polish                        |      22388 |
+| ms   | Malay + Indonesian            |      20981 |
+| bg   | Bulgarian                     |      20870 |
+| ca   | Catalan                       |      20391 |
+| eo   | Esperanto                     |      18820 |
+| hu   | Hungarian                     |      17512 |
+| el   | Greek                         |      16925 |
+| no   | Norwegian (Bokmål + Nynorsk)  |      14591 |
+| is   | Icelandic                     |      12645 |
+| sl   | Slovenian                     |      11457 |
+| ro   | Romanian                      |      10873 |
+| ga   | Irish (Gaelic)                |      10865 |
+| vi   | Vietnamese                    |      10341 |
+| lv   | Latvian                       |      10129 |
+| grc  | Ancient Greek                 |       9897 |
+| tr   | Turkish                       |       9878 |
+| da   | Danish                        |       9702 |
+| ar   | Arabic                        |       9293 |
+| fa   | Persian (Farsi)               |       8623 |
+| ko   | Korean                        |       7770 |
+| hy   | Armenian                      |       7593 |
+| eu   | Basque                        |       7436 |
+| fro  | Old French                    |       7361 |
+| io   | Ido                           |       7316 |
+| oc   | Occitan                       |       7000 |
+| gd   | Scottish Gaelic               |       6851 |
+| gl   | Galician                      |       6380 |
+| nrf  | Jèrriais / Guernésiais        |       6190 |
+| th   | Thai                          |       6133 |
+| ka   | Georgian                      |       6130 |
+| he   | Hebrew                        |       5940 |
+| sq   | Albanian                      |       5511 |
+| fo   | Faroese                       |       4761 |
+| te   | Telugu                        |       4617 |
+| mk   | Macedonian                    |       4369 |
+| se   | Northern Sami                 |       4328 |
+| mul  | (Multilingual conventions)    |       4316 |
+| et   | Estonian                      |       4122 |
+| gv   | Manx                          |       4071 |
+| sk   | Slovak                        |       4059 |
+| xcl  | Classical Armenian            |       4033 |
+| hi   | Hindi                         |       3979 |
+| af   | Afrikaans                     |       3753 |
+| ang  | Old English                   |       3661 |
+| lt   | Lithuanian                    |       3486 |
+| ast  | Asturian                      |       3429 |
+| uk   | Ukrainian                     |       3073 |
+| cy   | Welsh                         |       2759 |
+| nv   | Navajo                        |       2698 |
+| mg   | Malagasy                      |       2696 |
+| kk   | Kazakh                        |       2462 |
+| rup  | Aromanian                     |       2317 |
+| sa   | Sanskrit                      |       2257 |
+| non  | Old Norse                     |       2247 |
+| vo   | Volapük                       |       2115 |
+| be   | Belarusian                    |       2097 |
+| sw   | Swahili                       |       1995 |
+| ur   | Urdu                          |       1834 |
+| ku   | Kurdish                       |       1813 |
+| fil  | Filipino (Tagalog)            |       1571 |
+| az   | Azeri                         |        976 |
+| ta   | Tamil                         |        925 |
+| hsb  | Upper Sorbian                 |        740 |
+
