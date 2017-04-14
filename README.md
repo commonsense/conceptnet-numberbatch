@@ -163,14 +163,14 @@ The multilingual data in ConceptNet Numberbatch represents 78 different language
 codes, though some have vocabularies with much more coverage than others. The following
 table lists the languages and their vocabulary size.
 
-You may notice a focus on even the smaller languages of Europe, and
-under-representation of widely-spoken languages from outside Europe, which is
-an effect of the availability of linguistic resources for these languages. We
-would like to change this, but it requires finding good source data for
+You may notice a focus on even the smaller and historical languages of Europe,
+and under-representation of widely-spoken languages from outside Europe, which
+is an effect of the availability of linguistic resources for these languages.
+We would like to change this, but it requires finding good source data for
 ConceptNet in these under-represented languages.
 
 | code | language                      | vocab size |
-|------|-------------------------------|------------|
+|:-----|:------------------------------|-----------:|
 | en   | English                       |     484557 |
 | fr   | French                        |     296987 |
 | de   | German                        |     129405 |
