@@ -52,14 +52,15 @@ If you build on this data, you should cite it. Here is a straightforward citatio
 
 In BibTeX form, the citation is:
 
-	@paper{speer2017conceptnet,
-		author = {Robert Speer and Joshua Chin and Catherine Havasi},
-		title = {ConceptNet 5.5: An Open Multilingual Graph of General Knowledge},
-		conference = {AAAI Conference on Artificial Intelligence},
-		year = {2017},
-		keywords = {ConceptNet; knowledge graph; word embeddings},
-		url = {http://aaai.org/ocs/index.php/AAAI/AAAI17/paper/view/14972}
-	}
+    @paper{speer2017conceptnet,
+        author = {Robert Speer and Joshua Chin and Catherine Havasi},
+        title = {ConceptNet 5.5: An Open Multilingual Graph of General Knowledge},
+        conference = {AAAI Conference on Artificial Intelligence},
+        year = {2017},
+        pages = {4444--4451},
+        keywords = {ConceptNet; knowledge graph; word embeddings},
+        url = {http://aaai.org/ocs/index.php/AAAI/AAAI17/paper/view/14972}
+    }
 
 This data is itself built on:
 
@@ -96,11 +97,11 @@ The first line of the file contains the dimensions of the matrix:
 Each line contains a term label followed by 300 floating-point numbers,
 separated by spaces:
 
-	/c/en/absolute_value -0.0847 -0.1316 -0.0800 -0.0708 -0.2514 -0.1687 -...
-	/c/en/absolute_zero 0.0056 -0.0051 0.0332 -0.1525 -0.0955 -0.0902 0.07...
-	/c/en/absoluteless 0.2740 0.0718 0.1548 0.1118 -0.1669 -0.0216 -0.0508...
-	/c/en/absolutely 0.0065 -0.1813 0.0335 0.0991 -0.1123 0.0060 -0.0009 0...
-	/c/en/absolutely_convergent 0.3752 0.1087 -0.1299 -0.0796 -0.2753 -0.1...
+    /c/en/absolute_value -0.0847 -0.1316 -0.0800 -0.0708 -0.2514 -0.1687 -...
+    /c/en/absolute_zero 0.0056 -0.0051 0.0332 -0.1525 -0.0955 -0.0902 0.07...
+    /c/en/absoluteless 0.2740 0.0718 0.1548 0.1118 -0.1669 -0.0216 -0.0508...
+    /c/en/absolutely 0.0065 -0.1813 0.0335 0.0991 -0.1123 0.0060 -0.0009 0...
+    /c/en/absolutely_convergent 0.3752 0.1087 -0.1299 -0.0796 -0.2753 -0.1...
 
 * [`numberbatch-17.02.txt.gz`][nb1702] contains this data in 77 languages.
 
