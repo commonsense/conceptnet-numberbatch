@@ -102,7 +102,7 @@ separated by spaces:
 	/c/en/absolutely 0.0065 -0.1813 0.0335 0.0991 -0.1123 0.0060 -0.0009 0...
 	/c/en/absolutely_convergent 0.3752 0.1087 -0.1299 -0.0796 -0.2753 -0.1...
 
-* [`numberbatch-17.02.txt.gz`][nb1702] contains this data in all languages.
+* [`numberbatch-17.02.txt.gz`][nb1702] contains this data in 77 languages.
 
 * [`numberbatch-en-17.02.txt.gz`][nb1702-en] contains just the English subset
   of the data, with the `/c/en/` prefix removed.
