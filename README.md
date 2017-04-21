@@ -1,9 +1,5 @@
 ![ConceptNet Numberbatch](conceptnet-numberbatch.png)
 
-The main location of this repository is on GitHub, which may contain updates:
-
-  http://github.com/commonsense/conceptnet-numberbatch
-
 
 ## The best word embeddings you can use
 
