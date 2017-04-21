@@ -1,8 +1,9 @@
-# conceptnet-numberbatch
+![ConceptNet Numberbatch](conceptnet-numberbatch.png)
 
 The main location of this repository is on GitHub, which may contain updates:
 
   http://github.com/commonsense/conceptnet-numberbatch
+
 
 ## The best word embeddings you can use
 
@@ -11,7 +12,7 @@ known as word embeddings) that can be used directly as a representation of word
 meanings or as a starting point for further machine learning.
 
 It is built using an ensemble that combines data from ConceptNet, word2vec,
-GloVe, and (as of this version) OpenSubtitles 2016, using a variation on
+GloVe, and (since 17.02) OpenSubtitles 2016, using a variation on
 retrofitting. It is described in the paper [ConceptNet 5.5: An Open
 Multilingual Graph of General Knowledge][cn55-paper], presented at AAAI 2017.
 
@@ -28,6 +29,19 @@ paper, "[Extending Word Embeddings with Multilingual Relational Knowledge][semev
 The code and papers were created as a research project of [Luminoso
 Technologies, Inc.][luminoso], by Rob Speer, Joshua Chin, Catherine Havasi, and
 Joanna Lowry-Duda.
+
+![Graph of performance on English evaluations](eval_graph.png)
+
+
+### Now with more fairness
+
+Word embeddings are prone to learn human-like stereotypes and prejudices.
+ConceptNet Numberbatch 17.04 counteracts this as part of its build process,
+leading to word vectors that are less prejudiced than competitors such as
+word2vec and GloVe. See [our blog post on reducing
+bias](https://blog.conceptnet.io/?p=642&shareadraft=58f92dfc71aad).
+
+![Graph of biases](bias_graph.png)
 
 
 ## License and attribution
@@ -74,12 +88,14 @@ This data is itself built on:
   - [word2vec][], by Tomas Mikolov and Google Research
 
   - Parallel text from [OpenSubtitles 2016][opensubtitles], by Pierre Lison
-    and Jörg Tiedemann
+    and Jörg Tiedemann, analyzed using [fastText][], by Piotr Bojanowski,
+    Edouard Grave, Armand Joulin, and Tomas Mikolov
 
 [conceptnet]: http://conceptnet5.media.mit.edu
 [glove]: http://nlp.stanford.edu/projects/glove/
 [word2vec]: https://code.google.com/archive/p/word2vec/
 [opensubtitles]: http://opus.lingfil.uu.se/OpenSubtitles2016.php
+[fastText]: https://github.com/facebookresearch/fastText
 
 
 ## Downloading the term vectors
@@ -103,9 +119,9 @@ separated by spaces:
     /c/en/absolutely 0.0065 -0.1813 0.0335 0.0991 -0.1123 0.0060 -0.0009 0...
     /c/en/absolutely_convergent 0.3752 0.1087 -0.1299 -0.0796 -0.2753 -0.1...
 
-* [`numberbatch-17.02.txt.gz`][nb1702] contains this data in 77 languages.
+* [`numberbatch-17.04.txt.gz`][nb1702] contains this data in 77 languages.
 
-* [`numberbatch-en-17.02.txt.gz`][nb1702-en] contains just the English subset
+* [`numberbatch-en-17.04.txt.gz`][nb1702-en] contains just the English subset
   of the data, with the `/c/en/` prefix removed.
 
 This data is sufficient to work as a drop-in replacement for word2vec or GloVe.
@@ -118,16 +134,26 @@ code](https://github.com/commonsense/conceptnet5).
 We have included here the code necessary to convert text into ConceptNet URIs,
 in `text_to_uri.py`.
 
-[nb1702]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.02.txt.gz
-[nb1702-en]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.02.txt.gz
+[nb1704]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.04.txt.gz
+[nb1704-en]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.04.txt.gz
 
 
 ## Previous versions
 
-The code and paper for the April 2016 version of this system, also referred to as
-the 'ConceptNet Vector Ensemble', are available in a branch of this repository:
+### February 2017
 
-  https://github.com/commonsense/conceptnet-numberbatch/tree/16.04
+Numberbatch 17.02 contains the updates that were made for SemEval and
+its following paper, but not the de-biasing.
+
+* [`numberbatch-17.02.txt.gz`][nb1702] contains the data in 77 languages.
+
+* [`numberbatch-en-17.02.txt.gz`][nb1702-en] contains just the English subset.
+
+[nb1702]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.02.txt.gz
+[nb1702-en]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.02.txt.gz
+
+
+### September 2016
 
 The September 2016 version (ConceptNet Numberbatch 16.09) is available in these files:
 
@@ -157,6 +183,14 @@ terms up in ConceptNet.
 [h5]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609.h5
 
 
+### April 2016
+
+The code and paper for the April 2016 version of this system, also referred to as
+the 'ConceptNet Vector Ensemble', are available in a branch of this repository:
+
+  https://github.com/commonsense/conceptnet-numberbatch/tree/16.04
+
+
 ## Language statistics
 
 The multilingual data in ConceptNet Numberbatch represents 78 different language
@@ -168,6 +202,9 @@ and under-representation of widely-spoken languages from outside Europe, which
 is an effect of the availability of linguistic resources for these languages.
 We would like to change this, but it requires finding good source data for
 ConceptNet in these under-represented languages.
+
+These vocabulary sizes were last updated for ConceptNet Numberbatch 17.02,
+but they should not have changed significantly in 17.04.
 
 | code | language                      | vocab size |
 |:-----|:------------------------------|-----------:|
