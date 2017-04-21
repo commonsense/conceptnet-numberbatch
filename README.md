@@ -30,7 +30,7 @@ The code and papers were created as a research project of [Luminoso
 Technologies, Inc.][luminoso], by Rob Speer, Joshua Chin, Catherine Havasi, and
 Joanna Lowry-Duda.
 
-![Graph of performance on English evaluations](eval_graph.png)
+![Graph of performance on English evaluations](eval-graph.png)
 
 
 ### Now with more fairness
@@ -41,7 +41,7 @@ leading to word vectors that are less prejudiced than competitors such as
 word2vec and GloVe. See [our blog post on reducing
 bias](https://blog.conceptnet.io/?p=642&shareadraft=58f92dfc71aad).
 
-![Graph of biases](bias_graph.png)
+![Graph of biases](bias-graph.png)
 
 
 ## License and attribution
@@ -287,3 +287,8 @@ but they should not have changed significantly in 17.04.
 | ta   | Tamil                         |        925 |
 | hsb  | Upper Sorbian                 |        740 |
 
+## Image credit
+
+The otter logo was designed by [Christy
+Presler](https://thenounproject.com/cnpresler/) for The Noun Project, and is
+used under a Creative Commons Attribution license.
