@@ -35,7 +35,7 @@ Word embeddings are prone to learn human-like stereotypes and prejudices.
 ConceptNet Numberbatch 17.04 counteracts this as part of its build process,
 leading to word vectors that are less prejudiced than competitors such as
 word2vec and GloVe. See [our blog post on reducing
-bias](https://blog.conceptnet.io/?p=642&shareadraft=58f92dfc71aad).
+bias](https://blog.conceptnet.io/2017/04/24/conceptnet-numberbatch-17-04-better-less-stereotyped-word-vectors/).
 
 ![Graph of biases](bias-graph.png)
 
