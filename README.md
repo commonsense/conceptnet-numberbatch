@@ -115,10 +115,15 @@ separated by spaces:
     /c/en/absolutely 0.0065 -0.1813 0.0335 0.0991 -0.1123 0.0060 -0.0009 0...
     /c/en/absolutely_convergent 0.3752 0.1087 -0.1299 -0.0796 -0.2753 -0.1...
 
-* [`numberbatch-17.04.txt.gz`][nb1704] contains this data in 77 languages.
+* [`numberbatch-17.04.txt.gz`][nb1704] is the multilingual version, containing
+  this data in 77 languages.
 
-* [`numberbatch-en-17.04.txt.gz`][nb1704-en] contains just the English subset
+* [`numberbatch-en-17.04b.txt.gz`][nb1704-en] contains just the English subset
   of the data, with the `/c/en/` prefix removed.
+  
+(**Note:** A previous version of the English-only file was corrupted; its labels
+were aligned with the wrong vectors. It has now been replaced with the "17.04b"
+version. This did not affect the multilingual version.)
 
 This data is sufficient to work as a drop-in replacement for word2vec or GloVe.
 However, to achieve the best results and reproduce our performance at SemEval,
@@ -131,7 +136,7 @@ We have included here the code necessary to convert text into ConceptNet URIs,
 in `text_to_uri.py`.
 
 [nb1704]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.04.txt.gz
-[nb1704-en]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.04.txt.gz
+[nb1704-en]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.04b.txt.gz
 
 
 ## Previous versions
