@@ -133,7 +133,7 @@ words, including those that are out-of-vocabulary. You'll find this in the
 code](https://github.com/commonsense/conceptnet5).
 
 [`mini.h5`][nbmini] is a compact, HDF5 version of the word vector data, with a smaller vocabulary
-and 8-bit precision. This is the default file loaded `conceptnet5.vectors`, and it powers
+and 8-bit precision. This is the default file loaded by `conceptnet5.vectors`, and it powers
 the [ConceptNet relatedness API](https://github.com/commonsense/conceptnet5/wiki/API#looking-up-related-terms).
   
 We have included here the code necessary to convert text into ConceptNet URIs,
