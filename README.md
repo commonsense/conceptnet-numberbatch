@@ -132,12 +132,16 @@ words, including those that are out-of-vocabulary. You'll find this in the
 `conceptnet5.vectors` sub-package of the [ConceptNet
 code](https://github.com/commonsense/conceptnet5).
 
+[`mini.h5`][nbmini] is a compact, HDF5 version of the word vector data, with a smaller vocabulary
+and 8-bit precision. This is the default file loaded `conceptnet5.vectors`, and it powers
+the [ConceptNet relatedness API](https://github.com/commonsense/conceptnet5/wiki/API#looking-up-related-terms).
+  
 We have included here the code necessary to convert text into ConceptNet URIs,
 in `text_to_uri.py`.
 
 [nb1704]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.04.txt.gz
 [nb1704-en]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.04b.txt.gz
-
+[nbmini]: http://conceptnet.s3.amazonaws.com/precomputed-data/2016/numberbatch/17.05/mini.h5
 
 ## Previous versions
 
