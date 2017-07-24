@@ -7,10 +7,17 @@ ConceptNet Numberbatch consists of state-of-the-art semantic vectors (also
 known as word embeddings) that can be used directly as a representation of word
 meanings or as a starting point for further machine learning.
 
+ConceptNet Numberbatch is part of the [ConceptNet](http://conceptnet.io) open data
+project. ConceptNet provides lots of ways to compute with word meanings, one of which
+is word embeddings. ConceptNet Numberbatch is a snapshot of just the word embeddings.
+
 It is built using an ensemble that combines data from ConceptNet, word2vec,
-GloVe, and (since 17.02) OpenSubtitles 2016, using a variation on
-retrofitting. It is described in the paper [ConceptNet 5.5: An Open
-Multilingual Graph of General Knowledge][cn55-paper], presented at AAAI 2017.
+GloVe, and OpenSubtitles 2016, using a variation on retrofitting. It is
+described in the paper [ConceptNet 5.5: An Open Multilingual Graph of General
+Knowledge][cn55-paper], presented at AAAI 2017.
+
+
+### Evaluation and publications
 
 ConceptNet Numberbatch took first place in both subtasks at SemEval 2017 task
 2, "[Multilingual and Cross-lingual Semantic Word Similarity][semeval17-2]".
@@ -38,6 +45,78 @@ word2vec and GloVe. See [our blog post on reducing
 bias](https://blog.conceptnet.io/2017/04/24/conceptnet-numberbatch-17-04-better-less-stereotyped-word-vectors/).
 
 ![Graph of biases](bias-graph.png)
+
+
+## Code
+
+Since 2016, the code for building ConceptNet Numberbatch is part of the [ConceptNet
+code base][conceptnet5], in the `conceptnet5.vectors` package.
+
+A preliminary paper we put on arXiV in April 2016 described the ConceptNet
+Vector Ensemble, a previous version of this system. The code for that version
+is still available in the `16.04` branch:
+
+  https://github.com/commonsense/conceptnet-numberbatch/tree/16.04
+
+The only code contained in _this_ repository is `text_to_uri.py`, which normalizes natural-language text into
+the ConceptNet URI representation, allowing you to look up rows in these tables without requiring the entire
+ConceptNet codebase. For all other purposes, please refer to the [ConceptNet code][conceptnet5].
+
+[conceptnet5]: https://github.com/commonsense/conceptnet5
+
+
+## Downloads
+
+[ConceptNet Numberbatch 17.06][nb1706-main] is the current recommended download.
+
+This table lists the downloads and formats available for multiple recent versions:
+
+| Version | Multilingual                            | English-only                              | HDF5                         |
+| ------- | --------------------------------------- | ----------------------------------------- | ---------------------------- |
+| 17.06   | [numberbatch-17.06.txt.gz][nb1706-main] | [numberbatch-en-17.06.txt.gz][nb1706-en]  | [17.06/mini.h5][nb1706-mini] |
+| 17.04   | [numberbatch-17.04.txt.gz][nb1704-main] | [numberbatch-en-17.04b.txt.gz][nb1704-en] | [17.05/mini.h5][nb1704-mini] |
+| 17.02   | [numberbatch-17.02.txt.gz][nb1704-main] | [numberbatch-en-17.02.txt.gz][nb1702-en]  |                              |
+| 16.09   | [conceptnet-numberbatch-201609_uris_main.txt.gz][nb1609-main] | [conceptnet-numberbatch-201609_en_main.txt.gz][nb1609-en] | [conceptnet-numberbatch-201609.h5][nb1609-h5] |
+
+The 16.09 version was the version published at AAAI 2017. You can reproduce its results using a Docker snapshot of the conceptnet5 repository.
+See the instructions on the [ConceptNet wiki](https://github.com/commonsense/conceptnet5/wiki/Running-your-own-copy#reproducing-the-word-embedding-evaluation).
+
+[nb1706-main]: https://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.06.txt.gz
+[nb1706-en]: https://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.06.txt.gz
+[nb1706-mini]: http://conceptnet.s3.amazonaws.com/precomputed-data/2016/numberbatch/17.06/mini.h5
+
+[nb1704-main]: https://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.04.txt.gz
+[nb1704-en]: https://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.04b.txt.gz
+[nb1704-mini]: http://conceptnet.s3.amazonaws.com/precomputed-data/2016/numberbatch/17.05/mini.h5
+
+[nb1702-main]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.02.txt.gz
+[nb1702-en]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.02.txt.gz
+
+[nb1609-main]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_uris_main.txt.gz
+[nb1609-en]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_en_main.txt.gz
+[nb1609-en-extra]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_en_extra.txt.gz
+[nb1609-h5]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609.h5
+
+The .txt.gz files of term vectors are in the text format used by word2vec, GloVe, and fastText.
+
+The first line of the file contains the dimensions of the matrix:
+
+    1984681 300
+
+Each line contains a term label followed by 300 floating-point numbers,
+separated by spaces:
+
+    /c/en/absolute_value -0.0847 -0.1316 -0.0800 -0.0708 -0.2514 -0.1687 -...
+    /c/en/absolute_zero 0.0056 -0.0051 0.0332 -0.1525 -0.0955 -0.0902 0.07...
+    /c/en/absoluteless 0.2740 0.0718 0.1548 0.1118 -0.1669 -0.0216 -0.0508...
+    /c/en/absolutely 0.0065 -0.1813 0.0335 0.0991 -0.1123 0.0060 -0.0009 0...
+    /c/en/absolutely_convergent 0.3752 0.1087 -0.1299 -0.0796 -0.2753 -0.1...
+
+The HDF5 files are the format that ConceptNet uses internally. They are data
+tables that can be loaded into Python using a library such as `pandas` or
+`pytables`. The "mini.h5" files trade off a little bit of accuracy for a lot of
+memory savings, taking up less than 150 MB in RAM, and are used to power the
+[ConceptNet API](https://github.com/commonsense/conceptnet5/wiki/API).
 
 
 ## License and attribution
@@ -94,108 +173,6 @@ This data is itself built on:
 [fastText]: https://github.com/facebookresearch/fastText
 
 
-## Downloading the term vectors
-
-The `*.txt.gz` files of term vectors are too large to include in the GitHub
-repository for this package.  You should follow the links provided here to
-download them.
-
-The term vectors are in the text format used by word2vec, GloVe, and fastText.
-
-The first line of the file contains the dimensions of the matrix:
-
-    1984681 300
-
-Each line contains a term label followed by 300 floating-point numbers,
-separated by spaces:
-
-    /c/en/absolute_value -0.0847 -0.1316 -0.0800 -0.0708 -0.2514 -0.1687 -...
-    /c/en/absolute_zero 0.0056 -0.0051 0.0332 -0.1525 -0.0955 -0.0902 0.07...
-    /c/en/absoluteless 0.2740 0.0718 0.1548 0.1118 -0.1669 -0.0216 -0.0508...
-    /c/en/absolutely 0.0065 -0.1813 0.0335 0.0991 -0.1123 0.0060 -0.0009 0...
-    /c/en/absolutely_convergent 0.3752 0.1087 -0.1299 -0.0796 -0.2753 -0.1...
-
-* [`numberbatch-17.04.txt.gz`][nb1704] is the multilingual version, containing
-  this data in 77 languages.
-
-* [`numberbatch-en-17.04b.txt.gz`][nb1704-en] contains just the English subset
-  of the data, with the `/c/en/` prefix removed.
-  
-(**Note:** A previous version of the English-only file was corrupted; its labels
-were aligned with the wrong vectors. It has now been replaced with the "17.04b"
-version. This did not affect the multilingual version.)
-
-This data is sufficient to work as a drop-in replacement for word2vec or GloVe.
-However, to achieve the best results and reproduce our performance at SemEval,
-you will also need the ConceptNet database and its strategy for looking up
-words, including those that are out-of-vocabulary. You'll find this in the
-`conceptnet5.vectors` sub-package of the [ConceptNet
-code](https://github.com/commonsense/conceptnet5).
-
-[`mini.h5`][nbmini] is a compact, HDF5 version of the word vector data, with a smaller vocabulary
-and 8-bit precision. This is the default file loaded by `conceptnet5.vectors`, and it powers
-the [ConceptNet relatedness API](https://github.com/commonsense/conceptnet5/wiki/API#looking-up-related-terms).
-  
-We have included here the code necessary to convert text into ConceptNet URIs,
-in `text_to_uri.py`.
-
-[nb1704]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.04.txt.gz
-[nb1704-en]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.04b.txt.gz
-[nbmini]: http://conceptnet.s3.amazonaws.com/precomputed-data/2016/numberbatch/17.05/mini.h5
-
-## Previous versions
-
-### February 2017
-
-Numberbatch 17.02 contains the updates that were made for SemEval and
-its following paper, but not the de-biasing.
-
-* [`numberbatch-17.02.txt.gz`][nb1702] contains the data in 77 languages.
-
-* [`numberbatch-en-17.02.txt.gz`][nb1702-en] contains just the English subset.
-
-[nb1702]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.02.txt.gz
-[nb1702-en]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.02.txt.gz
-
-
-### September 2016
-
-The September 2016 version (ConceptNet Numberbatch 16.09) is available in these files:
-
-* [`conceptnet-numberbatch-201609_uris_main.txt.gz`][uris_main] (1928481 × 300)
-  contains terms from many languages, specified by their complete ConceptNet
-  URI (the strings starting with `/c/en/`, for example).
-
-* [`conceptnet-numberbatch-201609_en_main.txt.gz`][en_main] (426572 × 300)
-  contains only English terms, and strips the `/c/en/` prefix to provide just
-  the term text.  This form is the most compatible with other systems, as long
-  as you only want English.
-
-* [`conceptnet-numberbatch-201609_en_extra.txt.gz`][en_extra] (233488 × 300)
-  contains additional single words of English whose vectors could be inferred
-  as the average of their neighbors in ConceptNet.
-
-* [`conceptnet-numberbatch-201609.h5`][h5] contains the data in
-  its native HDF5 format, which can be loaded with the Python library `pandas`.
-
-If you have the ConceptNet database, the `extra` data should be redundant,
-but it provides a convenient way to expand the vocabulary without looking
-terms up in ConceptNet.
-
-[uris_main]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_uris_main.txt.gz
-[en_main]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_en_main.txt.gz
-[en_extra]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_en_extra.txt.gz
-[h5]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609.h5
-
-
-### April 2016
-
-The code and paper for the April 2016 version of this system, also referred to as
-the 'ConceptNet Vector Ensemble', are available in a branch of this repository:
-
-  https://github.com/commonsense/conceptnet-numberbatch/tree/16.04
-
-
 ## Language statistics
 
 The multilingual data in ConceptNet Numberbatch represents 78 different language
@@ -208,8 +185,7 @@ is an effect of the availability of linguistic resources for these languages.
 We would like to change this, but it requires finding good source data for
 ConceptNet in these under-represented languages.
 
-These vocabulary sizes were last updated for ConceptNet Numberbatch 17.02,
-but they should not have changed significantly in 17.04.
+These vocabulary sizes were last updated for ConceptNet Numberbatch 17.02.
 
 | code | language                      | vocab size |
 |:-----|:------------------------------|-----------:|
