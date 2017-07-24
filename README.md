@@ -76,7 +76,7 @@ This table lists the downloads and formats available for multiple recent version
 | 17.06   | [numberbatch-17.06.txt.gz][nb1706-main] | [numberbatch-en-17.06.txt.gz][nb1706-en]  | [17.06/mini.h5][nb1706-mini] |
 | 17.04   | [numberbatch-17.04.txt.gz][nb1704-main] | [numberbatch-en-17.04b.txt.gz][nb1704-en] | [17.05/mini.h5][nb1704-mini] |
 | 17.02   | [numberbatch-17.02.txt.gz][nb1704-main] | [numberbatch-en-17.02.txt.gz][nb1702-en]  |                              |
-| 16.09   | [conceptnet-numberbatch-201609_uris_main.txt.gz][nb1609-main] | [conceptnet-numberbatch-201609_en_main.txt.gz][nb1609-en] | [conceptnet-numberbatch-201609.h5][nb1609-h5] |
+| 16.09   |                                         |                                           | [16.09/numberbatch.h5][nb1609-h5] |
 
 The 16.09 version was the version published at AAAI 2017. You can reproduce its results using a Docker snapshot of the conceptnet5 repository.
 See the instructions on the [ConceptNet wiki](https://github.com/commonsense/conceptnet5/wiki/Running-your-own-copy#reproducing-the-word-embedding-evaluation).
@@ -92,10 +92,8 @@ See the instructions on the [ConceptNet wiki](https://github.com/commonsense/con
 [nb1702-main]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.02.txt.gz
 [nb1702-en]: http://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.02.txt.gz
 
-[nb1609-main]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_uris_main.txt.gz
-[nb1609-en]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_en_main.txt.gz
-[nb1609-en-extra]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609_en_extra.txt.gz
-[nb1609-h5]: http://conceptnet5.media.mit.edu/downloads/conceptnet-numberbatch-16.09/conceptnet-numberbatch-201609.h5
+[nb1609-h5]: http://conceptnet.s3.amazonaws.com/precomputed-data/2016/numberbatch/16.09/numberbatch.h5
+
 
 The .txt.gz files of term vectors are in the text format used by word2vec, GloVe, and fastText.
 
@@ -166,7 +164,7 @@ This data is itself built on:
     and Jörg Tiedemann, analyzed using [fastText][], by Piotr Bojanowski,
     Edouard Grave, Armand Joulin, and Tomas Mikolov
 
-[conceptnet]: http://conceptnet5.media.mit.edu
+[conceptnet]: http://conceptnet.io/
 [glove]: http://nlp.stanford.edu/projects/glove/
 [word2vec]: https://code.google.com/archive/p/word2vec/
 [opensubtitles]: http://opus.lingfil.uu.se/OpenSubtitles2016.php
