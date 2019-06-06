@@ -139,14 +139,12 @@ If you build on this data, you should cite it. Here is a straightforward citatio
 
 In BibTeX form, the citation is:
 
-    @paper{speer2017conceptnet,
-        author = {Robyn Speer and Joshua Chin and Catherine Havasi},
-        title = {ConceptNet 5.5: An Open Multilingual Graph of General Knowledge},
-        conference = {AAAI Conference on Artificial Intelligence},
-        year = {2017},
-        pages = {4444--4451},
-        keywords = {ConceptNet; knowledge graph; word embeddings},
-        url = {http://aaai.org/ocs/index.php/AAAI/AAAI17/paper/view/14972}
+    @inproceedings{speer2017conceptnet,
+	    title = {{ConceptNet} 5.5: An Open Multilingual Graph of General Knowledge},
+	    url = {http://aaai.org/ocs/index.php/AAAI/AAAI17/paper/view/14972},
+	    author = {Speer, Robyn and Chin, Joshua and Havasi, Catherine},
+	    year = {2017},
+	    pages = {4444--4451}
     }
 
 This data is itself built on:
