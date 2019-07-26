@@ -1,23 +1,35 @@
 ![ConceptNet Numberbatch](conceptnet-numberbatch.png)
 
 
-## The best word embeddings you can use
+## The best pre-computed word embeddings you can use
 
-ConceptNet Numberbatch consists of state-of-the-art semantic vectors (also
-known as word embeddings) that can be used directly as a representation of word
-meanings or as a starting point for further machine learning.
+ConceptNet Numberbatch is a set of semantic vectors (also known as word embeddings)
+than can be used directly as a representation of word meanings or as a starting point
+for further machine learning.
 
-ConceptNet Numberbatch is part of the [ConceptNet](http://conceptnet.io) open data
-project. ConceptNet provides lots of ways to compute with word meanings, one of which
-is word embeddings. ConceptNet Numberbatch is a snapshot of just the word embeddings.
+ConceptNet Numberbatch is part of the [ConceptNet](http://conceptnet.io) open
+data project. ConceptNet Numberbatch is a snapshot of just the word embeddings.
 
-It is built using an ensemble that combines data from ConceptNet, word2vec,
+ConceptNet provides lots of ways to compute with word meanings,
+one of which is word embeddings. These embeddings benefit from the fact that
+they have semi-structured, common sense knowledge from ConceptNet, giving them
+a way to learn about words that isn't _just_ observing them in context.
+
+Numberbatch is built using an ensemble that combines data from ConceptNet, word2vec,
 GloVe, and OpenSubtitles 2016, using a variation on retrofitting. It is
 described in the paper [ConceptNet 5.5: An Open Multilingual Graph of General
 Knowledge][cn55-paper], presented at AAAI 2017.
 
+Unlike most embeddings, ConceptNet Numberbatch is **multilingual** from the
+ground up.  Words in different languages share a common semantic space, and
+that semantic space is informed by all of the languages.
 
 ### Evaluation and publications
+
+ConceptNet Numberbatch can be seen as a replacement for other precomputed
+embeddings, such as word2vec and GloVe, that do not include the graph-style
+knowledge in ConceptNet. Numberbatch outperforms these datasets on benchmarks
+of word similarity.
 
 ConceptNet Numberbatch took first place in both subtasks at SemEval 2017 task
 2, "[Multilingual and Cross-lingual Semantic Word Similarity][semeval17-2]".
@@ -30,7 +42,7 @@ paper, "[Extending Word Embeddings with Multilingual Relational Knowledge][semev
 [semeval-paper]: https://arxiv.org/abs/1704.03560
 
 The code and papers were created as a research project of [Luminoso
-Technologies, Inc.][luminoso], by Rob Speer, Joshua Chin, Catherine Havasi, and
+Technologies, Inc.][luminoso], by Robyn Speer, Joshua Chin, Catherine Havasi, and
 Joanna Lowry-Duda.
 
 ![Graph of performance on English evaluations](eval-graph.png)
