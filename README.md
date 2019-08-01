@@ -8,12 +8,13 @@ than can be used directly as a representation of word meanings or as a starting 
 for further machine learning.
 
 ConceptNet Numberbatch is part of the [ConceptNet](http://conceptnet.io) open
-data project. ConceptNet Numberbatch is a snapshot of just the word embeddings.
+data project. ConceptNet is a knowledge graph that provides lots of ways to
+compute with word meanings, one of which is word embeddings, while ConceptNet
+Numberbatch is a snapshot of just the word embeddings.
 
-ConceptNet provides lots of ways to compute with word meanings,
-one of which is word embeddings. These embeddings benefit from the fact that
-they have semi-structured, common sense knowledge from ConceptNet, giving them
-a way to learn about words that isn't _just_ observing them in context.
+These embeddings benefit from the fact that they have semi-structured, common
+sense knowledge from ConceptNet, giving them a way to learn about words that
+isn't _just_ observing them in context.
 
 Numberbatch is built using an ensemble that combines data from ConceptNet, word2vec,
 GloVe, and OpenSubtitles 2016, using a variation on retrofitting. It is
@@ -47,17 +48,23 @@ Joanna Lowry-Duda.
 
 ![Graph of performance on English evaluations](eval-graph.png)
 
-
 ### Now with more fairness
 
 Word embeddings are prone to learn human-like stereotypes and prejudices.
-ConceptNet Numberbatch 17.04 counteracts this as part of its build process,
-leading to word vectors that are less prejudiced than competitors such as
-word2vec and GloVe. See [our blog post on reducing
+ConceptNet Numberbatch 17.04 and later counteract this as part of the build
+process, leading to word vectors that are less prejudiced than competitors such
+as word2vec and GloVe. See [our blog post on reducing
 bias](https://blog.conceptnet.io/2017/04/24/conceptnet-numberbatch-17-04-better-less-stereotyped-word-vectors/).
 
 ![Graph of biases](bias-graph.png)
 
+A paper by Chris Sweeney and Maryam Najafian, ["A Transparent Framework for
+Evaluating Unintended Demographic Bias in Word Embeddings"][sweeney-paper],
+independently evaluates bias in precomputed word embeddings, and finds that
+ConceptNet Numberbatch is less likely than GloVe to inherently lead to
+demographic discrimination.
+
+[sweeney-paper]: (https://www.aclweb.org/anthology/P19-1162)
 
 ## Code
 
@@ -70,28 +77,50 @@ is still available in the `16.04` branch:
 
   https://github.com/commonsense/conceptnet-numberbatch/tree/16.04
 
-The only code contained in _this_ repository is `text_to_uri.py`, which normalizes natural-language text into
-the ConceptNet URI representation, allowing you to look up rows in these tables without requiring the entire
-ConceptNet codebase. For all other purposes, please refer to the [ConceptNet code][conceptnet5].
+The only code contained in _this_ repository is `text_to_uri.py`, which
+normalizes natural-language text into the ConceptNet URI representation,
+allowing you to look up rows in these tables without requiring the entire
+ConceptNet codebase. For all other purposes, please refer to the [ConceptNet
+code][conceptnet5].
 
 [conceptnet5]: https://github.com/commonsense/conceptnet5
 
 
+## Out-of-vocabulary strategy
+
+ConceptNet Numberbatch is evaluated with an out-of-vocabulary strategy that
+helps its performance in the presence of unfamiliar words. The strategy is
+implemented in the [ConceptNet code base][conceptnet5]. It can be summarized
+as follows:
+
+- Given an unknown word whose language is not English, try looking up the
+  equivalently-spelled word in the English embeddings (because English words
+  tend to end up in text of all languages).
+- Given an unknown word, remove a letter from the end, and see if that is
+  a prefix of known words. If so, average the embeddings of those known words.
+- If the prefix is still unknown, continue removing letters from the end until
+  a known prefix is found. Give up when a single character remains.
+
+
 ## Downloads
 
-[ConceptNet Numberbatch 17.06][nb1706-main] is the current recommended download.
+[ConceptNet Numberbatch 19.08][nb1908-main] is the current recommended download.
 
 This table lists the downloads and formats available for multiple recent versions:
 
-| Version | Multilingual                            | English-only                              | HDF5                         |
-| ------- | --------------------------------------- | ----------------------------------------- | ---------------------------- |
-| 17.06   | [numberbatch-17.06.txt.gz][nb1706-main] | [numberbatch-en-17.06.txt.gz][nb1706-en]  | [17.06/mini.h5][nb1706-mini] |
-| 17.04   | [numberbatch-17.04.txt.gz][nb1704-main] | [numberbatch-en-17.04b.txt.gz][nb1704-en] | [17.05/mini.h5][nb1704-mini] |
-| 17.02   | [numberbatch-17.02.txt.gz][nb1704-main] | [numberbatch-en-17.02.txt.gz][nb1702-en]  |                              |
-| 16.09   |                                         |                                           | [16.09/numberbatch.h5][nb1609-h5] |
+| Version  | Multilingual                            | English-only                              | HDF5                         |
+| -------- | --------------------------------------- | ----------------------------------------- | ---------------------------- |
+| **19.08**| [numberbatch-19.08.txt.gz][nb1908-main] | [numberbatch-en-19.08.txt.gz][nb1908-en]  |                              |
+| 17.06    | [numberbatch-17.06.txt.gz][nb1706-main] | [numberbatch-en-17.06.txt.gz][nb1706-en]  | [17.06/mini.h5][nb1706-mini] |
+| 17.04    | [numberbatch-17.04.txt.gz][nb1704-main] | [numberbatch-en-17.04b.txt.gz][nb1704-en] | [17.05/mini.h5][nb1704-mini] |
+| 17.02    | [numberbatch-17.02.txt.gz][nb1704-main] | [numberbatch-en-17.02.txt.gz][nb1702-en]  |                              |
+| 16.09    |                                         |                                           | [16.09/numberbatch.h5][nb1609-h5] |
 
 The 16.09 version was the version published at AAAI 2017. You can reproduce its results using a Docker snapshot of the conceptnet5 repository.
 See the instructions on the [ConceptNet wiki](https://github.com/commonsense/conceptnet5/wiki/Running-your-own-copy#reproducing-the-word-embedding-evaluation).
+
+[nb1908-main]: https://conceptnet.s3.amazonaws.com/downloads/2019/numberbatch/numberbatch-19.08.txt.gz
+[nb1908-en]: https://conceptnet.s3.amazonaws.com/downloads/2019/numberbatch/numberbatch-en-19.08.txt.gz
 
 [nb1706-main]: https://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.06.txt.gz
 [nb1706-en]: https://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.06.txt.gz
@@ -111,7 +140,7 @@ The .txt.gz files of term vectors are in the text format used by word2vec, GloVe
 
 The first line of the file contains the dimensions of the matrix:
 
-    1984681 300
+    9161912 300
 
 Each line contains a term label followed by 300 floating-point numbers,
 separated by spaces:
@@ -124,7 +153,9 @@ separated by spaces:
 
 The HDF5 files are the format that ConceptNet uses internally. They are data
 tables that can be loaded into Python using a library such as `pandas` or
-`pytables`. The "mini.h5" files trade off a little bit of accuracy for a lot of
+`pytables`.
+
+The "mini.h5" files trade off a little bit of accuracy for a lot of
 memory savings, taking up less than 150 MB in RAM, and are used to power the
 [ConceptNet API](https://github.com/commonsense/conceptnet5/wiki/API).
 
@@ -152,16 +183,16 @@ If you build on this data, you should cite it. Here is a straightforward citatio
 In BibTeX form, the citation is:
 
     @inproceedings{speer2017conceptnet,
-	    title = {{ConceptNet} 5.5: An Open Multilingual Graph of General Knowledge},
-	    url = {http://aaai.org/ocs/index.php/AAAI/AAAI17/paper/view/14972},
-	    author = {Speer, Robyn and Chin, Joshua and Havasi, Catherine},
-	    year = {2017},
-	    pages = {4444--4451}
+        title = {{ConceptNet} 5.5: An Open Multilingual Graph of General Knowledge},
+        url = {http://aaai.org/ocs/index.php/AAAI/AAAI17/paper/view/14972},
+        author = {Speer, Robyn and Chin, Joshua and Havasi, Catherine},
+        year = {2017},
+        pages = {4444--4451}
     }
 
 This data is itself built on:
 
-  - [ConceptNet 5.5][conceptnet], which contains data from Wiktionary,
+  - [ConceptNet 5.7][conceptnet], which contains data from Wiktionary,
     WordNet, and many contributors to Open Mind Common Sense projects,
     edited by Robyn Speer
 
@@ -193,88 +224,92 @@ is an effect of the availability of linguistic resources for these languages.
 We would like to change this, but it requires finding good source data for
 ConceptNet in these under-represented languages.
 
-These vocabulary sizes were last updated for ConceptNet Numberbatch 17.02.
+Because Numberbatch contains word forms, inflected languages end up with larger
+vocabularies.
 
-| code | language                      | vocab size |
-|:-----|:------------------------------|-----------:|
-| en   | English                       |     484557 |
-| fr   | French                        |     296987 |
-| de   | German                        |     129405 |
-| ja   | Japanese                      |     121683 |
-| it   | Italian                       |      91828 |
-| fi   | Finnish                       |      56900 |
-| zh   | Chinese (Simp. + Trad.)       |      50185 |
-| pt   | Portuguese                    |      47592 |
-| la   | Latin                         |      46720 |
-| nl   | Dutch                         |      45245 |
-| es   | Spanish                       |      44756 |
-| ru   | Russian                       |      37503 |
-| sh   | Bosnian + Croatian + Serbian  |      31516 |
-| sv   | Swedish                       |      28519 |
-| cs   | Czech                         |      25934 |
-| pl   | Polish                        |      22388 |
-| ms   | Malay + Indonesian            |      20981 |
-| bg   | Bulgarian                     |      20870 |
-| ca   | Catalan                       |      20391 |
-| eo   | Esperanto                     |      18820 |
-| hu   | Hungarian                     |      17512 |
-| el   | Greek                         |      16925 |
-| no   | Norwegian (Bokmål + Nynorsk)  |      14591 |
-| is   | Icelandic                     |      12645 |
-| sl   | Slovenian                     |      11457 |
-| ro   | Romanian                      |      10873 |
-| ga   | Irish (Gaelic)                |      10865 |
-| vi   | Vietnamese                    |      10341 |
-| lv   | Latvian                       |      10129 |
-| grc  | Ancient Greek                 |       9897 |
-| tr   | Turkish                       |       9878 |
-| da   | Danish                        |       9702 |
-| ar   | Arabic                        |       9293 |
-| fa   | Persian (Farsi)               |       8623 |
-| ko   | Korean                        |       7770 |
-| hy   | Armenian                      |       7593 |
-| eu   | Basque                        |       7436 |
-| fro  | Old French                    |       7361 |
-| io   | Ido                           |       7316 |
-| oc   | Occitan                       |       7000 |
-| gd   | Scottish Gaelic               |       6851 |
-| gl   | Galician                      |       6380 |
-| nrf  | Jèrriais / Guernésiais        |       6190 |
-| th   | Thai                          |       6133 |
-| ka   | Georgian                      |       6130 |
-| he   | Hebrew                        |       5940 |
-| sq   | Albanian                      |       5511 |
-| fo   | Faroese                       |       4761 |
-| te   | Telugu                        |       4617 |
-| mk   | Macedonian                    |       4369 |
-| se   | Northern Sami                 |       4328 |
-| mul  | (Multilingual conventions)    |       4316 |
-| et   | Estonian                      |       4122 |
-| gv   | Manx                          |       4071 |
-| sk   | Slovak                        |       4059 |
-| xcl  | Classical Armenian            |       4033 |
-| hi   | Hindi                         |       3979 |
-| af   | Afrikaans                     |       3753 |
-| ang  | Old English                   |       3661 |
-| lt   | Lithuanian                    |       3486 |
-| ast  | Asturian                      |       3429 |
-| uk   | Ukrainian                     |       3073 |
-| cy   | Welsh                         |       2759 |
-| nv   | Navajo                        |       2698 |
-| mg   | Malagasy                      |       2696 |
-| kk   | Kazakh                        |       2462 |
-| rup  | Aromanian                     |       2317 |
-| sa   | Sanskrit                      |       2257 |
-| non  | Old Norse                     |       2247 |
-| vo   | Volapük                       |       2115 |
-| be   | Belarusian                    |       2097 |
-| sw   | Swahili                       |       1995 |
-| ur   | Urdu                          |       1834 |
-| ku   | Kurdish                       |       1813 |
-| fil  | Filipino (Tagalog)            |       1571 |
-| az   | Azeri                         |        976 |
-| ta   | Tamil                         |        925 |
-| hsb  | Upper Sorbian                 |        740 |
+These vocabulary sizes were updated for ConceptNet Numberbatch 19.08.
+
+| code | language                       | vocab size |
+|:-----|:-------------------------------|-----------:|
+|   fr | French                         |    1388686 |
+|   la | Latin                          |     855294 |
+|   es | Spanish                        |     651859 |
+|   de | German                         |     594456 |
+|   it | Italian                        |     557743 |
+|   en | English                        |     516782 |
+|   ru | Russian                        |     455325 |
+|   zh | Chinese                        |     307441 |
+|   fi | Finnish                        |     267307 |
+|   pt | Portuguese                     |     262904 |
+|   ja | Japanese                       |     256648 |
+|   nl | Dutch                          |     190221 |
+|   bg | Bulgarian                      |     178508 |
+|   sv | Swedish                        |     167321 |
+|   pl | Polish                         |     152949 |
+|   no | Norwegian Bokmål               |     105689 |
+|   eo | Esperanto                      |      96255 |
+|   th | Thai                           |      95342 |
+|   sl | Slovenian                      |      91134 |
+|   ms | Malay                          |      90554 |
+|   cs | Czech                          |      88613 |
+|   ca | Catalan                        |      87508 |
+|   ar | Arabic                         |      85325 |
+|   hu | Hungarian                      |      74384 |
+|   se | Northern Sami                  |      67601 |
+|   sh | Serbian                        |      66746 |
+|   el | Greek                          |      65905 |
+|   gl | Galician                       |      59006 |
+|   da | Danish                         |      57119 |
+|   fa | Persian                        |      53984 |
+|   ro | Romanian                       |      51437 |
+|   tr | Turkish                        |      51308 |
+|   is | Icelandic                      |      48639 |
+|   eu | Basque                         |      44151 |
+|   ko | Korean                         |      42106 |
+|   vi | Vietnamese                     |      39802 |
+|   ga | Irish                          |      36988 |
+|  grc | Ancient Greek                  |      36977 |
+|   uk | Ukrainian                      |      36851 |
+|   lv | Latvian                        |      36333 |
+|   he | Hebrew                         |      33435 |
+|   mk | Macedonian                     |      33370 |
+|   ka | Georgian                       |      32338 |
+|   hy | Armenian                       |      29844 |
+|   sk | Slovak                         |      29376 |
+|   lt | Lithuanian                     |      28826 |
+|  ast | Asturian                       |      28401 |
+|   mg | Malagasy                       |      26865 |
+|   et | Estonian                       |      26525 |
+|   oc | Occitan                        |      26095 |
+|  fil | Filipino                       |      25088 |
+|   io | Ido                            |      25004 |
+|  hsb | Upper Sorbian                  |      24852 |
+|   hi | Hindi                          |      23538 |
+|   te | Telugu                         |      22173 |
+|   be | Belarusian                     |      22117 |
+|  fro | Old French                     |      21249 |
+|   sq | Albanian                       |      20493 |
+|  mul | (Multilingual, such as emoji)  |      19376 |
+|   cy | Welsh                          |      18721 |
+|  xcl | Classical Armenian             |      18420 |
+|   az | Azerbaijani                    |      17184 |
+|   kk | Kazakh                         |      16979 |
+|   gd | Scottish Gaelic                |      16827 |
+|   af | Afrikaans                      |      16132 |
+|   fo | Faroese                        |      15973 |
+|  ang | Old English                    |      15700 |
+|   ku | Kurdish                        |      13804 |
+|   vo | Volapük                        |      12731 |
+|   ta | Tamil                          |      12690 |
+|   ur | Urdu                           |      12006 |
+|   sw | Swahili                        |      11150 |
+|   sa | Sanskrit                       |      11081 |
+|  nrf | Norman French                  |      10048 |
+|  non | Old Norse                      |       8536 |
+|   gv | Manx                           |       8425 |
+|   nv | Navajo                         |       8232 |
+|  rup | Aromanian                      |       5107 |
+
 
 ## Image credit
 
