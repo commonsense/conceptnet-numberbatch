@@ -16,7 +16,7 @@ this code, you may just want to download them directly: see "Downloading the
 term vectors" below.
 
 The code and paper were created as a research project of [Luminoso
-Technologies, Inc.][luminoso], by Rob Speer and Joshua Chin.
+Technologies, Inc.][luminoso], by Robyn Speer and Joshua Chin.
 
 
 ## License and attribution
@@ -38,13 +38,13 @@ Some suggested text:
 If you build on this data, you should cite it. We recommend citing the
 arXiV preprint for now:
 
-> Robert Speer and Joshua Chin. "An Ensemble Method to Produce High-Quality Word Embeddings." arXiv preprint arXiv:1604.01692 (2016).
+> Robyn Speer and Joshua Chin. "An Ensemble Method to Produce High-Quality Word Embeddings." arXiv preprint arXiv:1604.01692 (2016).
 
 In BibTeX form, the citation is:
 
     @article{speer2016ensemble,
       title={An Ensemble Method to Produce High-Quality Word Embeddings},
-      author={Speer, Robert and Chin, Joshua},
+      author={Speer, Robyn and Chin, Joshua},
       journal={arXiv preprint arXiv:1604.01692},
       year={2016}
     }
@@ -54,7 +54,7 @@ This data is itself built on:
 
   - [ConceptNet 5.4][conceptnet], which contains data from Wiktionary,
     WordNet, and many contributors to Open Mind Common Sense projects,
-    edited by Rob Speer
+    edited by Robyn Speer
 
   - [GloVe][glove], by Jeffrey Pennington, Richard Socher, and Christopher
     Manning
@@ -104,57 +104,8 @@ ConceptNet 5.5 will handle stemming differently and require a new version of Num
 so make sure to get version 5.4.2 when reproducing this paper.
 
 
-## Installing the code
+## Building
 
-If you want to be able to run the code included here, to reproduce the results
-or build a similar set of term vectors:
-
-- Install base dependencies such as Python 3, NumPy, and SciPy.
-
-- Install [git-annex](http://git-annex.branchable.com) and
-  [ninja](http://ninja-build.org).
-
-- Set up the Python package:
-
-```sh
-cd code
-python setup.py develop
-```
-
-Next you'll need to set up git-annex so you can get the large data files and
-track them when they change:
-
-- Read the git-annex walkthrough at
-  https://git-annex.branchable.com/walkthrough/.  git-annex is very useful but
-  you don't want to do anything to your files behind its back. If you find that
-  git-annex has prevented you from modifying a file, don't override it. It is
-  probably stopping you from doing something dumb.
-
-- Get the files (this should default to downloading them over the web):
-
-```sh
-git annex get
-```
-
-Finally, start the build process that will create and evaluate the various
-spaces of term embeddings that are described in the paper:
-
-```sh
-cd ..                # this should return you to the `code/` directory
-python ninja.py      # generate the build script
-ninja                # run the build
-```
-
-The code itself is distributed under the MIT license; see MIT-LICENSE.
-
-
-### Requirements for building
-
-- A POSIX-compatible system with utilities such as `grep` and `cut`
-- **System dependencies**: git-annex, ninja-build, Python 3.3 or later
-- **Python dependencies**: numpy, scipy, pandas, ftfy, scikit-learn, wordfreq,
-  and ordered-set. These will mostly be installed automatically via `setup.py`,
-  but large dependencies such as numpy and scipy may be easier to install
-  separately.
-- 32 GB of RAM
-
+Sadly, this version of the code is no longer reproducible unless you happen to have the input data.
+Because we chose at the time to rely on the unusable and unmaintainable `git-annex`, we don't.
+We recommend using [the updated build process that has been incorporated into ConceptNet](https://github.com/commonsense/conceptnet5/wiki/Build-process).
