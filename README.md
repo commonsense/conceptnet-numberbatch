@@ -1,6 +1,6 @@
-# conceptnet-numberbatch
+# conceptnet-numberbatch, outdated version from September 2016
 
-The main location of this repository is on GitHub, which may contain updates:
+The main location of this repository is on GitHub, which contains updates to more recent versions:
 
   http://github.com/LuminosoInsight/conceptnet-numberbatch
 
@@ -17,7 +17,7 @@ as a starting point for further machine learning.
 
 Here is [a paper we wrote about the previous version](https://arxiv.org/pdf/1604.01692v1.pdf) in early 2016.
 
-The code and paper were created as a research project of [Luminoso Technologies, Inc.][luminoso], by Rob Speer and Joshua Chin.
+The code and paper were created as a research project of [Luminoso Technologies, Inc.][luminoso], by Robyn Speer and Joshua Chin.
 
 
 ## License and attribution
@@ -39,13 +39,13 @@ Some suggested text:
 If you build on this data, you should cite it. We recommend citing the
 arXiV preprint for now:
 
-> Robert Speer and Joshua Chin. "An Ensemble Method to Produce High-Quality Word Embeddings." arXiv preprint arXiv:1604.01692 (2016).
+> Robyn Speer and Joshua Chin. "An Ensemble Method to Produce High-Quality Word Embeddings." arXiv preprint arXiv:1604.01692 (2016).
 
 In BibTeX form, the citation is:
 
     @article{speer2016ensemble,
       title={An Ensemble Method to Produce High-Quality Word Embeddings},
-      author={Speer, Robert and Chin, Joshua},
+      author={Speer, Robyn and Chin, Joshua},
       journal={arXiv preprint arXiv:1604.01692},
       year={2016}
     }
@@ -55,7 +55,7 @@ This data is itself built on:
 
   - [ConceptNet 5.5][conceptnet], which contains data from Wiktionary,
     WordNet, and many contributors to Open Mind Common Sense projects,
-    edited by Rob Speer
+    edited by Robyn Speer
 
   - [GloVe][glove], by Jeffrey Pennington, Richard Socher, and Christopher
     Manning
@@ -116,3 +116,7 @@ terms up in ConceptNet.
 
 We have included here the code necessary to convert text into ConceptNet URIs,
 in `text_to_uri.py`.
+
+## Building
+
+The raw data for this version doesn't exist anymore, and therefore it cannot be built. You can proceed to the ConceptNet wiki for instructions on [how to build the current version](https://github.com/commonsense/conceptnet5/wiki/Build-process).
