@@ -71,12 +71,6 @@ demographic discrimination.
 Since 2016, the code for building ConceptNet Numberbatch is part of the [ConceptNet
 code base][conceptnet5], in the `conceptnet5.vectors` package.
 
-A preliminary paper we put on arXiV in April 2016 described the ConceptNet
-Vector Ensemble, a previous version of this system. The code for that version
-is still available in the `16.04` branch:
-
-  https://github.com/commonsense/conceptnet-numberbatch/tree/16.04
-
 The only code contained in _this_ repository is `text_to_uri.py`, which
 normalizes natural-language text into the ConceptNet URI representation,
 allowing you to look up rows in these tables without requiring the entire
@@ -309,6 +303,15 @@ These vocabulary sizes were updated for ConceptNet Numberbatch 19.08.
 |   gv | Manx                           |       8425 |
 |   nv | Navajo                         |       8232 |
 |  rup | Aromanian                      |       5107 |
+
+
+## Referred here from an old version?
+
+An unpublished paper of ours described the "ConceptNet Vector Ensemble", and refers to
+a repository that now redirects here, and an attached store of data that is no
+longer hosted. We apologize, but we're not supporting the unpublished paper.
+Please use a newer version and use the currently supported
+[ConceptNet build process](https://github.com/commonsense/conceptnet5/wiki/Build-process)
 
 
 ## Image credit
