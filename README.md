@@ -311,7 +311,7 @@ An unpublished paper of ours described the "ConceptNet Vector Ensemble", and ref
 a repository that now redirects here, and an attached store of data that is no
 longer hosted. We apologize, but we're not supporting the unpublished paper.
 Please use a newer version and use the currently supported
-[ConceptNet build process](https://github.com/commonsense/conceptnet5/wiki/Build-process)
+[ConceptNet build process](https://github.com/commonsense/conceptnet5/wiki/Build-process).
 
 
 ## Image credit
