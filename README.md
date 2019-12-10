@@ -1,4 +1,11 @@
-# conceptnet-numberbatch
+# conceptnet-numberbatch, outdated version from April 2016
+
+The main location of this repository is on GitHub, which contains more recent versions
+than the one you're looking at:
+
+  http://github.com/LuminosoInsight/conceptnet-numberbatch
+
+## Documentation preserved for historical purposes
 
 This repository describes and implements an ensemble method that combines
 ConceptNet, word2vec, GloVe, and PPDB using a variation on retrofitting.
