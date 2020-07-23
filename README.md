@@ -104,7 +104,7 @@ This table lists the downloads and formats available for multiple recent version
 
 | Version  | Multilingual                            | English-only                              | HDF5                         |
 | -------- | --------------------------------------- | ----------------------------------------- | ---------------------------- |
-| **19.08**| [numberbatch-19.08.txt.gz][nb1908-main] | [numberbatch-en-19.08.txt.gz][nb1908-en]  |                              |
+| **19.08**| [numberbatch-19.08.txt.gz][nb1908-main] | [numberbatch-en-19.08.txt.gz][nb1908-en]  | [19.08/mini.h5][nb1908-mini] |
 | 17.06    | [numberbatch-17.06.txt.gz][nb1706-main] | [numberbatch-en-17.06.txt.gz][nb1706-en]  | [17.06/mini.h5][nb1706-mini] |
 | 17.04    | [numberbatch-17.04.txt.gz][nb1704-main] | [numberbatch-en-17.04b.txt.gz][nb1704-en] | [17.05/mini.h5][nb1704-mini] |
 | 17.02    | [numberbatch-17.02.txt.gz][nb1704-main] | [numberbatch-en-17.02.txt.gz][nb1702-en]  |                              |
@@ -115,6 +115,7 @@ See the instructions on the [ConceptNet wiki](https://github.com/commonsense/con
 
 [nb1908-main]: https://conceptnet.s3.amazonaws.com/downloads/2019/numberbatch/numberbatch-19.08.txt.gz
 [nb1908-en]: https://conceptnet.s3.amazonaws.com/downloads/2019/numberbatch/numberbatch-en-19.08.txt.gz
+[nb1908-mini]: http://conceptnet.s3.amazonaws.com/precomputed-data/2016/numberbatch/19.08/mini.h5
 
 [nb1706-main]: https://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-17.06.txt.gz
 [nb1706-en]: https://conceptnet.s3.amazonaws.com/downloads/2017/numberbatch/numberbatch-en-17.06.txt.gz
